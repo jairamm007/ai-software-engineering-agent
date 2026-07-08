@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Repository {
+  id        String   @id @default(cuid())
+  name      String
+  githubUrl String   @unique
+  localPath String
+  createdAt DateTime @default(now())
+
+  files RepositoryFile[]
+}
+
+model RepositoryFile {
+  id           String   @id @default(cuid())
+  repositoryId String
+  path         String
+  extension    String
+  size         Int
+
+  repository Repository @relation(fields: [repositoryId], references: [id])
+
+  chunks CodeChunk[]
+}
+
+model CodeChunk {
+  id        String @id @default(cuid())
+  fileId    String
+
+  content   String
+
+  startLine Int
+  endLine   Int
+
+  file RepositoryFile @relation(fields: [fileId], references: [id])
+}
