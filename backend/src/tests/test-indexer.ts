@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import { indexRepository } from "./indexer/repository.indexer.js";
+import { indexRepository } from "../indexer/repository.indexer.js";
 
 async function main() {
   const result = await indexRepository(

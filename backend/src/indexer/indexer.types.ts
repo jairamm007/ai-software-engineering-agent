@@ -1,22 +1,15 @@
-export interface IndexedChunk {
-  content: string;
-  embedding: number[];
-
-  startLine: number;
-  endLine: number;
-}
+import { CodeChunk } from "../rag/rag.types.js";
 
 export interface IndexedFile {
   path: string;
   extension: string;
   size: number;
-  chunks: IndexedChunk[];
+  chunks: CodeChunk[];
 }
 
 export interface RepositoryIndexResult {
   totalFiles: number;
   totalChunks: number;
-  totalEmbeddings: number;
 
   files: IndexedFile[];
 }

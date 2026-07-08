@@ -24,6 +24,21 @@ export const createRepository = async (
   });
 };
 
+export const getRepositories = async () => {
+  return prisma.repository.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      files: {
+        include: {
+          chunks: true,
+        },
+      },
+    },
+  });
+};
+
 export const getRepositoryByGithubUrl = async (
   githubUrl: string
 ) => {
@@ -41,5 +56,65 @@ export const getRepositoryById = async (
     where: {
       id,
     },
+    include: {
+      files: {
+        include: {
+          chunks: true,
+        },
+      },
+    },
+  });
+};
+
+export const repositoryExists = async (
+  githubUrl: string
+) => {
+  const repository = await prisma.repository.findUnique({
+    where: {
+      githubUrl,
+    },
+  });
+
+  return repository !== null;
+};
+
+export const deleteRepository = async (
+  repositoryId: string
+) => {
+  await prisma.$transaction(async (tx) => {
+    // Delete embeddings first
+    await tx.$executeRaw`
+      DELETE FROM code_embeddings
+      WHERE chunk_id IN (
+        SELECT cc.id
+        FROM "CodeChunk" cc
+        JOIN "RepositoryFile" rf
+          ON cc."fileId" = rf.id
+        WHERE rf."repositoryId" = ${repositoryId}
+      )
+    `;
+
+    // Delete chunks
+    await tx.codeChunk.deleteMany({
+      where: {
+        file: {
+          repositoryId,
+        },
+      },
+    });
+
+    // Delete files
+    await tx.repositoryFile.deleteMany({
+      where: {
+        repositoryId,
+      },
+    });
+
+    // Delete repository
+    await tx.repository.delete({
+      where: {
+        id: repositoryId,
+      },
+    });
   });
 };

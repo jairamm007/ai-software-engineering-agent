@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { generateEmbedding } from "./embeddings/embedding.service.js";
+import { generateEmbedding } from "../embeddings/embedding.service.js";
 
 async function main() {
   const embedding = await generateEmbedding(

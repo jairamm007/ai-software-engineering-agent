@@ -1,8 +1,16 @@
 import { Request, Response } from "express";
+
 import { parseGitHubUrl } from "../github/github.service.js";
-import { cloneRepository } from "../github/github.clone.js";
 import { githubParseSchema } from "../validators/github.validator.js";
-import { scanRepository } from "../repository/repository.scanner.js";
+
+import { indexGitHubRepository } from "../services/repository-index.service.js";
+
+import {
+  getRepositories,
+  getRepositoryById,
+  deleteRepository,
+} from "../repository/repository.repository.js";
+
 import {
   successResponse,
   errorResponse,
@@ -33,20 +41,15 @@ export const analyzeRepositoryController = async (
   }
 
   try {
-    const clonePath = await cloneRepository(
+    const indexResult = await indexGitHubRepository(
       repository.url,
       repository.repo
     );
 
-    const scanResult = scanRepository(clonePath);
-
     res.status(200).json(
       successResponse(
-        {
-          repository,
-          scanResult,
-        },
-        "Repository analyzed successfully"
+        indexResult,
+        "Repository indexed successfully"
       )
     );
   } catch (error) {
@@ -54,7 +57,99 @@ export const analyzeRepositoryController = async (
       errorResponse(
         error instanceof Error
           ? error.message
-          : "Analysis failed"
+          : "Repository indexing failed"
+      )
+    );
+  }
+};
+
+export const getRepositoriesController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const repositories = await getRepositories();
+
+    res.status(200).json(
+      successResponse(
+        repositories,
+        "Repositories fetched successfully"
+      )
+    );
+  } catch (error) {
+    res.status(500).json(
+      errorResponse(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch repositories"
+      )
+    );
+  }
+};
+
+export const getRepositoryByIdController = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> => {
+  try {
+    const repository = await getRepositoryById(
+      req.params.id
+    );
+
+    if (!repository) {
+      res.status(404).json(
+        errorResponse("Repository not found")
+      );
+      return;
+    }
+
+    res.status(200).json(
+      successResponse(
+        repository,
+        "Repository fetched successfully"
+      )
+    );
+  } catch (error) {
+    res.status(500).json(
+      errorResponse(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch repository"
+      )
+    );
+  }
+};
+
+export const deleteRepositoryController = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> => {
+  try {
+    const repository = await getRepositoryById(
+      req.params.id
+    );
+
+    if (!repository) {
+      res.status(404).json(
+        errorResponse("Repository not found")
+      );
+      return;
+    }
+
+    await deleteRepository(req.params.id);
+
+    res.status(200).json(
+      successResponse(
+        null,
+        "Repository deleted successfully"
+      )
+    );
+  } catch (error) {
+    res.status(500).json(
+      errorResponse(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete repository"
       )
     );
   }

@@ -3,7 +3,7 @@ import "dotenv/config";
 import {
   createRepository,
   getRepositoryByGithubUrl,
-} from "./repository/repository.repository.js";
+} from "../repository/repository.repository.js";
 
 async function main() {
   const repository = await createRepository(

@@ -2,12 +2,12 @@ import "dotenv/config";
 
 import {
   getRepositoryByGithubUrl,
-} from "./repository/repository.repository.js";
+} from "../repository/repository.repository.js";
 
 import {
   createRepositoryFile,
   getRepositoryFiles,
-} from "./repository/repository-file.repository.js";
+} from "../repository/repository-file.repository.js";
 
 async function main() {
   const repository = await getRepositoryByGithubUrl(
