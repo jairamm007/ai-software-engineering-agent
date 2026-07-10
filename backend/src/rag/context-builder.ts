@@ -1,22 +1,15 @@
-type RetrievedChunk = {
-  repository: string;
-  filePath: string;
-  startLine: number;
-  endLine: number;
-  content: string;
-  distance: number;
-};
+import { RetrievedChunk } from "../vector/vector.repository.js";
 
 export const buildContext = (
   chunks: RetrievedChunk[]
 ): string => {
+  if (chunks.length === 0) {
+    return "No relevant repository context found.";
+  }
+
   return chunks
     .map(
-      (chunk, index) => `
-==================================================
-
-Result ${index + 1}
-
+      (chunk) => `
 Repository:
 ${chunk.repository}
 
@@ -26,13 +19,11 @@ ${chunk.filePath}
 Lines:
 ${chunk.startLine}-${chunk.endLine}
 
-Similarity:
-${chunk.distance.toFixed(4)}
-
-Content:
-
+Code:
 ${chunk.content}
 `
     )
-    .join("\n");
+    .join(
+      "\n----------------------------------------\n"
+    );
 };

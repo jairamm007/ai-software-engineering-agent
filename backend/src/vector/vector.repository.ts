@@ -1,5 +1,14 @@
 import { prisma } from "../database/prisma.js";
 
+export interface RetrievedChunk {
+  repository: string;
+  filePath: string;
+  startLine: number;
+  endLine: number;
+  content: string;
+  distance: number;
+}
+
 export const insertEmbedding = async (
   chunkId: string,
   embedding: number[]
@@ -16,19 +25,12 @@ export const insertEmbedding = async (
 
 export const searchNearestChunks = async (
   embedding: number[],
-  limit = 5
-) => {
+  limit = 10
+): Promise<RetrievedChunk[]> => {
   const vector = `[${embedding.join(",")}]`;
 
-  return prisma.$queryRaw<
-    {
-      repository: string;
-      filePath: string;
-      startLine: number;
-      endLine: number;
-      content: string;
-      distance: number;
-    }[]
+  const results = await prisma.$queryRaw<
+    RetrievedChunk[]
   >`
     SELECT
       r.name AS "repository",
@@ -47,4 +49,8 @@ export const searchNearestChunks = async (
     ORDER BY ce.embedding <=> ${vector}::vector
     LIMIT ${limit}
   `;
+
+  return results
+    .filter((chunk) => chunk.distance < 0.65)
+    .sort((a, b) => a.distance - b.distance);
 };
