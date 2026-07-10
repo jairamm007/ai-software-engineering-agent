@@ -12,6 +12,9 @@ const ai = new GoogleGenAI({
 export class GeminiProvider
   implements EmbeddingProvider, LLMProvider
 {
+  // Added for multi-provider support
+  readonly name = "Gemini";
+
   async generateEmbedding(
     text: string
   ): Promise<number[]> {

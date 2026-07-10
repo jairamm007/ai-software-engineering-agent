@@ -4,4 +4,5 @@ export interface EmbeddingProvider {
 
 export interface LLMProvider {
   generateText(prompt: string): Promise<string>;
+  readonly name: string;
 }

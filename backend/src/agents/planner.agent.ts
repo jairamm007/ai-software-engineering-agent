@@ -1,44 +1,34 @@
+export type PlannerTask =
+  | "answer"
+  | "review"
+  | "architecture";
+
 export interface PlanResult {
   question: string;
-  task:
-    | "explain"
-    | "bug"
-    | "review"
-    | "documentation"
-    | "general";
-
+  task: PlannerTask;
   needsRepositorySearch: boolean;
 }
 
 export const plannerAgent = async (
   question: string
 ): Promise<PlanResult> => {
-  const q = question.toLowerCase();
+  const lower = question.toLowerCase();
 
-  let task: PlanResult["task"] = "general";
+  let task: PlannerTask = "answer";
 
   if (
-    q.includes("review") ||
-    q.includes("code review") ||
-    q.includes("quality")
+    lower.includes("review") ||
+    lower.includes("bug") ||
+    lower.includes("security")
   ) {
     task = "review";
   } else if (
-    q.includes("bug") ||
-    q.includes("error")
+    lower.includes("architecture") ||
+    lower.includes("folder") ||
+    lower.includes("structure") ||
+    lower.includes("flow")
   ) {
-    task = "bug";
-  } else if (
-    q.includes("documentation") ||
-    q.includes("readme")
-  ) {
-    task = "documentation";
-  } else if (
-    q.includes("explain") ||
-    q.includes("what") ||
-    q.includes("how")
-  ) {
-    task = "explain";
+    task = "architecture";
   }
 
   return {

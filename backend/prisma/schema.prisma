@@ -39,3 +39,21 @@ model CodeChunk {
 
   file RepositoryFile @relation(fields: [fileId], references: [id])
 }
+
+model CodeSymbol {
+  id        String @id @default(cuid())
+
+  fileId    String
+
+  name      String
+
+  kind      String
+
+  exported  Boolean
+
+  file RepositoryFile @relation(fields: [fileId], references: [id])
+
+  @@index([name])
+
+  @@index([kind])
+}
