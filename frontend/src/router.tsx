@@ -8,6 +8,8 @@ from "@/pages/Dashboard/DashboardPage";
 import RepositoryPage
 from "@/pages/Repository/RepositoryPage";
 
+import RepositoryDetailsPage from "@/pages/Repository/RepositoryDetailsPage";
+
 export const router =
   createBrowserRouter([
     {
@@ -23,5 +25,9 @@ export const router =
 
       element:
         <RepositoryPage />,
+    },
+    {
+      path: "/repositories/:id",
+      element: <RepositoryDetailsPage />,
     },
   ]);

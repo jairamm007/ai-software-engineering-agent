@@ -10,21 +10,10 @@ export default function DashboardLayout({
   children,
 }: Props) {
   return (
-    <div
-      style={{
-        display: "flex",
-      }}
-    >
+    <div className="flex min-h-screen bg-slate-100">
       <Sidebar />
 
-      <main
-        style={{
-          flex: 1,
-          padding: 40,
-          background: "#f8fafc",
-          minHeight: "100vh",
-        }}
-      >
+      <main className="flex-1 overflow-auto p-8">
         {children}
       </main>
     </div>
