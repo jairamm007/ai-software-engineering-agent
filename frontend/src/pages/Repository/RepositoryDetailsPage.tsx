@@ -10,16 +10,17 @@ import { Trash2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
-import IDEWorkspaceLayout from "@/layouts/IDEWorkspaceLayout";
+import RepositoryWorkspaceLayout from "@/layouts/RepositoryWorkspaceLayout";
 
 import BackButton from "@/components/common/BackButton";
 import RepositoryTabs from "@/components/repository/RepositoryTabs";
 import FileExplorer from "@/components/repository/FileExplorer";
 import FileViewer from "@/components/repository/FileViewer";
+import AIActionPanel from "@/components/repository/AIActionPanel";
+import AIResult from "@/components/repository/AIResult";
 import RepositoryAnalytics from "@/components/repository/RepositoryAnalytics";
-import AIAssistantPanel from "@/components/assistant/AIAssistantPanel";
-import BottomPanel from "@/components/workspace/BottomPanel";
-import DependencyGraph from "@/components/repository/DependencyGraph";
+import RepositoryOverview from "@/components/repository/RepositoryOverview";
+import CommandPalette, { type CommandAction } from "@/components/assistant/CommandPalette";
 
 import { askRepository } from "@/services/chat";
 import { deleteRepository, getRepository } from "@/services/repository";
@@ -36,10 +37,11 @@ export default function RepositoryDetailsPage() {
   const [conversation, setConversation] = useState<AIMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [cache, setCache] = useState<Record<string, string>>({});
-  const [pullRequest, setPullRequest] = useState<string | null>(null);
-  const [tests, setTests] = useState<string | null>(null);
-  const [securityReport, setSecurityReport] = useState<string | null>(null);
+  const [, setPullRequest] = useState<string | null>(null);
+  const [, setTests] = useState<string | null>(null);
+  const [, setSecurityReport] = useState<string | null>(null);
   const [selectedCode, setSelectedCode] = useState("");
+  const [openCommandPalette, setOpenCommandPalette] = useState(false);
 
   const {
     data,
@@ -333,10 +335,29 @@ export default function RepositoryDetailsPage() {
     await runAiAction(`${action} only this selected code from ${selectedFile.path}:\n\n${selectedCode}`, `${selectedFile.path}-${action}-${selectedCode}`, `Failed to ${action.toLowerCase()} the selection.`);
   };
 
+  const runCommand = (action: CommandAction) => {
+    const actions: Record<CommandAction, () => Promise<void>> = {
+      explain: explainFile,
+      review: reviewFile,
+      fix: suggestFix,
+      security: securityScan,
+      tests: generateTests,
+      commit: generateCommit,
+      pr: generatePullRequest,
+      docs: docsFile,
+    };
+
+    void actions[action]();
+  };
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setOpenCommandPalette(true);
+      }
+      if (event.key === "Escape") setOpenCommandPalette(false);
       if (!event.ctrlKey) return;
-      if (event.key.toLowerCase() === "k") { event.preventDefault(); window.alert("AI Command Palette: use the assistant actions in the right panel."); }
       if (event.key === "/") { event.preventDefault(); void runSelectionAction("Explain"); }
       if (event.shiftKey && event.key.toLowerCase() === "r") { event.preventDefault(); void reviewFile(); }
       if (event.shiftKey && event.key.toLowerCase() === "t") { event.preventDefault(); void generateTests(); }
@@ -388,9 +409,13 @@ export default function RepositoryDetailsPage() {
     );
   }
 
+  const latestAssistantMessage = [...conversation]
+    .reverse()
+    .find((message) => message.role === "assistant");
+
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-4">
         <BackButton />
 
         <div className="mb-8 flex items-start justify-between">
@@ -418,7 +443,7 @@ export default function RepositoryDetailsPage() {
           repositoryId={data.id}
         />
 
-        <IDEWorkspaceLayout
+        <RepositoryWorkspaceLayout
           sidebar={
             <FileExplorer
               files={data.files}
@@ -426,21 +451,45 @@ export default function RepositoryDetailsPage() {
               onSelect={setSelectedFile}
             />
           }
-          editor={
-            <div className="relative h-full min-h-0 p-3">
-              {selectedCode && <div className="absolute right-6 top-5 z-10 flex gap-1 rounded-lg border bg-white p-1 shadow-lg">{["Explain", "Review", "Fix", "Tests", "Security"].map((action) => <button key={action} onClick={() => void runSelectionAction(action)} className="rounded px-2 py-1 text-xs hover:bg-slate-100">{action}</button>)}</div>}
-            <FileViewer
-              filePath={selectedFile?.path}
-              content={selectedFile?.chunks
-                .map((chunk) => chunk.content)
-                .join("\n\n")}
-              onSelectionChange={setSelectedCode}
-            />
-            </div>
+          content={
+            <>
+              <AIActionPanel
+                loading={loading}
+                onExplain={explainFile}
+                onReview={reviewFile}
+                onFix={suggestFix}
+                onGenerateCommit={generateCommit}
+                onGeneratePullRequest={generatePullRequest}
+                onGenerateTests={generateTests}
+                onSecurityScan={securityScan}
+                onArchitecture={architectureFile}
+                onDocs={docsFile}
+              />
+              <AIResult
+                title="AI Output"
+                content={latestAssistantMessage?.content ?? ""}
+              />
+              <RepositoryOverview repository={data} />
+              <RepositoryAnalytics repositoryId={data.id} />
+              <div className="relative">
+                {selectedCode && <div className="absolute right-3 top-3 z-10 flex gap-1 rounded-lg border bg-white p-1 shadow-lg">{["Explain", "Review", "Fix", "Tests", "Security"].map((action) => <button key={action} onClick={() => void runSelectionAction(action)} className="rounded px-2 py-1 text-xs hover:bg-slate-100">{action}</button>)}</div>}
+                <FileViewer
+                  filePath={selectedFile?.path}
+                  content={selectedFile?.chunks
+                    .map((chunk) => chunk.content)
+                    .join("\n\n")}
+                  onSelectionChange={setSelectedCode}
+                />
+              </div>
+            </>
           }
-          assistant={<AIAssistantPanel loading={loading} messages={conversation} onExplain={explainFile} onReview={reviewFile} onFix={suggestFix} onGenerateCommit={generateCommit} onGeneratePullRequest={generatePullRequest} onGenerateTests={generateTests} onSecurityScan={securityScan} onArchitecture={architectureFile} onDocs={docsFile} />}
-          bottomPanel={<BottomPanel graph={<DependencyGraph repositoryId={data.id} />} analytics={<RepositoryAnalytics repositoryId={data.id} />} logs={[pullRequest && "Generated pull request", tests && "Generated tests", securityReport && "Completed security scan"].filter((item): item is string => Boolean(item))} />}
         />
+        {openCommandPalette && (
+          <CommandPalette
+            onClose={() => setOpenCommandPalette(false)}
+            onSelect={runCommand}
+          />
+        )}
       </div>
     </DashboardLayout>
   );

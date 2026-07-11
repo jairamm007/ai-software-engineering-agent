@@ -32,9 +32,9 @@ export default function FileExplorer({
   const tree = buildFileTree(filteredFiles);
 
   return (
-    <div className="rounded-xl border bg-white shadow-sm">
-      <div className="border-b p-4">
-        <h2 className="text-xl font-semibold">
+    <aside className="flex max-h-[calc(100vh-14rem)] min-h-0 flex-col overflow-hidden rounded-xl border border-slate-300 bg-white text-slate-800 shadow-sm">
+      <div className="border-b border-slate-200 px-4 py-3">
+        <h2 className="font-semibold text-slate-900">
           📁 Repository Files
         </h2>
 
@@ -43,7 +43,7 @@ export default function FileExplorer({
         </p>
       </div>
 
-      <div className="border-b p-3">
+      <div className="border-b border-slate-200 p-3">
         <input
           type="text"
           placeholder="🔍 Search files..."
@@ -53,7 +53,7 @@ export default function FileExplorer({
         />
       </div>
 
-      <div className="max-h-[650px] overflow-y-auto p-3">
+      <div className="min-h-0 overflow-y-auto p-3">
         {tree.length === 0 ? (
           <div className="py-8 text-center text-slate-500">
             No files found.
@@ -71,6 +71,6 @@ export default function FileExplorer({
           </div>
         )}
       </div>
-    </div>
+    </aside>
   );
 }

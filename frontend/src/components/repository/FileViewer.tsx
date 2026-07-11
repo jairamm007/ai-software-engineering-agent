@@ -66,13 +66,13 @@ export default function FileViewer({
   })();
 
   return (
-    <div className="rounded-xl border bg-white shadow-sm">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-none border-0 bg-white dark:bg-slate-900">
 
-      <div className="flex items-center justify-between border-b px-6 py-4">
+      <div className="flex items-center justify-between border-b border-slate-200 p-3 dark:border-slate-700">
 
         <div>
 
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
             📄 {displayName ?? "Select a file"}
           </h2>
 
@@ -84,7 +84,7 @@ export default function FileViewer({
 
       </div>
 
-      <div className="max-h-[650px] overflow-auto" onMouseUp={() => onSelectionChange?.(window.getSelection()?.toString().trim() ?? "")}>
+      <div className="min-h-0 flex-1 overflow-auto" onMouseUp={() => onSelectionChange?.(window.getSelection()?.toString().trim() ?? "")}>
 
         <SyntaxHighlighter
           language={language}
@@ -92,8 +92,10 @@ export default function FileViewer({
           showLineNumbers
           wrapLongLines
           customStyle={{
-            maxHeight: "650px",
-            borderRadius: "12px",
+            height: "100%",
+            minHeight: "100%",
+            maxHeight: "none",
+            borderRadius: 0,
             margin: 0,
             fontSize: "14px",
           }}

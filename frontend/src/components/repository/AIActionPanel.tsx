@@ -25,13 +25,13 @@ export default function AIActionPanel({
   onDocs,
 }: Props) {
   const buttonClass =
-    "rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-slate-100";
+    "rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-100 transition hover:border-blue-400 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400";
   const disabledClass = loading
     ? "cursor-not-allowed opacity-50"
     : "";
 
   return (
-    <div className="flex flex-wrap gap-3 rounded-xl border bg-white p-4 shadow-sm">
+    <div className="flex flex-wrap gap-2 rounded-xl border border-slate-800 bg-slate-950 p-3 shadow-sm">
       <button
         disabled={loading}
         className={`${buttonClass} ${disabledClass}`}

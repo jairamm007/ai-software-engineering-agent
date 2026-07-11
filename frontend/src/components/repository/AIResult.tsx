@@ -67,7 +67,7 @@ export default function AIResult({
 
       </div>
 
-      <div className="max-h-[500px] overflow-y-auto p-6">
+      <div className={content ? "max-h-[500px] overflow-y-auto p-6" : "flex h-28 items-center justify-center p-4"}>
 
         {content ? (
 
@@ -110,7 +110,7 @@ export default function AIResult({
               🤖 AI Assistant
             </p>
 
-            <p className="mt-3">
+            <p className="mt-1 text-sm">
               Select a file and click one of the AI actions.
             </p>
 
