@@ -1,3 +1,5 @@
+import MarkdownMessage from "./MarkdownMessage";
+
 interface Props {
   role: "user" | "assistant";
   message: string;
@@ -9,20 +11,20 @@ export default function ChatMessage({
 }: Props) {
   return (
     <div
-      className={`mb-4 flex ${
+      className={`mb-5 flex ${
         role === "user"
           ? "justify-end"
           : "justify-start"
       }`}
     >
       <div
-        className={`max-w-3xl rounded-xl px-4 py-3 ${
+        className={`max-w-4xl rounded-xl px-5 py-4 shadow ${
           role === "user"
             ? "bg-blue-600 text-white"
-            : "bg-white border"
+            : "border bg-white"
         }`}
       >
-        {message}
+        <MarkdownMessage content={message} />
       </div>
     </div>
   );
