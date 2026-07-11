@@ -29,6 +29,10 @@ const tabs = [
     label: "Documentation",
     path: "documentation",
   },
+  {
+    label: "Dependency Graph",
+    path: "dependency-graph",
+  },
 ];
 
 export default function RepositoryTabs({

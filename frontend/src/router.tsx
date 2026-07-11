@@ -11,6 +11,7 @@ import RepositoryFilesPage from "@/pages/Repository/Files/RepositoryFilesPage";
 import RepositoryReviewPage from "@/pages/Repository/Review/RepositoryReviewPage";
 import RepositoryArchitecturePage from "@/pages/Repository/Architecture/RepositoryArchitecturePage";
 import RepositoryDocumentationPage from "@/pages/Repository/Documentation/RepositoryDocumentationPage";
+import DependencyGraphPage from "@/pages/Repository/DependencyGraph/DependencyGraphPage";
 
 export const router = createBrowserRouter([
   {
@@ -56,5 +57,10 @@ export const router = createBrowserRouter([
   {
     path: "/repositories/:id/documentation",
     element: <RepositoryDocumentationPage />,
+  },
+
+  {
+    path: "/repositories/:id/dependency-graph",
+    element: <DependencyGraphPage />,
   },
 ]);

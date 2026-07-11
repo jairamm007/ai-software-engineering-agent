@@ -68,6 +68,23 @@ export const askRepository = async ({
     };
   }
 
+  if (result.commitResult) {
+    const firstChunk = result.chunks?.[0];
+
+    return {
+      type: "commit",
+      answer: result.commitResult,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
+
   if (result.architecture) {
     const firstChunk = result.chunks?.[0];
 
@@ -91,6 +108,57 @@ export const askRepository = async ({
     return {
       type: "documentation",
       answer: result.documentation,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
+
+  if (result.pullRequest) {
+    const firstChunk = result.chunks?.[0];
+
+    return {
+      type: "pullRequest",
+      answer: result.pullRequest,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
+
+  if (result.testResult) {
+    const firstChunk = result.chunks?.[0];
+
+    return {
+      type: "test",
+      answer: result.testResult,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
+
+  if (result.securityResult) {
+    const firstChunk = result.chunks?.[0];
+
+    return {
+      type: "security",
+      answer: result.securityResult,
       source: firstChunk
         ? {
             filePath: firstChunk.filePath,

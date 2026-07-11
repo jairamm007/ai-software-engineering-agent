@@ -2,11 +2,14 @@ export type PlannerTask =
   | "answer"
   | "review"
   | "fix"
+  | "commit"
   | "architecture"
   | "documentation"
+  | "pullRequest"
   | "explain"
   | "refactor"
-  | "tests";
+  | "test"
+  | "security";
 
 export interface PlanResult {
   question: string;
@@ -30,6 +33,22 @@ export const plannerAgent = async (
   let task: PlannerTask = "answer";
 
   if (
+    lower.includes("pull request") ||
+    /\bpr\b/.test(lower) ||
+    lower.includes("merge request") ||
+    lower.includes("github pr")
+  ) {
+    task = "pullRequest";
+  }
+
+  else if (
+    lower.includes("commit") ||
+    lower.includes("git commit")
+  ) {
+    task = "commit";
+  }
+
+  else if (
     lower.includes("fix") ||
     lower.includes("improve") ||
     lower.includes("refactor") ||
@@ -40,9 +59,18 @@ export const plannerAgent = async (
   }
 
   else if (
+    lower.includes("security") ||
+    lower.includes("vulnerability") ||
+    lower.includes("scan") ||
+    lower.includes("owasp") ||
+    lower.includes("audit")
+  ) {
+    task = "security";
+  }
+
+  else if (
     lower.includes("review") ||
     lower.includes("bug") ||
-    lower.includes("security") ||
     lower.includes("performance")
   ) {
     task = "review";
@@ -74,10 +102,13 @@ export const plannerAgent = async (
   }
 
   else if (
-    lower.includes("test") ||
-    lower.includes("unit test")
+    lower.includes("unit test") ||
+    lower.includes("generate tests") ||
+    lower.includes("jest") ||
+    lower.includes("vitest") ||
+    /\btests?\b/.test(lower)
   ) {
-    task = "tests";
+    task = "test";
   }
 
   return {

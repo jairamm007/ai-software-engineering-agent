@@ -6,6 +6,7 @@ import {
   getRepositoryByIdController,
   deleteRepositoryController,
 } from "../controllers/repository.controller.js";
+import { getRepositoryAnalyticsController } from "../controllers/repository-analytics.controller.js";
 
 const router = Router();
 
@@ -13,6 +14,8 @@ const router = Router();
  * Repository Management
  */
 router.get("/", getRepositoriesController);
+
+router.get("/:id/analytics", getRepositoryAnalyticsController);
 
 router.get("/:id", getRepositoryByIdController);
 

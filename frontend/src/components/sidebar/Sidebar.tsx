@@ -1,10 +1,6 @@
 import {
   LayoutDashboard,
   FolderGit2,
-  MessageSquare,
-  GitBranch,
-  FileCode2,
-  BookOpen,
   Settings,
 } from "lucide-react";
 

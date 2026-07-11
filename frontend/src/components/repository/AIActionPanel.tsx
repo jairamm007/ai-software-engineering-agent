@@ -4,6 +4,10 @@ interface Props {
   onExplain: () => void;
   onReview: () => void;
   onFix: () => void;
+  onGenerateCommit: () => void;
+  onGeneratePullRequest: () => void;
+  onGenerateTests: () => void;
+  onSecurityScan: () => void;
   onArchitecture: () => void;
   onDocs: () => void;
 }
@@ -13,6 +17,10 @@ export default function AIActionPanel({
   onExplain,
   onReview,
   onFix,
+  onGenerateCommit,
+  onGeneratePullRequest,
+  onGenerateTests,
+  onSecurityScan,
   onArchitecture,
   onDocs,
 }: Props) {
@@ -46,6 +54,38 @@ export default function AIActionPanel({
         onClick={onFix}
       >
         ✨ Suggest Fix
+      </button>
+
+      <button
+        disabled={loading}
+        className={`${buttonClass} ${disabledClass}`}
+        onClick={onGenerateCommit}
+      >
+        📝 Generate Commit
+      </button>
+
+      <button
+        disabled={loading}
+        className={`${buttonClass} ${disabledClass}`}
+        onClick={onGeneratePullRequest}
+      >
+        🚀 Generate PR
+      </button>
+
+      <button
+        disabled={loading}
+        className={`${buttonClass} ${disabledClass}`}
+        onClick={onGenerateTests}
+      >
+        🧪 Generate Tests
+      </button>
+
+      <button
+        disabled={loading}
+        className={`${buttonClass} ${disabledClass}`}
+        onClick={onSecurityScan}
+      >
+        🛡️ Security Scan
       </button>
 
       <button

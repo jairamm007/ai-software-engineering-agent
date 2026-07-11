@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 
+import BackButton from "@/components/common/BackButton";
 import ChatWindow from "@/components/chat/ChatWindow";
 import ChatInput from "@/components/chat/ChatInput";
 
@@ -58,6 +59,8 @@ export default function RepositoryChatPage() {
 
   return (
     <DashboardLayout>
+      <BackButton />
+
       <h1 className="mb-6 text-3xl font-bold">
         AI Repository Chat
       </h1>

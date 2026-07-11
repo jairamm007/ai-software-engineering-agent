@@ -2,8 +2,12 @@ export type AgentType =
   | "answer"
   | "review"
   | "fix"
+  | "commit"
   | "architecture"
-  | "documentation";
+  | "documentation"
+  | "pullRequest"
+  | "test"
+  | "security";
 
 export interface AgentDefinition {
   name: AgentType;

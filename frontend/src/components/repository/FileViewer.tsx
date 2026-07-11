@@ -7,11 +7,13 @@ import {
 interface Props {
   filePath?: string;
   content?: string;
+  onSelectionChange?: (selection: string) => void;
 }
 
 export default function FileViewer({
   filePath,
   content,
+  onSelectionChange,
 }: Props) {
   const displayName = filePath
     ?.replace(/\\/g, "/")
@@ -82,7 +84,7 @@ export default function FileViewer({
 
       </div>
 
-      <div className="max-h-[650px] overflow-auto">
+      <div className="max-h-[650px] overflow-auto" onMouseUp={() => onSelectionChange?.(window.getSelection()?.toString().trim() ?? "")}>
 
         <SyntaxHighlighter
           language={language}
