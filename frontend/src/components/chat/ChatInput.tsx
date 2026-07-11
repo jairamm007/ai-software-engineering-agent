@@ -4,43 +4,45 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
 interface Props {
-  onSend: (
-    message: string
-  ) => void;
+  onSend: (message: string) => Promise<void>;
+  loading: boolean;
 }
 
 export default function ChatInput({
   onSend,
+  loading,
 }: Props) {
-  const [message, setMessage] =
-    useState("");
+  const [message, setMessage] = useState("");
 
-  const submit = () => {
-    if (!message.trim()) return;
+  const submit = async () => {
+    if (!message.trim() || loading) return;
 
-    onSend(message);
+    const text = message;
 
     setMessage("");
+
+    await onSend(text);
   };
 
   return (
     <div className="flex gap-3">
       <Input
         value={message}
+        disabled={loading}
         placeholder="Ask about this repository..."
-        onChange={(e) =>
-          setMessage(
-            e.target.value
-          )
-        }
+        onChange={(e) => setMessage(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter")
-            submit();
+          if (e.key === "Enter") {
+            void submit();
+          }
         }}
       />
 
-      <Button onClick={submit}>
-        Send
+      <Button
+        onClick={() => void submit()}
+        disabled={loading}
+      >
+        {loading ? "Thinking..." : "Send"}
       </Button>
     </div>
   );

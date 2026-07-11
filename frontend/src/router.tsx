@@ -1,33 +1,30 @@
-import {
-  createBrowserRouter,
-} from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
-import DashboardPage
-from "@/pages/Dashboard/DashboardPage";
+import DashboardPage from "@/pages/Dashboard/DashboardPage";
 
-import RepositoryPage
-from "@/pages/Repository/RepositoryPage";
-
+import RepositoryPage from "@/pages/Repository/RepositoryPage";
 import RepositoryDetailsPage from "@/pages/Repository/RepositoryDetailsPage";
 
-export const router =
-  createBrowserRouter([
-    {
-      path: "/",
+import RepositoryChatPage from "@/pages/Repository/Chat/RepositoryChatPage";
 
-      element:
-        <DashboardPage />,
-    },
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <DashboardPage />,
+  },
 
-    {
-      path:
-        "/repositories",
+  {
+    path: "/repositories",
+    element: <RepositoryPage />,
+  },
 
-      element:
-        <RepositoryPage />,
-    },
-    {
-      path: "/repositories/:id",
-      element: <RepositoryDetailsPage />,
-    },
-  ]);
+  {
+    path: "/repositories/:id",
+    element: <RepositoryDetailsPage />,
+  },
+
+  {
+    path: "/repositories/:id/chat",
+    element: <RepositoryChatPage />,
+  },
+]);
