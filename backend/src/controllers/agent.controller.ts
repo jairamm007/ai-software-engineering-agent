@@ -1,39 +1,32 @@
 import { Request, Response } from "express";
 
-import { askRepository } from "../services/rag.service.js";
+import { executeAgent } from "../services/agent.service.js";
 
 import {
   successResponse,
   errorResponse,
 } from "../utils/api-response.js";
 
-export const chatController = async (
+export const agentController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const {
-      question,
-      repositoryId,
-      filePath,
-    } = req.body;
+    const { question } = req.body;
 
     if (!question) {
-      return res
-        .status(400)
-        .json(errorResponse("Question is required"));
+      return res.status(400).json(
+        errorResponse("Question is required")
+      );
     }
 
-    const response = await askRepository({
-      question,
-      repositoryId,
-      filePath,
-    });
+    const result =
+      await executeAgent(question);
 
     return res.json(
       successResponse(
-        response,
-        "Answer generated successfully"
+        result,
+        "Agent executed successfully"
       )
     );
   } catch (error) {

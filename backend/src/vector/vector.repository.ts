@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 import { prisma } from "../database/prisma.js";
 
 export interface RetrievedChunk {
@@ -25,13 +27,32 @@ export const insertEmbedding = async (
 
 export const searchNearestChunks = async (
   embedding: number[],
-  limit = 10
+  limit = 10,
+  repositoryId?: string,
+  filePath?: string
 ): Promise<RetrievedChunk[]> => {
   const vector = `[${embedding.join(",")}]`;
 
-  const results = await prisma.$queryRaw<
-    RetrievedChunk[]
-  >`
+  const filters: Prisma.Sql[] = [];
+
+  if (repositoryId) {
+    filters.push(
+      Prisma.sql`rf."repositoryId" = ${repositoryId}`
+    );
+  }
+
+  if (filePath) {
+    filters.push(Prisma.sql`rf.path = ${filePath}`);
+  }
+
+  const whereClause = filters.length
+    ? Prisma.sql`WHERE ${Prisma.join(
+        filters,
+        " AND "
+      )}`
+    : Prisma.empty;
+
+  const results = await prisma.$queryRaw<RetrievedChunk[]>`
     SELECT
       r.name AS "repository",
       rf.path AS "filePath",
@@ -46,6 +67,7 @@ export const searchNearestChunks = async (
       ON cc."fileId" = rf.id
     JOIN "Repository" r
       ON rf."repositoryId" = r.id
+    ${whereClause}
     ORDER BY ce.embedding <=> ${vector}::vector
     LIMIT ${limit}
   `;

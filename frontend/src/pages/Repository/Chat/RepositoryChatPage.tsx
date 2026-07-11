@@ -25,7 +25,9 @@ export default function RepositoryChatPage() {
     setLoading(true);
 
     try {
-      const answer = await askRepository(question);
+      const answer = await askRepository({
+        question,
+      });
 
       const assistantMessage: ChatMessage = {
         id: crypto.randomUUID(),

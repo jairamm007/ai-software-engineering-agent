@@ -1,14 +1,15 @@
 import { executeAgent } from "./agent-executor.js";
 
 import { PlanResult } from "./planner.agent.js";
+import { ReasoningResult } from "./reasoner.agent.js";
 
-export const architectureAgent = async (
+export const fixAgent = async (
   plan: PlanResult,
-  context: string
+  reasoning: ReasoningResult
 ) => {
   return executeAgent(
-    "architecture",
-    context,
+    "fix",
+    reasoning.context,
     plan.question
   );
 };

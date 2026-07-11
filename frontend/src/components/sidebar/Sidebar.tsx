@@ -22,26 +22,6 @@ const menu = [
     path: "/repositories",
   },
   {
-    icon: MessageSquare,
-    label: "AI Chat",
-    path: "/chat",
-  },
-  {
-    icon: GitBranch,
-    label: "Architecture",
-    path: "/architecture",
-  },
-  {
-    icon: FileCode2,
-    label: "Code Review",
-    path: "/review",
-  },
-  {
-    icon: BookOpen,
-    label: "Documentation",
-    path: "/docs",
-  },
-  {
     icon: Settings,
     label: "Settings",
     path: "/settings",

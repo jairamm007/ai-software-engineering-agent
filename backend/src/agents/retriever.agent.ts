@@ -8,5 +8,10 @@ export const retrieverAgent = async (
     return [];
   }
 
-  return semanticSearch(plan.question);
+  return semanticSearch(
+    plan.question,
+    5,
+    plan.repositoryId,
+    plan.filePath
+  );
 };

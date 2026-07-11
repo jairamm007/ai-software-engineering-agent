@@ -18,9 +18,12 @@ export const indexRepository = async (
   for (const file of scanResult.files) {
     try {
       const chunks = chunkFile(file.path);
+      const relativePath = path
+        .relative(repositoryPath, file.path)
+        .replace(/\\/g, "/");
 
       indexedFiles.push({
-        path: file.path,
+        path: relativePath,
         extension: path.extname(file.path),
         size: file.size,
         chunks,

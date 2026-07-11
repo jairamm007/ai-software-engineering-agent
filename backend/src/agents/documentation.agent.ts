@@ -2,12 +2,12 @@ import { executeAgent } from "./agent-executor.js";
 
 import { PlanResult } from "./planner.agent.js";
 
-export const architectureAgent = async (
+export const documentationAgent = async (
   plan: PlanResult,
   context: string
 ) => {
   return executeAgent(
-    "architecture",
+    "documentation",
     context,
     plan.question
   );

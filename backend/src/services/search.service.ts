@@ -7,16 +7,17 @@ import {
 
 export const semanticSearch = async (
   query: string,
-  limit = 10
+  limit = 10,
+  repositoryId?: string,
+  filePath?: string
 ): Promise<RetrievedChunk[]> => {
   const embedding =
     await generateEmbedding(query);
 
-  const chunks =
-    await searchNearestChunks(
-      embedding,
-      limit
-    );
-
-  return chunks;
+  return searchNearestChunks(
+    embedding,
+    limit,
+    repositoryId,
+    filePath
+  );
 };

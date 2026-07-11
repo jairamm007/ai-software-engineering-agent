@@ -1,37 +1,109 @@
-import { semanticSearch } from "./search.service.js";
-import { GeminiProvider } from "../ai/providers/gemini.provider.js";
+import { agentGraph } from "../agents/graph.state.js";
 
-import { buildContext } from "../rag/context-builder.js";
+export interface AskRepositoryInput {
+  question: string;
+  repositoryId?: string;
+  filePath?: string;
+}
 
-const gemini = new GeminiProvider();
+export const askRepository = async ({
+  question,
+  repositoryId,
+  filePath,
+}: AskRepositoryInput) => {
+  const result = await agentGraph.invoke({
+    question,
+    repositoryId,
+    filePath,
+  });
 
-export const askRepository = async (
-  question: string
-) => {
-  const chunks = await semanticSearch(question);
+  if (result.answer) {
+    const firstChunk = result.chunks?.[0];
 
-  const context = buildContext(chunks);
+    return {
+      type: "answer",
+      answer: result.answer,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
 
-  const prompt = `
-You are an expert software engineer.
+  if (result.reviewResult) {
+    const firstChunk = result.chunks?.[0];
 
-Use ONLY the repository context below.
+    return {
+      type: "review",
+      answer: result.reviewResult.summary,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
 
-${context}
+  if (result.fixResult) {
+    const firstChunk = result.chunks?.[0];
 
-Question:
+    return {
+      type: "fix",
+      answer: result.fixResult,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
 
-${question}
+  if (result.architecture) {
+    const firstChunk = result.chunks?.[0];
 
-If the answer cannot be determined from the repository,
-say that you do not have enough information.
-`;
+    return {
+      type: "architecture",
+      answer: result.architecture,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
 
-  const answer =
-    await gemini.generateText(prompt);
+  if (result.documentation) {
+    const firstChunk = result.chunks?.[0];
+
+    return {
+      type: "documentation",
+      answer: result.documentation,
+      source: firstChunk
+        ? {
+            filePath: firstChunk.filePath,
+            startLine: firstChunk.startLine,
+            endLine: firstChunk.endLine,
+            confidence: Math.round((1 - firstChunk.distance) * 100),
+          }
+        : null,
+    };
+  }
 
   return {
-    answer,
-    chunks,
+    type: "unknown",
+    answer: "No response generated.",
   };
 };

@@ -7,7 +7,7 @@ interface Props {
 const tabs = [
   {
     label: "Overview",
-    path: "",
+    path: "overview",
   },
   {
     label: "Files",
@@ -27,7 +27,7 @@ const tabs = [
   },
   {
     label: "Documentation",
-    path: "docs",
+    path: "documentation",
   },
 ];
 
@@ -40,7 +40,7 @@ export default function RepositoryTabs({
         <NavLink
           key={tab.label}
           to={`/repositories/${repositoryId}/${tab.path}`}
-          end={tab.path === ""}
+          end
           className={({ isActive }) =>
             `pb-3 ${
               isActive

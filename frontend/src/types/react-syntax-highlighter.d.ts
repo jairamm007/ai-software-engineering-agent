@@ -6,10 +6,13 @@ declare module "react-syntax-highlighter" {
     style?: Record<string, unknown>;
     customStyle?: Record<string, unknown>;
     codeTagProps?: HTMLAttributes<HTMLElement>;
+    showLineNumbers?: boolean;
+    wrapLongLines?: boolean;
     children?: ReactNode;
   }>;
 }
 
 declare module "react-syntax-highlighter/dist/esm/styles/prism" {
   export const oneLight: Record<string, unknown>;
+  export const oneDark: Record<string, unknown>;
 }

@@ -6,7 +6,9 @@ import { answerAgent } from "./answer.agent.js";
 export const runAgent = async (
   question: string
 ) => {
-  const plan = await plannerAgent(question);
+  const plan = await plannerAgent({
+    question,
+  });
 
   const chunks = await retrieverAgent(plan);
 
