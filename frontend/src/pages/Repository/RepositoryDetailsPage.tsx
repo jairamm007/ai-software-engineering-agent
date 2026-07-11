@@ -4,6 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 
+import RepositoryTabs from "@/components/repository/RepositoryTabs";
+import RepositoryOverview from "@/components/repository/RepositoryOverview";
+
 import { getRepository } from "@/services/repository";
 
 export default function RepositoryDetailsPage() {
@@ -12,75 +15,60 @@ export default function RepositoryDetailsPage() {
   const {
     data,
     isLoading,
+    isError,
   } = useQuery({
-    queryKey: [
-      "repository",
-      id,
-    ],
-
-    queryFn: () =>
-      getRepository(id!),
-
+    queryKey: ["repository", id],
+    queryFn: () => getRepository(id!),
     enabled: !!id,
   });
 
   if (isLoading) {
     return (
       <DashboardLayout>
-        Loading...
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-lg font-medium">
+            Loading repository...
+          </p>
+        </div>
       </DashboardLayout>
     );
   }
 
-  if (!data) {
+  if (isError || !data) {
     return (
       <DashboardLayout>
-        Repository not found
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-lg text-red-600">
+            Repository not found.
+          </p>
+        </div>
       </DashboardLayout>
     );
   }
-
-  const totalChunks =
-    data.files.reduce(
-      (sum, file) =>
-        sum + file.chunks.length,
-      0
-    );
 
   return (
     <DashboardLayout>
-      <h1 className="mb-6 text-3xl font-bold">
-        {data.name}
-      </h1>
+      <div className="space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-4xl font-bold">
+            {data.name}
+          </h1>
 
-      <div className="space-y-3">
+          <p className="mt-2 text-slate-500 break-all">
+            {data.githubUrl}
+          </p>
+        </div>
 
-        <p>
-          <strong>GitHub:</strong>
-          {" "}
-          {data.githubUrl}
-        </p>
+        {/* Navigation Tabs */}
+        <RepositoryTabs
+          repositoryId={data.id}
+        />
 
-        <p>
-          <strong>Files:</strong>
-          {" "}
-          {data.files.length}
-        </p>
-
-        <p>
-          <strong>Chunks:</strong>
-          {" "}
-          {totalChunks}
-        </p>
-
-        <p>
-          <strong>Created:</strong>
-          {" "}
-          {new Date(
-            data.createdAt
-          ).toLocaleString()}
-        </p>
-
+        {/* Statistics */}
+        <RepositoryOverview
+          repository={data}
+        />
       </div>
     </DashboardLayout>
   );
