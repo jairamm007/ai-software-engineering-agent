@@ -12,16 +12,17 @@ export class OpenAIProvider
   readonly name = "OpenAI";
 
   async generateText(
-    prompt: string
+    systemPrompt: string,
+    userPrompt: string
   ): Promise<string> {
     const response =
       await openai.chat.completions.create({
         model: "gpt-4.1-mini",
+        max_tokens: 4096,
+        temperature: 0.3,
         messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
       });
 

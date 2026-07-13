@@ -3,8 +3,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dagre from "dagre";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { useTheme } from "@/context/ThemeContext";
+import CodeBlock from "@/components/ui/CodeBlock";
 import ReactFlow, {
   Background,
   Controls,
@@ -302,9 +305,51 @@ export default function DependencyGraph({ repositoryId }: Props) {
       {(selectedNode || selectedEdge) && <div className={`rounded-2xl border p-5 shadow-sm ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
         {selectedNode && <><h2 className={`text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>📄 {selectedNode.id}</h2><p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>Click a graph node to inspect it and use repository-aware AI actions.</p><div className="mt-4 flex flex-wrap gap-2">{["Explain", "Review", "Generate tests for", "Run a security scan on", "Suggest a fix for"].map((action) => <button key={action} disabled={aiLoading} onClick={() => runAiAction(action)} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"} disabled:opacity-50`}>{action}</button>)}<button onClick={openSelectedFile} disabled={!selectedFile} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"} disabled:opacity-50`}>Open in Files</button></div>{selectedFile && <div className="mt-4"><FileViewer filePath={selectedFile.path} content={selectedFile.chunks.map((chunk) => chunk.content).join("\n")} /></div>}</>}
         {selectedEdge && <DependencyInspector source={selectedEdge.source} target={selectedEdge.target} importPath={selectedImport?.importPath} importStatement={selectedImport?.importStatement} />}
-        {aiResult && <pre className={`mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl p-4 text-sm ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800 border border-slate-200"}`}>{aiResult}</pre>}
+        {aiResult && (
+          <div className={`mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl p-4 text-sm ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800 border border-slate-200"}`}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code: ({ className, children }: any) => {
+                  const match = /language-(\w+)/.exec(className ?? "");
+                  if (match) {
+                    return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>;
+                  }
+                  return (
+                    <code className={`rounded px-1.5 py-0.5 font-mono text-[0.875em] ${isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-900"}`}>
+                      {children}
+                    </code>
+                  );
+                },
+              }}
+            >
+              {aiResult}
+            </ReactMarkdown>
+          </div>
+        )}
       </div>}
-      {aiResult && !selectedNode && <pre className={`max-h-72 overflow-auto whitespace-pre-wrap rounded-2xl p-5 text-sm shadow-sm ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800 border border-slate-200"}`}>{aiResult}</pre>}
+      {aiResult && !selectedNode && (
+        <div className={`max-h-72 overflow-auto whitespace-pre-wrap rounded-2xl p-5 text-sm shadow-sm ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800 border border-slate-200"}`}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              code: ({ className, children }: any) => {
+                const match = /language-(\w+)/.exec(className ?? "");
+                if (match) {
+                  return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>;
+                }
+                return (
+                  <code className={`rounded px-1.5 py-0.5 font-mono text-[0.875em] ${isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-900"}`}>
+                    {children}
+                  </code>
+                );
+              },
+            }}
+          >
+            {aiResult}
+          </ReactMarkdown>
+        </div>
+      )}
     </div>
   );
 }

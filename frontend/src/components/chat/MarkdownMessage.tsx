@@ -1,9 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "@/context/ThemeContext";
+import CodeBlock from "@/components/ui/CodeBlock";
 
 interface Props {
   content: string;
@@ -72,35 +70,13 @@ export default function MarkdownMessage({ content }: Props) {
         ),
         code: ({ className, children }: any) => {
           const match = /language-(\w+)/.exec(className ?? "");
-          const isBlock = Boolean(match);
-
-          if (!isBlock) {
-            return (
-              <code className={`rounded px-1.5 py-0.5 font-mono text-[0.875em] ${isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-900"}`}>
-                {children}
-              </code>
-            );
+          if (match) {
+            return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>;
           }
-
           return (
-            <SyntaxHighlighter
-              language={match?.[1] ?? "tsx"}
-              style={isDark ? oneDark : oneLight}
-              customStyle={{
-                margin: "0 0 0.75rem 0",
-                borderRadius: "0.875rem",
-                padding: "1rem",
-                background: isDark ? "#1a1a2e" : "#f8fafc",
-              }}
-              codeTagProps={{
-                style: {
-                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace",
-                  fontSize: "0.875rem",
-                },
-              }}
-            >
-              {String(children).replace(/\n$/, "")}
-            </SyntaxHighlighter>
+            <code className={`rounded px-1.5 py-0.5 font-mono text-[0.875em] ${isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-900"}`}>
+              {children}
+            </code>
           );
         },
       }}

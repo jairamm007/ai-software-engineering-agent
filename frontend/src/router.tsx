@@ -3,6 +3,8 @@ import { createBrowserRouter } from "react-router-dom";
 import DashboardPage from "@/pages/Dashboard/DashboardPage";
 import LandingPage from "@/pages/Landing/LandingPage";
 import AIChatPage from "@/pages/Chat/AIChatPage";
+import SettingsPage from "@/pages/Settings/SettingsPage";
+import ProfilePage from "@/pages/Profile/ProfilePage";
 
 import RepositoryPage from "@/pages/Repository/RepositoryPage";
 import RepositoryDetailsPage from "@/pages/Repository/RepositoryDetailsPage";
@@ -34,6 +36,16 @@ export const router = createBrowserRouter([
   {
     path: "/chat",
     element: <AIChatPage />,
+  },
+
+  {
+    path: "/settings",
+    element: <SettingsPage />,
+  },
+
+  {
+    path: "/profile",
+    element: <ProfilePage />,
   },
 
   {

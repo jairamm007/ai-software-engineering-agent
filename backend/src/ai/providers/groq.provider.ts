@@ -10,16 +10,17 @@ export class GroqProvider implements LLMProvider {
   readonly name = "Groq";
 
   async generateText(
-    prompt: string
+    systemPrompt: string,
+    userPrompt: string
   ): Promise<string> {
     const response =
       await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
+        max_tokens: 4096,
+        temperature: 0.3,
         messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
       });
 

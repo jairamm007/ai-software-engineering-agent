@@ -12,33 +12,69 @@ const isRetryableError = (error: unknown): boolean => {
     message.includes("ECONNRESET") ||
     message.includes("503") ||
     message.includes("502") ||
-    message.includes("500")
+    message.includes("500") ||
+    message.includes("overloaded")
   );
 };
 
+const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+const PROVIDER_TIMEOUT_MS = 30_000;
+const MAX_RETRIES_PER_PROVIDER = 1;
+
+const withTimeout = <T>(
+  promise: Promise<T>,
+  ms: number
+): Promise<T> => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms);
+
+  return Promise.race([
+    promise.finally(() => clearTimeout(timeout)),
+    new Promise<T>((_, reject) =>
+      setTimeout(
+        () => reject(new Error("timeout")),
+        ms
+      )
+    ),
+  ]);
+};
+
 export const generateText = async (
-  prompt: string
+  systemPrompt: string,
+  userPrompt: string
 ): Promise<string> => {
   const providers = ProviderFactory.getProviders();
 
   let lastError: unknown;
 
   for (const provider of providers) {
-    try {
-      console.log(`🤖 Trying ${provider.name}...`);
+    for (let attempt = 0; attempt <= MAX_RETRIES_PER_PROVIDER; attempt++) {
+      try {
+        if (attempt > 0) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 4000);
+          console.log(`⏳ Retrying ${provider.name} in ${delay}ms (attempt ${attempt + 1})...`);
+          await sleep(delay);
+        }
 
-      const response = await provider.generateText(prompt);
+        console.log(`🤖 Trying ${provider.name}...`);
 
-      console.log(`✅ ${provider.name} succeeded`);
+        const response = await withTimeout(
+          provider.generateText(systemPrompt, userPrompt),
+          PROVIDER_TIMEOUT_MS
+        );
 
-      return response;
-    } catch (error) {
-      console.error(`❌ ${provider.name} failed`);
+        console.log(`✅ ${provider.name} succeeded`);
 
-      lastError = error;
+        return response;
+      } catch (error) {
+        console.error(`❌ ${provider.name} failed${attempt > 0 ? ` (attempt ${attempt + 1})` : ""}`);
+        lastError = error;
 
-      if (!isRetryableError(error)) {
-        throw error;
+        if (!isRetryableError(error)) {
+          break;
+        }
       }
     }
   }

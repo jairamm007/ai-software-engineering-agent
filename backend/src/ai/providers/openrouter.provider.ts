@@ -13,16 +13,17 @@ export class OpenRouterProvider
   readonly name = "OpenRouter";
 
   async generateText(
-    prompt: string
+    systemPrompt: string,
+    userPrompt: string
   ): Promise<string> {
     const response =
       await client.chat.completions.create({
         model: "meta-llama/llama-3.3-70b-instruct",
+        max_tokens: 4096,
+        temperature: 0.3,
         messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
       });
 

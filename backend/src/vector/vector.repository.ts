@@ -52,6 +52,8 @@ export const searchNearestChunks = async (
       )}`
     : Prisma.empty;
 
+  const fetchLimit = Math.min(limit * 2, 20);
+
   const results = await prisma.$queryRaw<RetrievedChunk[]>`
     SELECT
       r.name AS "repository",
@@ -69,10 +71,19 @@ export const searchNearestChunks = async (
       ON rf."repositoryId" = r.id
     ${whereClause}
     ORDER BY ce.embedding <=> ${vector}::vector
-    LIMIT ${limit}
+    LIMIT ${fetchLimit}
   `;
 
+  const seen = new Set<string>();
+
   return results
-    .filter((chunk) => chunk.distance < 0.65)
-    .sort((a, b) => a.distance - b.distance);
+    .filter((chunk) => {
+      if (chunk.distance >= 0.75) return false;
+      const key = `${chunk.filePath}:${chunk.startLine}-${chunk.endLine}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, limit);
 };

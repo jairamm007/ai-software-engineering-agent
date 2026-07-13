@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import AnalyticsCard from "@/components/repository/AnalyticsCard";
 import { getRepositoryAnalytics } from "@/services/analytics";
 import { useTheme } from "@/context/ThemeContext";
@@ -16,6 +18,7 @@ const formatBytes = (size: number) => {
 export default function RepositoryAnalytics({ repositoryId }: Props) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [collapsed, setCollapsed] = useState(false);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["repository-analytics", repositoryId],
     queryFn: () => getRepositoryAnalytics(repositoryId),
@@ -28,12 +31,25 @@ export default function RepositoryAnalytics({ repositoryId }: Props) {
     <section className={`space-y-5 rounded-2xl border p-6 shadow-sm ${
       isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
     }`}>
-      <div>
-        <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Repository Analytics</h2>
-        <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-          Index coverage and codebase composition.
-        </p>
-      </div>
+      <button
+        type="button"
+        onClick={() => setCollapsed(!collapsed)}
+        className={`flex w-full items-center justify-between text-left transition-colors rounded-lg -mx-1 px-1 py-0.5 ${
+          isDark ? "hover:bg-white/5" : "hover:bg-slate-100/60"
+        }`}
+      >
+        <div>
+          <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Repository Analytics</h2>
+          <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+            Index coverage and codebase composition.
+          </p>
+        </div>
+        <div className={`rounded-lg p-1.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+          {collapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+        </div>
+      </button>
+
+      {!collapsed && (<>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <AnalyticsCard icon="📄" label="Files" value={data.totalFiles} />
@@ -86,6 +102,7 @@ export default function RepositoryAnalytics({ repositoryId }: Props) {
           </dl>
         </div>
       </div>
+      </>)}
     </section>
   );
 }

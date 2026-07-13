@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import BackButton from "@/components/common/BackButton";
+import MarkdownMessage from "@/components/chat/MarkdownMessage";
 import { askRepository } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import type { ChatMessage } from "@/types/chat";
@@ -106,7 +107,13 @@ export default function RepositoryChatPage() {
                         ? "border border-white/10 bg-white/5 text-slate-200"
                         : "border border-slate-200 bg-slate-50 text-slate-800"
                   }`}>
-                    <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
+                    {message.role === "user" ? (
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
+                    ) : (
+                      <div className="text-sm leading-relaxed">
+                        <MarkdownMessage content={message.content} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

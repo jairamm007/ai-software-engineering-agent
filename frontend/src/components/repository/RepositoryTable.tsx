@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Trash2, FolderGit2, FileCode2, Layers, ExternalLink } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { deleteRepository } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
@@ -26,17 +26,28 @@ export default function RepositoryTable({ repositories }: Props) {
   };
 
   return (
-    <div className={`overflow-hidden rounded-xl border shadow-sm ${
-      isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
+    <div className={`overflow-hidden rounded-2xl border shadow-sm ${
+      isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
     }`}>
       <table className="w-full border-collapse">
-        <thead className={isDark ? "bg-white/5" : "bg-slate-100"}>
+        <thead className={isDark ? "bg-white/[0.03]" : "bg-slate-50/80"}>
           <tr>
-            <th className={`p-4 text-left font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Repository</th>
-            <th className={`p-4 text-left font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Files</th>
-            <th className={`p-4 text-left font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Chunks</th>
-            <th className={`p-4 text-left font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Created</th>
-            <th className={`w-20 text-center font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Actions</th>
+            {[
+              { label: "Repository", icon: FolderGit2 },
+              { label: "Files", icon: FileCode2 },
+              { label: "Chunks", icon: Layers },
+              { label: "Created", icon: null },
+              { label: "Actions", icon: null },
+            ].map((h) => (
+              <th key={h.label} className={`px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wider ${
+                isDark ? "text-slate-500" : "text-slate-400"
+              }`}>
+                <div className="flex items-center gap-1.5">
+                  {h.icon && <h.icon size={12} />}
+                  {h.label}
+                </div>
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -44,29 +55,63 @@ export default function RepositoryTable({ repositories }: Props) {
             const files = repo.files.length;
             const chunks = repo.files.reduce((sum, file) => sum + file.chunks.length, 0);
             return (
-              <tr key={repo.id} className={`border-t transition-colors ${
-                isDark ? "border-white/5 hover:bg-white/5" : "border-slate-100 hover:bg-slate-50"
+              <tr key={repo.id} className={`group border-t transition-colors ${
+                isDark ? "border-white/5 hover:bg-white/[0.03]" : "border-slate-100 hover:bg-slate-50/80"
               }`}>
-                <td className="p-4">
-                  <Link to={`/repositories/${repo.id}`} className="font-medium text-violet-500 hover:text-violet-400 hover:underline">
-                    {repo.name}
-                  </Link>
+                <td className="px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${
+                      isDark ? "bg-violet-500/15" : "bg-violet-50"
+                    }`}>
+                      <FolderGit2 size={16} className="text-violet-500" />
+                    </div>
+                    <div>
+                      <Link
+                        to={`/repositories/${repo.id}`}
+                        className={`flex items-center gap-1.5 font-semibold transition-colors ${
+                          isDark ? "text-white hover:text-violet-400" : "text-slate-900 hover:text-violet-600"
+                        }`}
+                      >
+                        {repo.name}
+                        <ExternalLink size={12} className="opacity-0 transition-opacity group-hover:opacity-100" />
+                      </Link>
+                      <p className={`mt-0.5 max-w-[300px] truncate text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                        {repo.githubUrl}
+                      </p>
+                    </div>
+                  </div>
                 </td>
-                <td className={`p-4 ${isDark ? "text-slate-300" : "text-slate-600"}`}>{files}</td>
-                <td className={`p-4 ${isDark ? "text-slate-300" : "text-slate-600"}`}>{chunks}</td>
-                <td className={`p-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                <td className="px-5 py-4">
+                  <div className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${
+                    isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-600"
+                  }`}>
+                    <FileCode2 size={12} />
+                    {files}
+                  </div>
+                </td>
+                <td className="px-5 py-4">
+                  <div className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${
+                    isDark ? "bg-fuchsia-500/10 text-fuchsia-400" : "bg-fuchsia-50 text-fuchsia-600"
+                  }`}>
+                    <Layers size={12} />
+                    {chunks}
+                  </div>
+                </td>
+                <td className={`px-5 py-4 text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   {new Date(repo.createdAt).toLocaleDateString()}
                 </td>
-                <td className="text-center">
+                <td className="px-5 py-4">
                   <button
                     type="button"
                     title="Delete Repository"
                     onClick={() => handleDelete(repo.id)}
-                    className={`rounded-lg p-2 transition-colors ${
-                      isDark ? "hover:bg-red-500/10 hover:text-red-400" : "hover:bg-red-50 hover:text-red-600"
+                    className={`rounded-lg p-2 transition-all ${
+                      isDark
+                        ? "text-slate-500 hover:bg-red-500/10 hover:text-red-400"
+                        : "text-slate-400 hover:bg-red-50 hover:text-red-500"
                     }`}
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 </td>
               </tr>

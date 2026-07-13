@@ -43,27 +43,22 @@ export const plannerAgent = async (
 
   else if (
     lower.includes("commit") ||
-    lower.includes("git commit")
+    lower.includes("git commit") ||
+    lower.includes("commit message")
   ) {
     task = "commit";
   }
 
   else if (
-    lower.includes("fix") ||
-    lower.includes("improve") ||
-    lower.includes("refactor") ||
-    lower.includes("optimize") ||
-    lower.includes("rewrite")
-  ) {
-    task = "fix";
-  }
-
-  else if (
     lower.includes("security") ||
     lower.includes("vulnerability") ||
+    lower.includes("vulnerabilities") ||
     lower.includes("scan") ||
     lower.includes("owasp") ||
-    lower.includes("audit")
+    lower.includes("audit") ||
+    lower.includes("xss") ||
+    lower.includes("injection") ||
+    lower.includes("exploit")
   ) {
     task = "security";
   }
@@ -71,7 +66,9 @@ export const plannerAgent = async (
   else if (
     lower.includes("review") ||
     lower.includes("bug") ||
-    lower.includes("performance")
+    lower.includes("performance") ||
+    lower.includes("code quality") ||
+    lower.includes("smell")
   ) {
     task = "review";
   }
@@ -81,7 +78,10 @@ export const plannerAgent = async (
     lower.includes("structure") ||
     lower.includes("folder") ||
     lower.includes("flow") ||
-    lower.includes("design")
+    lower.includes("design") ||
+    lower.includes("diagram") ||
+    lower.includes("dependency") ||
+    lower.includes("module")
   ) {
     task = "architecture";
   }
@@ -89,16 +89,34 @@ export const plannerAgent = async (
   else if (
     lower.includes("document") ||
     lower.includes("documentation") ||
-    lower.includes("readme")
+    lower.includes("readme") ||
+    lower.includes("jsdoc") ||
+    lower.includes("api doc")
   ) {
     task = "documentation";
   }
 
   else if (
-    lower.includes("explain") ||
-    lower.includes("understand")
+    lower.includes("fix") ||
+    lower.includes("improve") ||
+    lower.includes("refactor") ||
+    lower.includes("optimize") ||
+    lower.includes("rewrite") ||
+    lower.includes("suggestion") ||
+    lower.includes("cleanup")
   ) {
-    task = "explain";
+    task = "fix";
+  }
+
+  else if (
+    lower.includes("explain") ||
+    lower.includes("understand") ||
+    lower.includes("what does") ||
+    lower.includes("how does") ||
+    lower.includes("what is") ||
+    lower.includes("describe")
+  ) {
+    task = "answer";
   }
 
   else if (
@@ -106,7 +124,10 @@ export const plannerAgent = async (
     lower.includes("generate tests") ||
     lower.includes("jest") ||
     lower.includes("vitest") ||
-    /\btests?\b/.test(lower)
+    lower.includes("test case") ||
+    lower.includes("test suite") ||
+    /\btests?\b/.test(lower) ||
+    lower.includes("testing")
   ) {
     task = "test";
   }

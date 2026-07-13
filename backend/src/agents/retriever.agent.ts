@@ -8,9 +8,16 @@ export const retrieverAgent = async (
     return [];
   }
 
+  const limit =
+    plan.task === "review" ||
+    plan.task === "security" ||
+    plan.task === "test"
+      ? 8
+      : 6;
+
   return semanticSearch(
     plan.question,
-    5,
+    limit,
     plan.repositoryId,
     plan.filePath
   );

@@ -6,6 +6,19 @@ import {
   AgentType,
 } from "./agent.types.js";
 
+const MAX_CONTEXT_CHARS = 12_000;
+
+const truncateContext = (context: string): string => {
+  if (context.length <= MAX_CONTEXT_CHARS) {
+    return context;
+  }
+
+  return (
+    context.slice(0, MAX_CONTEXT_CHARS) +
+    "\n\n... [Context truncated for optimal processing] ..."
+  );
+};
+
 export const executeAgent = async (
   type: AgentType,
   context: string,
@@ -13,17 +26,9 @@ export const executeAgent = async (
 ) => {
   const agent = AGENTS[type];
 
-  const prompt = `
-${agent.systemPrompt}
+  const truncatedContext = truncateContext(context);
 
-Repository Context:
+  const userPrompt = `Repository Context:\n\n${truncatedContext}\n\nQuestion: ${question}`;
 
-${context}
-
-Question:
-
-${question}
-`;
-
-  return generateText(prompt);
+  return generateText(agent.systemPrompt, userPrompt);
 };

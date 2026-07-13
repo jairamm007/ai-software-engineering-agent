@@ -12,7 +12,6 @@ const ai = new GoogleGenAI({
 export class GeminiProvider
   implements EmbeddingProvider, LLMProvider
 {
-  // Added for multi-provider support
   readonly name = "Gemini";
 
   async generateEmbedding(
@@ -27,11 +26,17 @@ export class GeminiProvider
   }
 
   async generateText(
-    prompt: string
+    systemPrompt: string,
+    userPrompt: string
   ): Promise<string> {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: prompt,
+      config: {
+        systemInstruction: systemPrompt,
+        maxOutputTokens: 4096,
+        temperature: 0.3,
+      },
+      contents: userPrompt,
     });
 
     return response.text ?? "";

@@ -1,6 +1,11 @@
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTheme } from "@/context/ThemeContext";
+import CodeBlock from "@/components/ui/CodeBlock";
+import { ChevronDown, ChevronUp, Copy, Check, Download, FileText, FileType, FileImage } from "lucide-react";
+import { jsPDF } from "jspdf";
+import { Document, Packer, Paragraph, TextRun } from "docx";
 
 interface Props {
   title: string;
@@ -16,68 +21,181 @@ interface Props {
 export default function AIResult({ title, content, source }: Props) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [collapsed, setCollapsed] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const copyToClipboard = async () => {
+  const handleCopy = async () => {
     await navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const downloadMarkdown = () => {
-    const blob = new Blob([content], { type: "text/markdown" });
+  const downloadBlob = (blob: Blob, name: string) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "ai-output.md";
+    a.download = name;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  return (
-    <div className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
-      <div className={`flex items-center justify-between border-b p-4 ${isDark ? "border-white/10" : "border-slate-200"}`}>
-        <h2 className={`text-xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>🤖 {title}</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={copyToClipboard}
-            className={`rounded-lg border px-3 py-1 text-sm transition-colors ${
-              isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-100"
-            }`}
-          >
-            📋 Copy
-          </button>
-          <button
-            onClick={downloadMarkdown}
-            className={`rounded-lg border px-3 py-1 text-sm transition-colors ${
-              isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-100"
-            }`}
-          >
-            ⬇ Download
-          </button>
-        </div>
-      </div>
+  const downloadTXT = () => {
+    downloadBlob(new Blob([content], { type: "text/plain" }), "ai-output.txt");
+    setMenuOpen(false);
+  };
 
-      <div className={content ? "max-h-[500px] overflow-y-auto p-6" : "flex h-28 items-center justify-center p-4"}>
-        {content ? (
-          <>
-            {source && (
-              <div className={`mb-5 rounded-lg border p-4 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
-                <div className={`space-y-2 text-sm ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                  <p><strong>📄 Source:</strong> {source.filePath}</p>
-                  <p><strong>📍 Lines:</strong> {source.startLine}–{source.endLine}</p>
-                  <p><strong>🧠 Confidence:</strong> {source.confidence}%</p>
+  const downloadMarkdown = () => {
+    downloadBlob(new Blob([content], { type: "text/markdown" }), "ai-output.md");
+    setMenuOpen(false);
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    doc.setFont("Courier", "normal");
+    doc.setFontSize(9);
+    const lines = doc.splitTextToSize(content, 180);
+    let y = 15;
+    for (const line of lines) {
+      if (y > 275) { doc.addPage(); y = 15; }
+      doc.text(line, 15, y);
+      y += 4;
+    }
+    doc.save("ai-output.pdf");
+    setMenuOpen(false);
+  };
+
+  const downloadDOCX = async () => {
+    const paragraphs = content.split("\n").map(
+      (line) =>
+        new Paragraph({
+          children: [new TextRun({ text: line, font: "Courier New", size: 20 })],
+        })
+    );
+    const doc = new Document({ sections: [{ children: paragraphs }] });
+    const blob = await Packer.toBlob(doc);
+    downloadBlob(blob, "ai-output.docx");
+    setMenuOpen(false);
+  };
+
+  return (
+    <div className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"}`}>
+      <button
+        type="button"
+        onClick={() => setCollapsed(!collapsed)}
+        className={`flex w-full items-center justify-between border-b p-4 text-left transition-colors ${
+          isDark ? "border-white/10 hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50/80"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className={`flex h-7 w-7 items-center justify-center rounded-lg transition-transform ${collapsed ? "" : "rotate-180"}`}>
+            <ChevronDown size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
+          </div>
+          <h2 className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
+            {title}
+          </h2>
+        </div>
+
+        {!collapsed && (
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
+                copied
+                  ? "bg-emerald-500/15 text-emerald-500"
+                  : isDark
+                    ? "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+              }`}
+            >
+              {copied ? <Check size={13} /> : <Copy size={13} />}
+              {copied ? "Copied" : "Copy"}
+            </button>
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuOpen(!menuOpen)}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
+                  isDark
+                    ? "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                }`}
+              >
+                <Download size={13} />
+                Download
+              </button>
+
+              {menuOpen && (
+                <div className={`absolute right-0 top-full z-50 mt-1 w-44 overflow-hidden rounded-xl border shadow-xl ${
+                  isDark ? "border-white/10 bg-[#1a1a2e]" : "border-slate-200 bg-white"
+                }`}>
+                  <button type="button" onClick={downloadMarkdown} className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-medium transition-colors ${isDark ? "text-slate-300 hover:bg-white/10" : "text-slate-700 hover:bg-slate-50"}`}>
+                    <FileText size={13} className="text-slate-400" />
+                    Markdown (.md)
+                  </button>
+                  <button type="button" onClick={downloadTXT} className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-medium transition-colors ${isDark ? "text-slate-300 hover:bg-white/10" : "text-slate-700 hover:bg-slate-50"}`}>
+                    <FileText size={13} className="text-blue-500" />
+                    Plain Text (.txt)
+                  </button>
+                  <button type="button" onClick={downloadPDF} className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-medium transition-colors ${isDark ? "text-slate-300 hover:bg-white/10" : "text-slate-700 hover:bg-slate-50"}`}>
+                    <FileType size={13} className="text-red-500" />
+                    PDF (.pdf)
+                  </button>
+                  <button type="button" onClick={() => void downloadDOCX()} className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-medium transition-colors ${isDark ? "text-slate-300 hover:bg-white/10" : "text-slate-700 hover:bg-slate-50"}`}>
+                    <FileImage size={13} className="text-violet-500" />
+                    Word (.docx)
+                  </button>
                 </div>
-              </div>
-            )}
-            <article className={`prose max-w-none ${isDark ? "prose-invert" : ""}`}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-            </article>
-          </>
-        ) : (
-          <div className={`text-center ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-            <p className="text-lg font-medium">🤖 AI Assistant</p>
-            <p className="mt-1 text-sm">Select a file and click one of the AI actions.</p>
+              )}
+            </div>
           </div>
         )}
-      </div>
+      </button>
+
+      {!collapsed && (
+        <div className={content ? "max-h-[600px] overflow-y-auto p-6" : "flex h-28 items-center justify-center p-4"}>
+          {content ? (
+            <>
+              {source && (
+                <div className={`mb-5 rounded-lg border p-4 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                  <div className={`space-y-2 text-sm ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    <p><strong>Source:</strong> {source.filePath}</p>
+                    <p><strong>Lines:</strong> {source.startLine}–{source.endLine}</p>
+                    <p><strong>Confidence:</strong> {source.confidence}%</p>
+                  </div>
+                </div>
+              )}
+              <article className={`prose max-w-none ${isDark ? "prose-invert" : ""}`}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    code: ({ className, children }: any) => {
+                      const match = /language-(\w+)/.exec(className ?? "");
+                      if (match) {
+                        return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>;
+                      }
+                      return (
+                        <code className={`rounded px-1.5 py-0.5 font-mono text-[0.875em] ${isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-900"}`}>
+                          {children}
+                        </code>
+                      );
+                    },
+                  }}
+                >
+                  {content}
+                </ReactMarkdown>
+              </article>
+            </>
+          ) : (
+            <div className={`text-center ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              <p className="text-lg font-medium">AI Assistant</p>
+              <p className="mt-1 text-sm">Select a file and click one of the AI actions.</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

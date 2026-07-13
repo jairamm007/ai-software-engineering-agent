@@ -10,6 +10,7 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
+  User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
@@ -35,6 +36,11 @@ const menu = [
     icon: Settings,
     label: "Settings",
     path: "/settings",
+  },
+  {
+    icon: User,
+    label: "Profile",
+    path: "/profile",
   },
 ];
 

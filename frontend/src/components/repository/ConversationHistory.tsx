@@ -2,6 +2,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { AIMessage } from "@/types/ai-conversation";
 import { useTheme } from "@/context/ThemeContext";
+import CodeBlock from "@/components/ui/CodeBlock";
 
 interface Props {
   messages: AIMessage[];
@@ -39,7 +40,24 @@ export default function ConversationHistory({ messages }: Props) {
 
               {message.role === "assistant" ? (
                 <article className={`prose max-w-none ${isDark ? "prose-invert" : ""}`}>
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      code: ({ className, children }: any) => {
+                        const match = /language-(\w+)/.exec(className ?? "");
+                        if (match) {
+                          return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>;
+                        }
+                        return (
+                          <code className={`rounded px-1.5 py-0.5 font-mono text-[0.875em] ${isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-900"}`}>
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
                 </article>
               ) : (
                 <p className={`whitespace-pre-wrap ${isDark ? "text-slate-200" : "text-slate-700"}`}>{message.content}</p>
