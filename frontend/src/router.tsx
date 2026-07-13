@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import DashboardPage from "@/pages/Dashboard/DashboardPage";
+import LandingPage from "@/pages/Landing/LandingPage";
+import AIChatPage from "@/pages/Chat/AIChatPage";
 
 import RepositoryPage from "@/pages/Repository/RepositoryPage";
 import RepositoryDetailsPage from "@/pages/Repository/RepositoryDetailsPage";
@@ -16,7 +18,22 @@ import DependencyGraphPage from "@/pages/Repository/DependencyGraph/DependencyGr
 export const router = createBrowserRouter([
   {
     path: "/",
+    element: <LandingPage />,
+  },
+
+  {
+    path: "/landing",
+    element: <LandingPage />,
+  },
+
+  {
+    path: "/dashboard",
     element: <DashboardPage />,
+  },
+
+  {
+    path: "/chat",
+    element: <AIChatPage />,
   },
 
   {

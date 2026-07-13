@@ -9,6 +9,8 @@ import { Trash2 } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { useTheme } from "@/context/ThemeContext";
+
 import DashboardLayout from "@/layouts/DashboardLayout";
 import RepositoryWorkspaceLayout from "@/layouts/RepositoryWorkspaceLayout";
 
@@ -17,6 +19,7 @@ import RepositoryTabs from "@/components/repository/RepositoryTabs";
 import FileExplorer from "@/components/repository/FileExplorer";
 import FileViewer from "@/components/repository/FileViewer";
 import AIActionPanel from "@/components/repository/AIActionPanel";
+import AIHistory from "@/components/repository/AIHistory";
 import AIResult from "@/components/repository/AIResult";
 import RepositoryAnalytics from "@/components/repository/RepositoryAnalytics";
 import RepositoryOverview from "@/components/repository/RepositoryOverview";
@@ -26,15 +29,21 @@ import { askRepository } from "@/services/chat";
 import { deleteRepository, getRepository } from "@/services/repository";
 
 import type { RepositoryFile } from "@/types/repository";
+import type { AIHistoryItem } from "@/types/ai";
 import type { AIMessage } from "@/types/ai-conversation";
 
 export default function RepositoryDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [selectedFile, setSelectedFile] =
     useState<RepositoryFile | null>(null);
   const [conversation, setConversation] = useState<AIMessage[]>([]);
+  const [aiResult, setAiResult] = useState("");
+  const [history, setHistory] = useState<AIHistoryItem[]>([]);
+  const [selectedHistoryItemId, setSelectedHistoryItemId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [cache, setCache] = useState<Record<string, string>>({});
   const [, setPullRequest] = useState<string | null>(null);
@@ -101,10 +110,24 @@ export default function RepositoryDetailsPage() {
     ]);
   };
 
+  const addAiResult = (title: string, content: string) => {
+    const item: AIHistoryItem = {
+      id: crypto.randomUUID(),
+      title,
+      content,
+      createdAt: new Date(),
+    };
+
+    setAiResult(content);
+    setSelectedHistoryItemId(item.id);
+    setHistory((previous) => [item, ...previous]);
+  };
+
   const runAiAction = async (
     question: string,
     cacheKey: string,
-    failureMessage: string
+    failureMessage: string,
+    title: string
   ) => {
     if (!selectedFile || !data) return;
 
@@ -112,6 +135,7 @@ export default function RepositoryDetailsPage() {
 
     if (cache[cacheKey]) {
       addMessage("assistant", cache[cacheKey]);
+      addAiResult(title, cache[cacheKey]);
 
       return;
     }
@@ -127,9 +151,11 @@ export default function RepositoryDetailsPage() {
       const answer = formatAnswer(response.answer);
 
       addMessage("assistant", answer);
+      addAiResult(title, answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
       addMessage("assistant", failureMessage);
+      addAiResult(title, failureMessage);
     } finally {
       setLoading(false);
     }
@@ -141,7 +167,8 @@ export default function RepositoryDetailsPage() {
     await runAiAction(
       `Explain this file: ${selectedFile.path}`,
       `${selectedFile.path}-explain`,
-      "Failed to generate explanation."
+      "Failed to generate explanation.",
+      "Explain File"
     );
   };
 
@@ -151,7 +178,8 @@ export default function RepositoryDetailsPage() {
     await runAiAction(
       `Review this file for bugs, security and best practices: ${selectedFile.path}`,
       `${selectedFile.path}-review`,
-      "Review failed."
+      "Review failed.",
+      "Code Review"
     );
   };
 
@@ -161,7 +189,8 @@ export default function RepositoryDetailsPage() {
     await runAiAction(
       "Suggest improvements for this file.",
       `${selectedFile.path}-fix`,
-      "Failed to suggest a fix."
+      "Failed to suggest a fix.",
+      "Suggest Fix"
     );
   };
 
@@ -175,6 +204,7 @@ export default function RepositoryDetailsPage() {
 
     if (cache[cacheKey]) {
       addMessage("assistant", cache[cacheKey]);
+      addAiResult("Generate Commit", cache[cacheKey]);
 
       return;
     }
@@ -189,9 +219,12 @@ export default function RepositoryDetailsPage() {
       const answer = formatAnswer(response.answer);
 
       addMessage("assistant", answer);
+      addAiResult("Generate Commit", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
-      addMessage("assistant", "Failed to generate a commit message.");
+      const failureMessage = "Failed to generate a commit message.";
+      addMessage("assistant", failureMessage);
+      addAiResult("Generate Commit", failureMessage);
     } finally {
       setLoading(false);
     }
@@ -208,6 +241,7 @@ export default function RepositoryDetailsPage() {
     if (cache[cacheKey]) {
       setPullRequest(cache[cacheKey]);
       addMessage("assistant", cache[cacheKey]);
+      addAiResult("Pull Request", cache[cacheKey]);
 
       return;
     }
@@ -223,12 +257,14 @@ export default function RepositoryDetailsPage() {
 
       setPullRequest(answer);
       addMessage("assistant", answer);
+      addAiResult("Pull Request", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
       const failureMessage = "Failed to generate a pull request.";
 
       setPullRequest(failureMessage);
       addMessage("assistant", failureMessage);
+      addAiResult("Pull Request", failureMessage);
     } finally {
       setLoading(false);
     }
@@ -245,6 +281,7 @@ export default function RepositoryDetailsPage() {
     if (cache[cacheKey]) {
       setTests(cache[cacheKey]);
       addMessage("assistant", cache[cacheKey]);
+      addAiResult("Generate Tests", cache[cacheKey]);
 
       return;
     }
@@ -261,12 +298,14 @@ export default function RepositoryDetailsPage() {
 
       setTests(answer);
       addMessage("assistant", answer);
+      addAiResult("Generate Tests", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
       const failureMessage = "Failed to generate tests.";
 
       setTests(failureMessage);
       addMessage("assistant", failureMessage);
+      addAiResult("Generate Tests", failureMessage);
     } finally {
       setLoading(false);
     }
@@ -283,6 +322,7 @@ export default function RepositoryDetailsPage() {
     if (cache[cacheKey]) {
       setSecurityReport(cache[cacheKey]);
       addMessage("assistant", cache[cacheKey]);
+      addAiResult("Security Scan", cache[cacheKey]);
 
       return;
     }
@@ -299,12 +339,14 @@ export default function RepositoryDetailsPage() {
 
       setSecurityReport(answer);
       addMessage("assistant", answer);
+      addAiResult("Security Scan", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
       const failureMessage = "Failed to complete the security scan.";
 
       setSecurityReport(failureMessage);
       addMessage("assistant", failureMessage);
+      addAiResult("Security Scan", failureMessage);
     } finally {
       setLoading(false);
     }
@@ -316,7 +358,8 @@ export default function RepositoryDetailsPage() {
     await runAiAction(
       `Explain the architecture of this file: ${selectedFile.path}`,
       `${selectedFile.path}-architecture`,
-      "Architecture analysis failed."
+      "Architecture analysis failed.",
+      "Architecture"
     );
   };
 
@@ -326,13 +369,14 @@ export default function RepositoryDetailsPage() {
     await runAiAction(
       `Generate documentation for this file: ${selectedFile.path}`,
       `${selectedFile.path}-docs`,
-      "Documentation generation failed."
+      "Documentation generation failed.",
+      "Documentation"
     );
   };
 
   const runSelectionAction = async (action: string) => {
     if (!selectedCode || !selectedFile) return;
-    await runAiAction(`${action} only this selected code from ${selectedFile.path}:\n\n${selectedCode}`, `${selectedFile.path}-${action}-${selectedCode}`, `Failed to ${action.toLowerCase()} the selection.`);
+    await runAiAction(`${action} only this selected code from ${selectedFile.path}:\n\n${selectedCode}`, `${selectedFile.path}-${action}-${selectedCode}`, `Failed to ${action.toLowerCase()} the selection.`, action === "Review" ? "Code Review" : action === "Explain" ? "Explain File" : `${action} Selection`);
   };
 
   const runCommand = (action: CommandAction) => {
@@ -389,7 +433,7 @@ export default function RepositoryDetailsPage() {
     return (
       <DashboardLayout>
         <div className="flex h-64 items-center justify-center">
-          <p className="text-lg font-medium">
+          <p className={`text-lg font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
             Loading repository...
           </p>
         </div>
@@ -409,10 +453,6 @@ export default function RepositoryDetailsPage() {
     );
   }
 
-  const latestAssistantMessage = [...conversation]
-    .reverse()
-    .find((message) => message.role === "assistant");
-
   return (
     <DashboardLayout>
       <div className="space-y-4">
@@ -420,11 +460,11 @@ export default function RepositoryDetailsPage() {
 
         <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-bold">
+            <h1 className={`text-4xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
               {data.name}
             </h1>
 
-            <p className="mt-2 break-all text-slate-500">
+            <p className={`mt-2 break-all ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               {data.githubUrl}
             </p>
           </div>
@@ -433,7 +473,9 @@ export default function RepositoryDetailsPage() {
             type="button"
             onClick={handleDeleteRepository}
             title="Delete Repository"
-            className="rounded-xl border border-slate-300 p-3 transition hover:border-red-500 hover:bg-red-50 hover:text-red-600"
+            className={`rounded-xl border p-3 transition hover:border-red-500 hover:bg-red-50 hover:text-red-600 ${
+              isDark ? "border-white/20" : "border-slate-300"
+            }`}
           >
             <Trash2 size={20} />
           </button>
@@ -467,12 +509,24 @@ export default function RepositoryDetailsPage() {
               />
               <AIResult
                 title="AI Output"
-                content={latestAssistantMessage?.content ?? ""}
+                content={aiResult}
+              />
+              <AIHistory
+                items={history}
+                selectedItemId={selectedHistoryItemId}
+                onSelect={(item) => {
+                  setAiResult(item.content);
+                  setSelectedHistoryItemId(item.id);
+                }}
+                onClear={() => {
+                  setHistory([]);
+                  setSelectedHistoryItemId(null);
+                }}
               />
               <RepositoryOverview repository={data} />
               <RepositoryAnalytics repositoryId={data.id} />
               <div className="relative">
-                {selectedCode && <div className="absolute right-3 top-3 z-10 flex gap-1 rounded-lg border bg-white p-1 shadow-lg">{["Explain", "Review", "Fix", "Tests", "Security"].map((action) => <button key={action} onClick={() => void runSelectionAction(action)} className="rounded px-2 py-1 text-xs hover:bg-slate-100">{action}</button>)}</div>}
+                {selectedCode && <div className={`absolute right-3 top-3 z-10 flex gap-1 rounded-lg border p-1 shadow-lg ${isDark ? "border-white/20 bg-slate-800" : "border-slate-200 bg-white"}`}>{["Explain", "Review", "Fix", "Tests", "Security"].map((action) => <button key={action} onClick={() => void runSelectionAction(action)} className={`rounded px-2 py-1 text-xs ${isDark ? "hover:bg-white/10" : "hover:bg-slate-100"}`}>{action}</button>)}</div>}
                 <FileViewer
                   filePath={selectedFile?.path}
                   content={selectedFile?.chunks

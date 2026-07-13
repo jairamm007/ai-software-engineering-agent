@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTheme } from "@/context/ThemeContext";
 
 interface Props {
   sidebar: ReactNode;
@@ -9,13 +10,18 @@ export default function RepositoryWorkspaceLayout({
   sidebar,
   content,
 }: Props) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <div className="grid grid-cols-12 gap-6">
       <aside className="col-span-3">
         {sidebar}
       </aside>
 
-      <section className="col-span-9 space-y-6">
+      <section className={`col-span-9 space-y-6 rounded-2xl border p-6 shadow-sm ${
+        isDark ? "border-white/5 bg-white/[0.02]" : "border-slate-200/60 bg-white/60"
+      }`}>
         {content}
       </section>
     </div>

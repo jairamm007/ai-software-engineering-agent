@@ -11,6 +11,9 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 
+import { ThemeProvider } from "@/context/ThemeContext";
+import { SidebarProvider } from "@/context/SidebarContext";
+
 import "./index.css";
 
 import { router } from "./router";
@@ -23,7 +26,11 @@ createRoot(
 ).render(
   <StrictMode>
     <QueryClientProvider client={client}>
-      <RouterProvider router={router} />
+      <ThemeProvider>
+        <SidebarProvider>
+          <RouterProvider router={router} />
+        </SidebarProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>
 );

@@ -1,35 +1,24 @@
 import type { Repository } from "@/types/repository";
+import { useTheme } from "@/context/ThemeContext";
 
 interface Props {
   repository: Repository;
 }
 
-export default function RepositoryCard({
-  repository,
-}: Props) {
+export default function RepositoryCard({ repository }: Props) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
-    <div
-      style={{
-        background: "white",
-        padding: 20,
-        borderRadius: 12,
-        marginBottom: 15,
-        boxShadow:
-          "0 4px 12px rgba(0,0,0,.08)",
-      }}
-    >
-      <h2>{repository.name}</h2>
-
-      <p>
-        Files:
-        {" "}
-        {repository.files.length}
+    <div className={`rounded-xl border p-5 shadow-sm ${
+      isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
+    }`}>
+      <h2 className={`font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>{repository.name}</h2>
+      <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+        Files: {repository.files.length}
       </p>
-
-      <p>
-        URL:
-        {" "}
-        {repository.githubUrl}
+      <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+        URL: {repository.githubUrl}
       </p>
     </div>
   );

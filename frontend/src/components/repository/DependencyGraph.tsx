@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dagre from "dagre";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+
+import { useTheme } from "@/context/ThemeContext";
 import ReactFlow, {
   Background,
   Controls,
@@ -90,6 +92,8 @@ export default function DependencyGraph({ repositoryId }: Props) {
   const graphRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [query, setQuery] = useState("");
   const [selectedNode, setSelectedNode] = useState<Node<FileNodeData> | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
@@ -268,35 +272,39 @@ export default function DependencyGraph({ repositoryId }: Props) {
     image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(data)}`;
   };
 
-  if (graphQuery.isLoading) return <div className="h-[680px] animate-pulse rounded-2xl bg-slate-100" />;
+  if (graphQuery.isLoading) return <div className={`h-[680px] animate-pulse rounded-2xl ${isDark ? "bg-white/5" : "bg-slate-100"}`} />;
   if (graphQuery.isError) return <p className="text-red-600">Failed to load dependency graph.</p>;
-  if (nodes.length === 0) return <p className="text-slate-500">No TypeScript or JavaScript files were found in this repository.</p>;
+  if (nodes.length === 0) return <p className={isDark ? "text-slate-400" : "text-slate-500"}>No TypeScript or JavaScript files were found in this repository.</p>;
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className={`flex flex-wrap items-center gap-3 rounded-xl border p-3 shadow-sm ${
+        isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
+      }`}>
         <GraphSearch inputRef={searchRef} value={query} onChange={setQuery} />
-        <span className="text-sm text-slate-500">{nodes.length} files · {edges.length} imports · {averageDependencies} avg/file · {circularNodes.size} circular · {disconnectedCount} disconnected</span>
-        <button onClick={summarizeGraph} disabled={aiLoading} className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50 disabled:opacity-50">Summarize graph</button>
-        <button onClick={() => download("dependency-graph.json", JSON.stringify(graphQuery.data, null, 2), "application/json")} className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50">JSON</button>
-        <button onClick={exportSvg} className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50">SVG</button>
-        <button onClick={exportPng} className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50">PNG</button>
+        <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>{nodes.length} files · {edges.length} imports · {averageDependencies} avg/file · {circularNodes.size} circular · {disconnectedCount} disconnected</span>
+        <button onClick={summarizeGraph} disabled={aiLoading} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"} disabled:opacity-50`}>Summarize graph</button>
+        <button onClick={() => download("dependency-graph.json", JSON.stringify(graphQuery.data, null, 2), "application/json")} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"}`}>JSON</button>
+        <button onClick={exportSvg} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"}`}>SVG</button>
+        <button onClick={exportPng} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"}`}>PNG</button>
       </div>
-      {circularNodes.size > 0 && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">Circular dependency found across {circularNodes.size} file{circularNodes.size === 1 ? "" : "s"}.</div>}
-      <div ref={graphRef} className="relative h-[min(680px,70vh)] min-h-[420px] overflow-hidden rounded-2xl border bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      {circularNodes.size > 0 && <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${isDark ? "border-red-500/30 bg-red-500/10 text-red-300" : "border-red-200 bg-red-50 text-red-800"}`}>Circular dependency found across {circularNodes.size} file{circularNodes.size === 1 ? "" : "s"}.</div>}
+      <div ref={graphRef} className={`relative h-[min(680px,70vh)] min-h-[420px] overflow-hidden rounded-2xl border shadow-sm ${
+        isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
+      }`}>
         <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ fileNode: FileNode }} fitView nodesDraggable panOnDrag onInit={setFlow} onNodeClick={(_, node) => selectNode(node as Node<FileNodeData>)} onNodeContextMenu={(event, node) => { event.preventDefault(); setContextMenu({ x: event.clientX, y: event.clientY, node: node as Node<FileNodeData> }); }} onPaneClick={() => setContextMenu(null)} onEdgeClick={(_, edge) => { setSelectedEdge(edge); setSelectedNode(null); }}>
           <Background gap={16} />
           <Controls />
-          <MiniMap nodeColor={(node) => node.data?.isCircular ? "#ef4444" : "#60a5fa"} />
+          <MiniMap nodeColor={(node) => node.data?.isCircular ? "#ef4444" : "#8b5cf6"} />
         </ReactFlow>
         {contextMenu && <GraphContextMenu x={contextMenu.x} y={contextMenu.y} label={contextMenu.node.data.label} onAction={(action) => { selectNode(contextMenu.node); setContextMenu(null); void runAiAction(action, contextMenu.node); }} />}
       </div>
-      {(selectedNode || selectedEdge) && <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        {selectedNode && <><h2 className="text-lg font-semibold">📄 {selectedNode.id}</h2><p className="mt-1 text-sm text-slate-500">Click a graph node to inspect it and use repository-aware AI actions.</p><div className="mt-4 flex flex-wrap gap-2">{["Explain", "Review", "Generate tests for", "Run a security scan on", "Suggest a fix for"].map((action) => <button key={action} disabled={aiLoading} onClick={() => runAiAction(action)} className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50 disabled:opacity-50">{action}</button>)}<button onClick={openSelectedFile} disabled={!selectedFile} className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50 disabled:opacity-50">Open in Files</button></div>{selectedFile && <div className="mt-4"><FileViewer filePath={selectedFile.path} content={selectedFile.chunks.map((chunk) => chunk.content).join("\n")} /></div>}</>}
+      {(selectedNode || selectedEdge) && <div className={`rounded-2xl border p-5 shadow-sm ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+        {selectedNode && <><h2 className={`text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>📄 {selectedNode.id}</h2><p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>Click a graph node to inspect it and use repository-aware AI actions.</p><div className="mt-4 flex flex-wrap gap-2">{["Explain", "Review", "Generate tests for", "Run a security scan on", "Suggest a fix for"].map((action) => <button key={action} disabled={aiLoading} onClick={() => runAiAction(action)} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"} disabled:opacity-50`}>{action}</button>)}<button onClick={openSelectedFile} disabled={!selectedFile} className={`rounded-lg border px-3 py-2 text-sm transition-colors ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-200 hover:bg-slate-50"} disabled:opacity-50`}>Open in Files</button></div>{selectedFile && <div className="mt-4"><FileViewer filePath={selectedFile.path} content={selectedFile.chunks.map((chunk) => chunk.content).join("\n")} /></div>}</>}
         {selectedEdge && <DependencyInspector source={selectedEdge.source} target={selectedEdge.target} importPath={selectedImport?.importPath} importStatement={selectedImport?.importStatement} />}
-        {aiResult && <pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-sm text-slate-100">{aiResult}</pre>}
+        {aiResult && <pre className={`mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl p-4 text-sm ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800 border border-slate-200"}`}>{aiResult}</pre>}
       </div>}
-      {aiResult && !selectedNode && <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-2xl bg-slate-950 p-5 text-sm text-slate-100 shadow-sm">{aiResult}</pre>}
+      {aiResult && !selectedNode && <pre className={`max-h-72 overflow-auto whitespace-pre-wrap rounded-2xl p-5 text-sm shadow-sm ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800 border border-slate-200"}`}>{aiResult}</pre>}
     </div>
   );
 }
