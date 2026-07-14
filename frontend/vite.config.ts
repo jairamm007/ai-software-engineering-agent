@@ -29,13 +29,25 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom", "react-router-dom"],
-          "vendor-query": ["@tanstack/react-query"],
-          "vendor-ui": ["framer-motion", "lucide-react", "clsx", "tailwind-merge"],
-          "vendor-markdown": ["react-markdown", "remark-gfm", "react-syntax-highlighter"],
-          "vendor-graph": ["reactflow", "dagre"],
-          "vendor-docs": ["jspdf", "docx"],
+        manualChunks(id) {
+          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
+            return "vendor-react";
+          }
+          if (id.includes("node_modules/@tanstack/react-query")) {
+            return "vendor-query";
+          }
+          if (id.includes("node_modules/framer-motion") || id.includes("node_modules/lucide-react") || id.includes("node_modules/clsx") || id.includes("node_modules/tailwind-merge")) {
+            return "vendor-ui";
+          }
+          if (id.includes("node_modules/react-markdown") || id.includes("node_modules/remark-gfm") || id.includes("node_modules/react-syntax-highlighter")) {
+            return "vendor-markdown";
+          }
+          if (id.includes("node_modules/reactflow") || id.includes("node_modules/dagre")) {
+            return "vendor-graph";
+          }
+          if (id.includes("node_modules/jspdf") || id.includes("node_modules/docx")) {
+            return "vendor-docs";
+          }
         },
       },
     },

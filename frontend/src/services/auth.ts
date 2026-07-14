@@ -1,12 +1,5 @@
 import type { User, LoginCredentials, RegisterData } from "@/types/auth";
-import {
-  signIn,
-  signUp,
-  signOut,
-  getSession,
-  requestPasswordReset,
-  resetPassword as baResetPassword,
-} from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const FRONTEND_URL = window.location.origin;
@@ -23,7 +16,7 @@ function mapUser(data: Record<string, unknown>): User {
 }
 
 export async function apiLogin(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
-  const { data, error } = await signIn.email({
+  const { data, error } = await authClient.signIn.email({
     email: credentials.email,
     password: credentials.password,
     rememberMe: credentials.rememberMe ?? false,
@@ -44,7 +37,7 @@ export async function apiLogin(credentials: LoginCredentials): Promise<{ user: U
 }
 
 export async function apiRegister(data: RegisterData): Promise<{ user: User; token: string }> {
-  const { data: result, error } = await signUp.email({
+  const { data: result, error } = await authClient.signUp.email({
     name: data.name,
     email: data.email,
     password: data.password,
@@ -65,7 +58,7 @@ export async function apiRegister(data: RegisterData): Promise<{ user: User; tok
 }
 
 export async function apiLoginWithGoogle(): Promise<{ user: User; token: string }> {
-  const { data, error } = await signIn.social({
+  const { data, error } = await authClient.signIn.social({
     provider: "google",
     callbackURL: `${FRONTEND_URL}/dashboard`,
   });
@@ -74,7 +67,6 @@ export async function apiLoginWithGoogle(): Promise<{ user: User; token: string 
     throw new Error(error.message || "Google sign-in failed");
   }
 
-  // Better Auth returns a redirect URL for social providers — navigate to it
   if (data?.url) {
     window.location.href = data.url;
     return new Promise(() => {});
@@ -88,7 +80,7 @@ export async function apiLoginWithGoogle(): Promise<{ user: User; token: string 
 }
 
 export async function apiLoginWithGithub(): Promise<{ user: User; token: string }> {
-  const { data, error } = await signIn.social({
+  const { data, error } = await authClient.signIn.social({
     provider: "github",
     callbackURL: `${FRONTEND_URL}/dashboard`,
   });
@@ -111,7 +103,7 @@ export async function apiLoginWithGithub(): Promise<{ user: User; token: string 
 
 export async function apiGetSession(): Promise<{ user: User; token: string } | null> {
   try {
-    const { data } = await getSession();
+    const { data } = await authClient.getSession();
 
     if (!data?.session) return null;
 
@@ -125,11 +117,11 @@ export async function apiGetSession(): Promise<{ user: User; token: string } | n
 }
 
 export async function apiLogout(): Promise<void> {
-  await signOut();
+  await authClient.signOut();
 }
 
 export async function apiForgotPassword(email: string): Promise<void> {
-  const { error } = await requestPasswordReset({
+  const { error } = await authClient.forgetPassword({
     email,
     redirectTo: `${FRONTEND_URL}/reset-password`,
   });
@@ -140,7 +132,7 @@ export async function apiForgotPassword(email: string): Promise<void> {
 }
 
 export async function apiResetPassword(token: string, newPassword: string): Promise<void> {
-  const { error } = await baResetPassword({
+  const { error } = await authClient.resetPassword({
     token,
     newPassword,
   });
