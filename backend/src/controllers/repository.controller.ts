@@ -1,5 +1,3 @@
-import { Request, Response } from "express";
-
 import { parseGitHubUrl } from "../github/github.service.js";
 import { githubParseSchema } from "../validators/github.validator.js";
 
@@ -15,11 +13,19 @@ import {
   successResponse,
   errorResponse,
 } from "../utils/api-response.js";
+import type { AuthRequest } from "../auth/auth.middleware.js";
+import type { Response } from "express";
 
 export const analyzeRepositoryController = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ): Promise<void> => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   const result = githubParseSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -43,7 +49,8 @@ export const analyzeRepositoryController = async (
   try {
     const indexResult = await indexGitHubRepository(
       repository.url,
-      repository.repo
+      repository.repo,
+      userId
     );
 
     res.status(200).json(
@@ -64,11 +71,17 @@ export const analyzeRepositoryController = async (
 };
 
 export const getRepositoriesController = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ): Promise<void> => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   try {
-    const repositories = await getRepositories();
+    const repositories = await getRepositories(userId);
 
     res.status(200).json(
       successResponse(
@@ -88,12 +101,19 @@ export const getRepositoriesController = async (
 };
 
 export const getRepositoryByIdController = async (
-  req: Request<{ id: string }>,
+  req: AuthRequest & { params: { id: string } },
   res: Response
 ): Promise<void> => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   try {
     const repository = await getRepositoryById(
-      req.params.id
+      req.params.id,
+      userId
     );
 
     if (!repository) {
@@ -121,12 +141,19 @@ export const getRepositoryByIdController = async (
 };
 
 export const deleteRepositoryController = async (
-  req: Request<{ id: string }>,
+  req: AuthRequest & { params: { id: string } },
   res: Response
 ): Promise<void> => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   try {
     const repository = await getRepositoryById(
-      req.params.id
+      req.params.id,
+      userId
     );
 
     if (!repository) {
@@ -136,7 +163,7 @@ export const deleteRepositoryController = async (
       return;
     }
 
-    await deleteRepository(req.params.id);
+    await deleteRepository(req.params.id, userId);
 
     res.status(200).json(
       successResponse(

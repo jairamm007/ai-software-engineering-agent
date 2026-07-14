@@ -3,11 +3,12 @@ import { prisma } from "../database/prisma.js";
 export const createRepository = async (
   name: string,
   githubUrl: string,
-  localPath: string
+  localPath: string,
+  userId: string
 ) => {
   const existingRepository = await prisma.repository.findUnique({
     where: {
-      githubUrl,
+      githubUrl_userId: { githubUrl, userId },
     },
   });
 
@@ -20,19 +21,22 @@ export const createRepository = async (
       name,
       githubUrl,
       localPath,
+      userId,
     },
   });
 };
 
-export const getRepositories = async () => {
+export const getRepositories = async (userId: string) => {
   return prisma.repository.findMany({
+    where: { userId },
     orderBy: {
       createdAt: "desc",
     },
     include: {
+      _count: { select: { files: true } },
       files: {
-        include: {
-          chunks: true,
+        select: {
+          _count: { select: { chunks: true } },
         },
       },
     },
@@ -40,21 +44,24 @@ export const getRepositories = async () => {
 };
 
 export const getRepositoryByGithubUrl = async (
-  githubUrl: string
+  githubUrl: string,
+  userId: string
 ) => {
   return prisma.repository.findUnique({
     where: {
-      githubUrl,
+      githubUrl_userId: { githubUrl, userId },
     },
   });
 };
 
 export const getRepositoryById = async (
-  id: string
+  id: string,
+  userId: string
 ) => {
-  return prisma.repository.findUnique({
+  return prisma.repository.findFirst({
     where: {
       id,
+      userId,
     },
     include: {
       files: {
@@ -67,11 +74,12 @@ export const getRepositoryById = async (
 };
 
 export const repositoryExists = async (
-  githubUrl: string
+  githubUrl: string,
+  userId: string
 ) => {
   const repository = await prisma.repository.findUnique({
     where: {
-      githubUrl,
+      githubUrl_userId: { githubUrl, userId },
     },
   });
 
@@ -79,8 +87,17 @@ export const repositoryExists = async (
 };
 
 export const deleteRepository = async (
-  repositoryId: string
+  repositoryId: string,
+  userId: string
 ) => {
+  const repo = await prisma.repository.findFirst({
+    where: { id: repositoryId, userId },
+  });
+
+  if (!repo) {
+    throw new Error("Repository not found or access denied");
+  }
+
   await prisma.$transaction(async (tx) => {
     // Delete embeddings first
     await tx.$executeRaw`
@@ -92,7 +109,7 @@ export const deleteRepository = async (
           ON cc."fileId" = rf.id
         WHERE rf."repositoryId" = ${repositoryId}
       )
-    `;
+    `.catch(() => {});
 
     // Delete chunks
     await tx.codeChunk.deleteMany({

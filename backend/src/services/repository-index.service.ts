@@ -18,23 +18,25 @@ import { createChunkEmbedding } from "./embedding.service.js";
 
 export const indexGitHubRepository = async (
   repositoryUrl: string,
-  repositoryName: string
+  repositoryName: string,
+  userId: string
 ) => {
   console.log("\n========== Repository Indexing Started ==========");
 
-  // Clone repository
+  // Clone repository — use userId-prefixed path for per-user isolation
   const repositoryPath = await cloneRepository(
     repositoryUrl,
-    repositoryName
+    `${userId}/${repositoryName}`
   );
 
   console.log("✅ Repository cloned:", repositoryPath);
 
-  // Save repository
+  // Save repository — scoped to this user
   const repository = await createRepository(
     repositoryName,
     repositoryUrl,
-    repositoryPath
+    repositoryPath,
+    userId
   );
 
   console.log("✅ Repository saved:", repository.id);

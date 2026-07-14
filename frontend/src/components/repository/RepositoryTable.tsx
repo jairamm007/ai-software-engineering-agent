@@ -3,10 +3,10 @@ import { Trash2, FolderGit2, FileCode2, Layers, ExternalLink } from "lucide-reac
 import { useQueryClient } from "@tanstack/react-query";
 import { deleteRepository } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
-import type { Repository } from "@/types/repository";
+import type { RepositoryListItem } from "@/types/repository";
 
 interface Props {
-  repositories: Repository[];
+  repositories: RepositoryListItem[];
 }
 
 export default function RepositoryTable({ repositories }: Props) {
@@ -52,8 +52,8 @@ export default function RepositoryTable({ repositories }: Props) {
         </thead>
         <tbody>
           {repositories.map((repo) => {
-            const files = repo.files.length;
-            const chunks = repo.files.reduce((sum, file) => sum + file.chunks.length, 0);
+            const files = repo._count.files;
+            const chunks = repo.files.reduce((sum, file) => sum + file._count.chunks, 0);
             return (
               <tr key={repo.id} className={`group border-t transition-colors ${
                 isDark ? "border-white/5 hover:bg-white/[0.03]" : "border-slate-100 hover:bg-slate-50/80"

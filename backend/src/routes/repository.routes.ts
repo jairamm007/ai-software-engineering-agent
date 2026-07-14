@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import { requireAuth } from "../auth/auth.middleware.js";
 import {
   analyzeRepositoryController,
   getRepositoriesController,
@@ -10,20 +10,10 @@ import { getRepositoryAnalyticsController } from "../controllers/repository-anal
 
 const router = Router();
 
-/**
- * Repository Management
- */
-router.get("/", getRepositoriesController);
-
-router.get("/:id/analytics", getRepositoryAnalyticsController);
-
-router.get("/:id", getRepositoryByIdController);
-
-router.delete("/:id", deleteRepositoryController);
-
-/**
- * Repository Indexing
- */
-router.post("/analyze", analyzeRepositoryController);
+router.get("/", requireAuth, getRepositoriesController);
+router.get("/:id/analytics", requireAuth, getRepositoryAnalyticsController);
+router.get("/:id", requireAuth, getRepositoryByIdController);
+router.delete("/:id", requireAuth, deleteRepositoryController);
+router.post("/analyze", requireAuth, analyzeRepositoryController);
 
 export default router;

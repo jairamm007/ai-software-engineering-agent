@@ -13,6 +13,7 @@ import {
 
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SidebarProvider } from "@/context/SidebarContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 import "./index.css";
 
@@ -28,7 +29,9 @@ createRoot(
     <QueryClientProvider client={client}>
       <ThemeProvider>
         <SidebarProvider>
-          <RouterProvider router={router} />
+          <AuthProvider>
+            <RouterProvider router={router} />
+          </AuthProvider>
         </SidebarProvider>
       </ThemeProvider>
     </QueryClientProvider>

@@ -25,4 +25,19 @@ export default defineConfig({
       },
     },
   },
+
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react": ["react", "react-dom", "react-router-dom"],
+          "vendor-query": ["@tanstack/react-query"],
+          "vendor-ui": ["framer-motion", "lucide-react", "clsx", "tailwind-merge"],
+          "vendor-markdown": ["react-markdown", "remark-gfm", "react-syntax-highlighter"],
+          "vendor-graph": ["reactflow", "dagre"],
+          "vendor-docs": ["jspdf", "docx"],
+        },
+      },
+    },
+  },
 });

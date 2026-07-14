@@ -4,13 +4,14 @@ import RepositoryForm from "@/components/repository/RepositoryForm";
 import RepositoryTable from "@/components/repository/RepositoryTable";
 import { analyzeRepository, getRepositories } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
+import type { RepositoryListItem } from "@/types/repository";
 
 export default function RepositoryPage() {
   const queryClient = useQueryClient();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading } = useQuery<RepositoryListItem[]>({
     queryKey: ["repositories"],
     queryFn: getRepositories,
   });

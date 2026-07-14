@@ -9,9 +9,12 @@ import {
   getRepositoryFiles,
 } from "../repository/repository-file.repository.js";
 
+const TEST_USER_ID = "test-user-000";
+
 async function main() {
   const repository = await getRepositoryByGithubUrl(
-    "https://github.com/facebook/react"
+    "https://github.com/facebook/react",
+    TEST_USER_ID
   );
 
   if (!repository) {

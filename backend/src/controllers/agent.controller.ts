@@ -1,16 +1,21 @@
-import { Request, Response } from "express";
-
 import { executeAgent } from "../services/agent.service.js";
-
 import {
   successResponse,
   errorResponse,
 } from "../utils/api-response.js";
+import type { AuthRequest } from "../auth/auth.middleware.js";
+import type { Response } from "express";
 
 export const agentController = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   try {
     const { question } = req.body;
 

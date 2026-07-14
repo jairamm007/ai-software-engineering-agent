@@ -13,6 +13,16 @@ export interface RepositoryFile {
   chunks: CodeChunk[];
 }
 
+export interface RepositoryListItem {
+  id: string;
+  name: string;
+  githubUrl: string;
+  localPath: string;
+  createdAt: string;
+  _count: { files: number };
+  files: { _count: { chunks: number } }[];
+}
+
 export interface Repository {
   id: string;
   name: string;

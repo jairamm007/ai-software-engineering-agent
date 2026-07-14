@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
 import { parseGitHubUrl } from "../github/github.service.js";
 import { cloneRepository } from "../github/github.clone.js";
 import { githubParseSchema } from "../validators/github.validator.js";
 import { successResponse, errorResponse } from "../utils/api-response.js";
+import type { AuthRequest } from "../auth/auth.middleware.js";
+import type { Response } from "express";
 
 export const parseRepositoryController = (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ): void => {
   const result = githubParseSchema.safeParse(req.body);
@@ -34,9 +35,15 @@ export const parseRepositoryController = (
 };
 
 export const cloneRepositoryController = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ): Promise<void> => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   const result = githubParseSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -60,7 +67,7 @@ export const cloneRepositoryController = async (
   try {
     const clonePath = await cloneRepository(
       repository.url,
-      repository.repo
+      `${userId}/${repository.repo}`
     );
 
     res.status(200).json(

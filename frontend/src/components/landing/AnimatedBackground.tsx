@@ -15,7 +15,7 @@ const lightOrbs = [
   { size: 280, x: 100, y: -150, color: "bg-cyan-300/20", blur: 90, dur: 16, scale: [1, 1.25, 1] },
 ];
 
-const stars = Array.from({ length: 100 }, (_, index) => ({
+const stars = Array.from({ length: 40 }, (_, index) => ({
   id: index,
   size: Math.random() * 3 + 0.5,
   left: Math.random() * 100,
@@ -47,15 +47,24 @@ export default function AnimatedBackground() {
         />
       ))}
 
-      {isDark && stars.map((star) => (
-        <motion.div
-          key={star.id}
-          animate={{ opacity: [0.1, 0.9, 0.1], scale: [1, 1.5, 1] }}
-          transition={{ repeat: Infinity, duration: star.duration, delay: star.delay }}
-          className="absolute rounded-full bg-white"
-          style={{ width: star.size, height: star.size, left: `${star.left}%`, top: `${star.top}%` }}
-        />
-      ))}
+      {isDark && (
+        <div className="absolute inset-0">
+          {stars.map((star) => (
+            <div
+              key={star.id}
+              className="absolute rounded-full bg-white animate-pulse"
+              style={{
+                width: star.size,
+                height: star.size,
+                left: `${star.left}%`,
+                top: `${star.top}%`,
+                animationDuration: `${star.duration}s`,
+                animationDelay: `${star.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {isDark && (
         <div

@@ -11,10 +11,12 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   User,
+  LogOut,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
 import { useSidebar } from "@/context/SidebarContext";
+import { useAuth } from "@/context/AuthContext";
 
 const menu = [
   {
@@ -49,6 +51,7 @@ export default function Sidebar() {
   const { theme, toggleTheme } = useTheme();
   const { collapsed, toggle } = useSidebar();
   const isDark = theme === "dark";
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <motion.aside
@@ -82,6 +85,65 @@ export default function Sidebar() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Top controls — Theme toggle + Collapse toggle */}
+      <div className={`border-b px-3 py-3 space-y-1 ${
+        isDark ? "border-white/5" : "border-slate-200/80"
+      }`}>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+            isDark
+              ? "text-slate-400 hover:bg-white/5 hover:text-white"
+              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+        >
+          {isDark ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                className="overflow-hidden whitespace-nowrap"
+              >
+                {isDark ? "Light Mode" : "Dark Mode"}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+
+        <button
+          type="button"
+          onClick={toggle}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+            isDark
+              ? "text-slate-400 hover:bg-white/5 hover:text-white"
+              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+        >
+          {collapsed ? (
+            <PanelLeftOpen size={18} className="shrink-0" />
+          ) : (
+            <PanelLeftClose size={18} className="shrink-0" />
+          )}
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                className="overflow-hidden whitespace-nowrap"
+              >
+                Collapse
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
       </div>
 
       {/* Navigation */}
@@ -153,10 +215,48 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      {/* Bottom controls */}
+      {/* Bottom controls — User + AI Status + Logout */}
       <div className={`border-t px-3 py-4 space-y-2 ${
         isDark ? "border-white/5" : "border-slate-200/80"
       }`}>
+        {/* User display when authenticated */}
+        {isAuthenticated && user && (
+          <AnimatePresence>
+            {!collapsed ? (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className={`overflow-hidden rounded-xl p-3 ${
+                  isDark
+                    ? "bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10"
+                    : "bg-gradient-to-br from-violet-50 to-fuchsia-50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-xs font-bold text-white">
+                    {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                  <div className="min-w-0">
+                    <p className={`truncate text-xs font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+                      {user.name || "User"}
+                    </p>
+                    <p className={`truncate text-[10px] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="flex justify-center">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-xs font-bold text-white">
+                  {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
+                </div>
+              </div>
+            )}
+          </AnimatePresence>
+        )}
+
         {/* AI Status — only when expanded */}
         <AnimatePresence>
           {!collapsed && (
@@ -183,61 +283,33 @@ export default function Sidebar() {
           )}
         </AnimatePresence>
 
-        {/* Theme toggle */}
-        <button
-          type="button"
-          onClick={toggleTheme}
-          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-            isDark
-              ? "text-slate-400 hover:bg-white/5 hover:text-white"
-              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-          }`}
-        >
-          {isDark ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                className="overflow-hidden whitespace-nowrap"
-              >
-                {isDark ? "Light Mode" : "Dark Mode"}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
-
-        {/* Collapse toggle */}
-        <button
-          type="button"
-          onClick={toggle}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-            isDark
-              ? "text-slate-400 hover:bg-white/5 hover:text-white"
-              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-          }`}
-        >
-          {collapsed ? (
-            <PanelLeftOpen size={18} className="shrink-0" />
-          ) : (
-            <PanelLeftClose size={18} className="shrink-0" />
-          )}
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                className="overflow-hidden whitespace-nowrap"
-              >
-                Collapse
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
+        {/* Logout button when authenticated */}
+        {isAuthenticated && (
+          <button
+            type="button"
+            onClick={() => logout()}
+            title={collapsed ? "Sign out" : "Sign out"}
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+              isDark
+                ? "text-red-400 hover:bg-red-500/10"
+                : "text-red-500 hover:bg-red-50"
+            }`}
+          >
+            <LogOut size={18} className="shrink-0" />
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  className="overflow-hidden whitespace-nowrap"
+                >
+                  Sign Out
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+        )}
       </div>
     </motion.aside>
   );

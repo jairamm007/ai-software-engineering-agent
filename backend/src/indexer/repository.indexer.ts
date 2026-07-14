@@ -11,13 +11,13 @@ import {
 export const indexRepository = async (
   repositoryPath: string
 ): Promise<RepositoryIndexResult> => {
-  const scanResult = scanRepository(repositoryPath);
+  const scanResult = await scanRepository(repositoryPath);
 
   const indexedFiles: IndexedFile[] = [];
 
   for (const file of scanResult.files) {
     try {
-      const chunks = chunkFile(file.path);
+      const chunks = await chunkFile(file.path);
       const relativePath = path
         .relative(repositoryPath, file.path)
         .replace(/\\/g, "/");
@@ -33,9 +33,14 @@ export const indexRepository = async (
     }
   }
 
+  const totalChunks = indexedFiles.reduce(
+    (sum, file) => sum + file.chunks.length,
+    0
+  );
+
   return {
-    totalFiles: scanResult.totalFiles,
-    totalChunks: scanResult.totalChunks,
+    totalFiles: indexedFiles.length,
+    totalChunks,
     files: indexedFiles,
   };
 };

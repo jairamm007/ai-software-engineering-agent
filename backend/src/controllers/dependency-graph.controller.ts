@@ -1,16 +1,22 @@
-import { Request, Response } from "express";
-
 import { getRepositoryById } from "../repository/repository.repository.js";
 import { buildDependencyGraph } from "../services/dependency-graph.service.js";
 import { executeAgent } from "../services/agent.service.js";
 import { errorResponse, successResponse } from "../utils/api-response.js";
+import type { AuthRequest } from "../auth/auth.middleware.js";
+import type { Response } from "express";
 
 export const getDependencyGraphController = async (
-  req: Request<{ id: string }>,
+  req: AuthRequest & { params: { id: string } },
   res: Response
 ): Promise<void> => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   try {
-    const repository = await getRepositoryById(req.params.id);
+    const repository = await getRepositoryById(req.params.id, userId);
 
     if (!repository) {
       res.status(404).json(errorResponse("Repository not found"));
@@ -34,11 +40,17 @@ export const getDependencyGraphController = async (
 };
 
 export const dependencyGraphSummaryController = async (
-  req: Request<{ id: string }>,
+  req: AuthRequest & { params: { id: string } },
   res: Response
 ): Promise<void> => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json(errorResponse("Unauthorized"));
+    return;
+  }
+
   try {
-    const repository = await getRepositoryById(req.params.id);
+    const repository = await getRepositoryById(req.params.id, userId);
 
     if (!repository) {
       res.status(404).json(errorResponse("Repository not found"));

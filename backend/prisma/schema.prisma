@@ -6,14 +6,76 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─── Better Auth Tables ───────────────────────────────────────────────
+
+model user {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions  session[]
+  accounts  account[]
+  repositories Repository[]
+}
+
+model session {
+  id           String   @id @default(cuid())
+  token        String   @unique
+  expiresAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model account {
+  id                String  @id @default(cuid())
+  accountId         String
+  providerId        String
+  userId            String
+  accessToken       String?
+  refreshToken      String?
+  idToken           String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Application Tables ───────────────────────────────────────────────
+
 model Repository {
   id        String   @id @default(cuid())
   name      String
-  githubUrl String   @unique
+  githubUrl String
   localPath String
+  userId    String
   createdAt DateTime @default(now())
 
-  files RepositoryFile[]
+  user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files  RepositoryFile[]
+
+  @@unique([githubUrl, userId])
 }
 
 model RepositoryFile {
@@ -23,9 +85,10 @@ model RepositoryFile {
   extension    String
   size         Int
 
-  repository Repository @relation(fields: [repositoryId], references: [id])
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
 
-  chunks CodeChunk[]
+  chunks     CodeChunk[]
+  symbols    CodeSymbol[]
 }
 
 model CodeChunk {
@@ -37,7 +100,7 @@ model CodeChunk {
   startLine Int
   endLine   Int
 
-  file RepositoryFile @relation(fields: [fileId], references: [id])
+  file RepositoryFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
 }
 
 model CodeSymbol {
@@ -51,7 +114,7 @@ model CodeSymbol {
 
   exported  Boolean
 
-  file RepositoryFile @relation(fields: [fileId], references: [id])
+  file RepositoryFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
   @@index([name])
 

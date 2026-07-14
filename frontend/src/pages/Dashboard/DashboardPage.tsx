@@ -20,6 +20,7 @@ import StatCard from "@/components/cards/StatCard";
 import { useTheme } from "@/context/ThemeContext";
 
 import { getRepositories } from "@/services/repository";
+import type { RepositoryListItem } from "@/types/repository";
 
 const capabilities = [
   { icon: GitBranch, label: "Code Review & Analysis", color: "text-violet-500" },
@@ -50,20 +51,20 @@ export default function DashboardPage() {
 
   const totalRepositories = data.length;
   const totalFiles = data.reduce(
-    (sum: number, repository: any) => sum + repository.files.length,
+    (sum: number, repo: RepositoryListItem) => sum + repo._count.files,
     0
   );
   const totalChunks = data.reduce(
-    (sum: number, repository: any) =>
-      sum + repository.files.reduce(
-        (chunkSum: number, file: any) => chunkSum + file.chunks.length,
+    (sum: number, repo: RepositoryListItem) =>
+      sum + repo.files.reduce(
+        (chunkSum: number, file: { _count: { chunks: number } }) => chunkSum + file._count.chunks,
         0
       ),
     0
   );
 
   const recentRepos = [...data]
-    .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a: RepositoryListItem, b: RepositoryListItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
   return (
@@ -181,10 +182,10 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentRepos.map((repo: any, index: number) => {
-                    const files = repo.files.length;
+                  {recentRepos.map((repo: RepositoryListItem, index: number) => {
+                    const files = repo._count.files;
                     const chunks = repo.files.reduce(
-                      (sum: number, file: any) => sum + file.chunks.length, 0
+                      (sum: number, file: { _count: { chunks: number } }) => sum + file._count.chunks, 0
                     );
                     return (
                       <motion.tr

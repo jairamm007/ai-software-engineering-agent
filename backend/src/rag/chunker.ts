@@ -1,13 +1,13 @@
-import fs from "fs";
+import fs from "fs/promises";
 import { randomUUID } from "crypto";
 
 import { CodeChunk } from "./rag.types.js";
 
-export const chunkFile = (
+export const chunkFile = async (
   filePath: string,
   chunkSize = 50
-): CodeChunk[] => {
-  const content = fs.readFileSync(filePath, "utf8");
+): Promise<CodeChunk[]> => {
+  const content = await fs.readFile(filePath, "utf8");
 
   const lines = content.split("\n");
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import {
   Camera,
@@ -13,9 +13,13 @@ import {
   Trash2,
   ExternalLink,
   Check,
+  X,
+  Loader2,
+  User,
 } from "lucide-react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import { getRepositories } from "@/services/repository";
 
 const container = {
@@ -31,13 +35,24 @@ const item = {
 export default function ProfilePage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { user, updateProfile, deleteAccount, changePassword } = useAuth();
 
-  const [name, setName] = useState("AI Engineer");
-  const [email, setEmail] = useState("engineer@example.com");
-  const [bio, setBio] = useState("Full-stack developer building AI-powered tools.");
-  const [role, setRole] = useState("Software Engineer");
+  const [name, setName] = useState(user?.name ?? "AI Engineer");
+  const [email, setEmail] = useState(user?.email ?? "engineer@example.com");
+  const [bio, setBio] = useState(user?.bio ?? "Full-stack developer building AI-powered tools.");
+  const [role, setRole] = useState(user?.role ?? "Software Engineer");
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
   const { data: repos } = useQuery({
     queryKey: ["repositories"],
@@ -47,20 +62,96 @@ export default function ProfilePage() {
   const totalFiles = repos?.reduce((sum, r) => sum + r.files.length, 0) ?? 0;
   const totalChunks = repos?.reduce((sum, r) => sum + r.files.reduce((s, f) => s + f.chunks.length, 0), 0) ?? 0;
 
+  const timeAgo = (date: string | Date) => {
+    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+    if (seconds < 60) return "just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days}d ago`;
+    const months = Math.floor(days / 30);
+    return `${months}mo ago`;
+  };
+
+  const recentActivity = [
+    user?.createdAt ? { action: "Account created", target: user.email, time: timeAgo(user.createdAt), icon: User, color: "text-violet-500" } : null,
+    ...(repos ?? []).slice(0, 5).map((repo) => ({
+      action: "Indexed repository",
+      target: repo.name,
+      time: timeAgo(repo.createdAt),
+      icon: FolderGit2,
+      color: "text-amber-500" as const,
+    })),
+  ].filter(Boolean).slice(0, 5);
+
   const stats = [
     { icon: FolderGit2, label: "Repositories", value: repos?.length ?? 0, color: "from-violet-500 to-purple-600" },
     { icon: FileCode2, label: "Files Indexed", value: totalFiles, color: "from-cyan-500 to-blue-600" },
-    { icon: MessageSquare, label: "AI Questions", value: 47, color: "from-emerald-500 to-teal-600" },
-    { icon: Shield, label: "Security Scans", value: 12, color: "from-rose-500 to-pink-600" },
+    { icon: MessageSquare, label: "AI Questions", value: 0, color: "from-emerald-500 to-teal-600" },
+    { icon: Shield, label: "Security Scans", value: 0, color: "from-rose-500 to-pink-600" },
   ];
 
-  const handleSave = () => {
-    setSaved(true);
-    setEditing(false);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    try {
+      await updateProfile({ name, email, bio, role });
+      setSaved(true);
+      setEditing(false);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      // profile update failed silently
+    }
   };
 
-  const initials = name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await deleteAccount();
+      window.location.href = "/login";
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete account");
+      setDeleting(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    setPasswordSuccess(false);
+
+    if (!currentPassword || !newPassword) {
+      setPasswordError("All fields are required");
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      await changePassword(currentPassword, newPassword);
+      setPasswordSuccess(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setTimeout(() => {
+        setShowPasswordDialog(false);
+        setPasswordSuccess(false);
+      }, 1500);
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : "Failed to change password");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const initials = (user?.name ?? name).split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
     <DashboardLayout>
@@ -103,7 +194,7 @@ export default function ProfilePage() {
                 </button>
               </div>
               <div className="pb-1">
-                <h2 className={`text-xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>{name}</h2>
+                <h2 className={`text-xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>{user?.name ?? name}</h2>
                 <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>{role}</p>
               </div>
             </div>
@@ -255,12 +346,7 @@ export default function ProfilePage() {
             <h3 className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Recent Activity</h3>
           </div>
           <div className="divide-y divide-white/5">
-            {[
-              { action: "Ran code review on", target: "src/components/Dashboard.tsx", time: "2 hours ago", icon: FileCode2, color: "text-violet-500" },
-              { action: "Analyzed architecture of", target: "src/services/api.ts", time: "5 hours ago", icon: Shield, color: "text-cyan-500" },
-              { action: "Generated documentation for", target: "src/utils/helpers.ts", time: "1 day ago", icon: MessageSquare, color: "text-emerald-500" },
-              { action: "Indexed repository", target: "ai-software-engineering-agent", time: "2 days ago", icon: FolderGit2, color: "text-amber-500" },
-            ].map((activity, i) => (
+            {recentActivity.length > 0 ? recentActivity.map((activity, i) => (
               <div key={i} className={`flex items-center gap-3 px-5 py-3.5 transition-colors ${isDark ? "hover:bg-white/[0.02]" : "hover:bg-slate-50/80"}`}>
                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
                   isDark ? "bg-white/5" : "bg-slate-50"
@@ -277,7 +363,11 @@ export default function ProfilePage() {
                   <span className={`text-xs ${isDark ? "text-slate-600" : "text-slate-400"}`}>{activity.time}</span>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className={`px-5 py-8 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                No activity yet. Analyze a repository to get started.
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -303,7 +393,18 @@ export default function ProfilePage() {
                     <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>Update your account password</p>
                   </div>
                 </div>
-                <button type="button" className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPasswordDialog(true);
+                    setPasswordError("");
+                    setPasswordSuccess(false);
+                    setCurrentPassword("");
+                    setNewPassword("");
+                    setConfirmNewPassword("");
+                  }}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}
+                >
                   Update
                 </button>
               </div>
@@ -317,14 +418,206 @@ export default function ProfilePage() {
                     <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>Permanently delete your account and all data</p>
                   </div>
                 </div>
-                <button type="button" className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/20 dark:text-red-400 dark:hover:bg-red-500/10">
-                  Delete
+                <button
+                  type="button"
+                  onClick={() => { setShowDeleteConfirm(true); setDeleteError(""); }}
+                  disabled={deleting}
+                  className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/20 dark:text-red-400 dark:hover:bg-red-500/10 disabled:opacity-50"
+                >
+                  {deleting ? <Loader2 size={12} className="animate-spin" /> : "Delete"}
                 </button>
               </div>
             </div>
           </div>
         </motion.div>
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative w-full max-w-md rounded-2xl border p-6 shadow-2xl ${
+                isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/15">
+                  <Trash2 size={18} className="text-red-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Delete Account</h3>
+                  <p className={`mt-2 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    This will permanently delete your account, all repositories, chat history, and settings. This action cannot be undone.
+                  </p>
+                  {deleteError && (
+                    <div className="mt-3 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">
+                      {deleteError}
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className={`shrink-0 rounded-lg p-1 transition-colors ${isDark ? "text-slate-400 hover:bg-white/5" : "text-slate-400 hover:bg-slate-100"}`}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:opacity-50"
+                >
+                  {deleting && <Loader2 size={14} className="animate-spin" />}
+                  {deleting ? "Deleting..." : "Delete Account"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Change Password Dialog */}
+      <AnimatePresence>
+        {showPasswordDialog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowPasswordDialog(false)}
+          >
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative w-full max-w-md rounded-2xl border p-6 shadow-2xl ${
+                isDark ? "border-white/10 bg-slate-900" : "border-slate-200 bg-white"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15">
+                  <Lock size={18} className="text-amber-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Change Password</h3>
+                  <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>Enter your current and new password</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordDialog(false)}
+                  className={`shrink-0 rounded-lg p-1 transition-colors ${isDark ? "text-slate-400 hover:bg-white/5" : "text-slate-400 hover:bg-slate-100"}`}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {passwordError && (
+                <div className="mt-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">
+                  {passwordError}
+                </div>
+              )}
+              {passwordSuccess && (
+                <div className="mt-4 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-500">
+                  Password changed successfully!
+                </div>
+              )}
+
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label className={`mb-1 block text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Current Password</label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-violet-500"
+                        : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+                    }`}
+                    placeholder="Enter current password"
+                  />
+                </div>
+                <div>
+                  <label className={`mb-1 block text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>New Password</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-violet-500"
+                        : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+                    }`}
+                    placeholder="Enter new password (min 8 characters)"
+                  />
+                </div>
+                <div>
+                  <label className={`mb-1 block text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-violet-500"
+                        : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+                    }`}
+                    placeholder="Confirm new password"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordDialog(false)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleChangePassword}
+                  disabled={passwordLoading || passwordSuccess}
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: "var(--accent)" }}
+                >
+                  {passwordLoading && <Loader2 size={14} className="animate-spin" />}
+                  {passwordLoading ? "Changing..." : passwordSuccess ? "Done" : "Change Password"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </DashboardLayout>
   );
 }

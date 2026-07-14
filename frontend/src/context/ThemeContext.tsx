@@ -1,15 +1,20 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 type Theme = "light" | "dark";
+type Accent = "violet" | "blue" | "emerald" | "amber" | "rose";
 
 interface ThemeContextValue {
   theme: Theme;
+  accent: Accent;
   toggleTheme: () => void;
+  setAccent: (accent: Accent) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   theme: "light",
+  accent: "violet",
   toggleTheme: () => {},
+  setAccent: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -21,6 +26,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       : "light";
   });
 
+  const [accent, setAccentState] = useState<Accent>(() => {
+    const saved = localStorage.getItem("accent");
+    if (saved === "violet" || saved === "blue" || saved === "emerald" || saved === "amber" || saved === "rose") return saved;
+    return "violet";
+  });
+
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("light", "dark");
@@ -28,10 +39,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute("data-accent", accent);
+    localStorage.setItem("accent", accent);
+  }, [accent]);
+
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
+  const setAccent = useCallback((a: Accent) => setAccentState(a), []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, accent, toggleTheme, setAccent }}>
       {children}
     </ThemeContext.Provider>
   );

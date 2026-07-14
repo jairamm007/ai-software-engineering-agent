@@ -1,95 +1,118 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
+import ProtectedRoute, { GuestRoute } from "@/components/auth/ProtectedRoute";
 
-import DashboardPage from "@/pages/Dashboard/DashboardPage";
-import LandingPage from "@/pages/Landing/LandingPage";
-import AIChatPage from "@/pages/Chat/AIChatPage";
-import SettingsPage from "@/pages/Settings/SettingsPage";
-import ProfilePage from "@/pages/Profile/ProfilePage";
+const LandingPage = lazy(() => import("@/pages/Landing/LandingPage"));
+const LoginPage = lazy(() => import("@/pages/Auth/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage"));
+const ForgotPasswordPage = lazy(() => import("@/pages/Auth/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("@/pages/Auth/ResetPasswordPage"));
+const VerifyEmailPage = lazy(() => import("@/pages/Auth/VerifyEmailPage"));
+const DashboardPage = lazy(() => import("@/pages/Dashboard/DashboardPage"));
+const AIChatPage = lazy(() => import("@/pages/Chat/AIChatPage"));
+const SettingsPage = lazy(() => import("@/pages/Settings/SettingsPage"));
+const ProfilePage = lazy(() => import("@/pages/Profile/ProfilePage"));
+const RepositoryPage = lazy(() => import("@/pages/Repository/RepositoryPage"));
+const RepositoryDetailsPage = lazy(() => import("@/pages/Repository/RepositoryDetailsPage"));
+const RepositoryChatPage = lazy(() => import("@/pages/Repository/Chat/RepositoryChatPage"));
+const RepositoryOverviewPage = lazy(() => import("@/pages/Repository/Overview/RepositoryOverviewPage"));
+const RepositoryFilesPage = lazy(() => import("@/pages/Repository/Files/RepositoryFilesPage"));
+const RepositoryReviewPage = lazy(() => import("@/pages/Repository/Review/RepositoryReviewPage"));
+const RepositoryArchitecturePage = lazy(() => import("@/pages/Repository/Architecture/RepositoryArchitecturePage"));
+const RepositoryDocumentationPage = lazy(() => import("@/pages/Repository/Documentation/RepositoryDocumentationPage"));
+const DependencyGraphPage = lazy(() => import("@/pages/Repository/DependencyGraph/DependencyGraphPage"));
 
-import RepositoryPage from "@/pages/Repository/RepositoryPage";
-import RepositoryDetailsPage from "@/pages/Repository/RepositoryDetailsPage";
+function PageLoader() {
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+    </div>
+  );
+}
 
-import RepositoryChatPage from "@/pages/Repository/Chat/RepositoryChatPage";
-import RepositoryOverviewPage from "@/pages/Repository/Overview/RepositoryOverviewPage";
-import RepositoryFilesPage from "@/pages/Repository/Files/RepositoryFilesPage";
-import RepositoryReviewPage from "@/pages/Repository/Review/RepositoryReviewPage";
-import RepositoryArchitecturePage from "@/pages/Repository/Architecture/RepositoryArchitecturePage";
-import RepositoryDocumentationPage from "@/pages/Repository/Documentation/RepositoryDocumentationPage";
-import DependencyGraphPage from "@/pages/Repository/DependencyGraph/DependencyGraphPage";
+function LazyPage({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
+}
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: <LazyPage><LandingPage /></LazyPage>,
   },
 
   {
     path: "/landing",
-    element: <LandingPage />,
+    element: <LazyPage><LandingPage /></LazyPage>,
   },
+
+  { path: "/login", element: <LazyPage><GuestRoute><LoginPage /></GuestRoute></LazyPage> },
+  { path: "/register", element: <LazyPage><GuestRoute><RegisterPage /></GuestRoute></LazyPage> },
+  { path: "/forgot-password", element: <LazyPage><GuestRoute><ForgotPasswordPage /></GuestRoute></LazyPage> },
+  { path: "/reset-password", element: <LazyPage><ResetPasswordPage /></LazyPage> },
+  { path: "/verify-email", element: <LazyPage><VerifyEmailPage /></LazyPage> },
 
   {
     path: "/dashboard",
-    element: <DashboardPage />,
+    element: <LazyPage><ProtectedRoute><DashboardPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/chat",
-    element: <AIChatPage />,
+    element: <LazyPage><ProtectedRoute><AIChatPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/settings",
-    element: <SettingsPage />,
+    element: <LazyPage><ProtectedRoute><SettingsPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/profile",
-    element: <ProfilePage />,
+    element: <LazyPage><ProtectedRoute><ProfilePage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories",
-    element: <RepositoryPage />,
+    element: <LazyPage><ProtectedRoute><RepositoryPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id",
-    element: <RepositoryDetailsPage />,
+    element: <LazyPage><ProtectedRoute><RepositoryDetailsPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id/chat",
-    element: <RepositoryChatPage />,
+    element: <LazyPage><ProtectedRoute><RepositoryChatPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id/overview",
-    element: <RepositoryOverviewPage />,
+    element: <LazyPage><ProtectedRoute><RepositoryOverviewPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id/files",
-    element: <RepositoryFilesPage />,
+    element: <LazyPage><ProtectedRoute><RepositoryFilesPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id/review",
-    element: <RepositoryReviewPage />,
+    element: <LazyPage><ProtectedRoute><RepositoryReviewPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id/architecture",
-    element: <RepositoryArchitecturePage />,
+    element: <LazyPage><ProtectedRoute><RepositoryArchitecturePage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id/documentation",
-    element: <RepositoryDocumentationPage />,
+    element: <LazyPage><ProtectedRoute><RepositoryDocumentationPage /></ProtectedRoute></LazyPage>,
   },
 
   {
     path: "/repositories/:id/dependency-graph",
-    element: <DependencyGraphPage />,
+    element: <LazyPage><ProtectedRoute><DependencyGraphPage /></ProtectedRoute></LazyPage>,
   },
 ]);

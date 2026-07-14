@@ -5,18 +5,22 @@ import {
   getRepositoryByGithubUrl,
 } from "../repository/repository.repository.js";
 
+const TEST_USER_ID = "test-user-000";
+
 async function main() {
   const repository = await createRepository(
     "react",
     "https://github.com/facebook/react",
-    "./temp/react"
+    "./temp/react",
+    TEST_USER_ID
   );
 
   console.log("Created Repository:");
   console.log(repository);
 
   const found = await getRepositoryByGithubUrl(
-    repository.githubUrl
+    repository.githubUrl,
+    TEST_USER_ID
   );
 
   console.log("\nFound Repository:");

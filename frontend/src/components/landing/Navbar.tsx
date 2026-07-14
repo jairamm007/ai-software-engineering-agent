@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 
 const navigationLinks = [
   { href: "#features", label: "Features" },
@@ -13,6 +14,7 @@ const navigationLinks = [
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
+  const { isAuthenticated } = useAuth();
 
   return (
     <motion.header
@@ -62,23 +64,23 @@ export default function Navbar() {
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
-              to="/dashboard"
+              to={isAuthenticated ? "/dashboard" : "/login"}
               className={`rounded-full border px-5 py-2 text-sm font-medium transition-colors ${
                 isDark
                   ? "border-white/20 text-white hover:bg-white/10"
                   : "border-slate-200 text-slate-700 hover:bg-slate-100"
               }`}
             >
-              Sign In
+              {isAuthenticated ? "Dashboard" : "Sign In"}
             </Link>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
-              to="/dashboard"
+              to={isAuthenticated ? "/dashboard" : "/register"}
               className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-shadow hover:shadow-xl hover:shadow-violet-500/40"
             >
-              Get Started
+              {isAuthenticated ? "Dashboard" : "Get Started"}
             </Link>
           </motion.div>
         </div>

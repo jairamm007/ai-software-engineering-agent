@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireAuth } from "../auth/auth.middleware.js";
 
 import {
   dependencyGraphSummaryController,
@@ -7,7 +8,7 @@ import {
 
 const router = Router();
 
-router.get("/:id/dependency-graph", getDependencyGraphController);
-router.post("/:id/dependency-graph/summary", dependencyGraphSummaryController);
+router.get("/:id/dependency-graph", requireAuth, getDependencyGraphController);
+router.post("/:id/dependency-graph/summary", requireAuth, dependencyGraphSummaryController);
 
 export default router;
