@@ -108,7 +108,7 @@ export default function RegisterPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`w-full max-w-md space-y-6 rounded-2xl border p-8 shadow-sm ${
+          className={`w-full max-w-md space-y-6 rounded-2xl border p-5 shadow-sm sm:p-6 md:p-8 ${
             isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
           }`}
         >

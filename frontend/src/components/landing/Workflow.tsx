@@ -25,7 +25,7 @@ function StepCard({ step, index, isDark }: { step: (typeof steps)[number]; index
     >
       <div className={`w-full lg:w-1/2 ${isLeft ? "lg:pr-20 lg:text-right" : "lg:pl-20 lg:text-left"}`}>
         <motion.div whileHover={{ scale: 1.03, rotateY: isLeft ? 3 : -3 }} style={{ transformStyle: "preserve-3d" }}
-          className={`inline-block rounded-2xl border p-8 backdrop-blur-sm ${isLeft ? "ml-auto" : ""} ${
+          className={`inline-block rounded-2xl border p-5 backdrop-blur-sm sm:p-6 md:p-8 ${isLeft ? "ml-auto" : ""} ${
             isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-md"
           }`}>
           <span className="mb-3 block text-sm font-bold text-slate-500">STEP {step.step}</span>
@@ -54,13 +54,13 @@ export default function Workflow() {
   const lineHeight = useTransform(scrollYProgress, [0.1, 0.9], ["0%", "100%"]);
 
   return (
-    <section id="workflow" className="px-8 py-32" ref={containerRef}>
+    <section id="workflow" className="px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-32" ref={containerRef}>
       <div className="mx-auto max-w-7xl" style={{ perspective: "1200px" }}>
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-20 text-center">
           <span className={`mb-4 inline-block rounded-full border px-4 py-1.5 text-sm ${
             isDark ? "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300" : "border-fuchsia-200 bg-fuchsia-100 text-fuchsia-700"
           }`}>How It Works</span>
-          <h2 className="mt-4 text-5xl font-bold">
+          <h2 className="mt-4 text-3xl font-bold sm:text-4xl md:text-5xl">
             From Repo to <span className="bg-gradient-to-r from-fuchsia-400 to-violet-500 bg-clip-text text-transparent">Insight</span> in Minutes
           </h2>
           <p className={`mx-auto mt-6 max-w-2xl text-lg ${isDark ? "text-slate-400" : "text-slate-500"}`}>

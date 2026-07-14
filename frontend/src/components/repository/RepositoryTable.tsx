@@ -26,10 +26,10 @@ export default function RepositoryTable({ repositories }: Props) {
   };
 
   return (
-    <div className={`overflow-hidden rounded-2xl border shadow-sm ${
+    <div className={`overflow-x-auto rounded-2xl border shadow-sm ${
       isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
     }`}>
-      <table className="w-full border-collapse">
+      <table className="w-full border-collapse min-w-[600px]">
         <thead className={isDark ? "bg-white/[0.03]" : "bg-slate-50/80"}>
           <tr>
             {[

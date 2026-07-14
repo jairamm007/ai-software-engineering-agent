@@ -12,38 +12,20 @@ import {
   PanelLeftOpen,
   User,
   LogOut,
+  X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
 import { useSidebar } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 const menu = [
-  {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    path: "/dashboard",
-  },
-  {
-    icon: FolderGit2,
-    label: "Repositories",
-    path: "/repositories",
-  },
-  {
-    icon: MessageSquare,
-    label: "AI Chat",
-    path: "/chat",
-  },
-  {
-    icon: Settings,
-    label: "Settings",
-    path: "/settings",
-  },
-  {
-    icon: User,
-    label: "Profile",
-    path: "/profile",
-  },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: FolderGit2, label: "Repositories", path: "/repositories" },
+  { icon: MessageSquare, label: "AI Chat", path: "/chat" },
+  { icon: Settings, label: "Settings", path: "/settings" },
+  { icon: User, label: "Profile", path: "/profile" },
 ];
 
 export default function Sidebar() {
@@ -53,7 +35,26 @@ export default function Sidebar() {
   const isDark = theme === "dark";
   const { user, isAuthenticated, logout } = useAuth();
 
-  return (
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024 && !collapsed) {
+        toggle();
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile && !collapsed) {
+      toggle();
+    }
+  }, [location.pathname]);
+
+  const sidebarContent = (
     <motion.aside
       animate={{ width: collapsed ? 72 : 256 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -63,7 +64,6 @@ export default function Sidebar() {
           : "border-slate-200/80 bg-gradient-to-b from-white via-white to-slate-50 text-slate-900"
       }`}
     >
-      {/* Logo / Header */}
       <div className={`flex items-center gap-3 border-b px-4 py-5 ${
         isDark ? "border-white/5" : "border-slate-200/80"
       }`}>
@@ -85,9 +85,17 @@ export default function Sidebar() {
             </motion.div>
           )}
         </AnimatePresence>
+        <button
+          type="button"
+          onClick={toggle}
+          className={`ml-auto hidden rounded-lg p-1.5 transition-colors lg:flex ${
+            isDark ? "hover:bg-white/10 text-slate-400" : "hover:bg-slate-100 text-slate-500"
+          }`}
+        >
+          {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+        </button>
       </div>
 
-      {/* Top controls — Theme toggle + Collapse toggle */}
       <div className={`border-b px-3 py-3 space-y-1 ${
         isDark ? "border-white/5" : "border-slate-200/80"
       }`}>
@@ -115,12 +123,11 @@ export default function Sidebar() {
             )}
           </AnimatePresence>
         </button>
-
         <button
           type="button"
           onClick={toggle}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all lg:hidden ${
             isDark
               ? "text-slate-400 hover:bg-white/5 hover:text-white"
               : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
@@ -146,7 +153,6 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-3 py-4">
         {!collapsed && (
           <p className={`mb-3 px-3 text-[10px] font-semibold uppercase tracking-widest ${
@@ -159,7 +165,6 @@ export default function Sidebar() {
           {menu.map((item, index) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-
             return (
               <motion.li
                 key={`${item.label}-${index}`}
@@ -215,11 +220,9 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      {/* Bottom controls — User + AI Status + Logout */}
       <div className={`border-t px-3 py-4 space-y-2 ${
         isDark ? "border-white/5" : "border-slate-200/80"
       }`}>
-        {/* User display when authenticated */}
         {isAuthenticated && user && (
           <AnimatePresence>
             {!collapsed ? (
@@ -257,7 +260,6 @@ export default function Sidebar() {
           </AnimatePresence>
         )}
 
-        {/* AI Status — only when expanded */}
         <AnimatePresence>
           {!collapsed && (
             <motion.div
@@ -283,12 +285,11 @@ export default function Sidebar() {
           )}
         </AnimatePresence>
 
-        {/* Logout button when authenticated */}
         {isAuthenticated && (
           <button
             type="button"
             onClick={() => logout()}
-            title={collapsed ? "Sign out" : "Sign out"}
+            title="Sign out"
             className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
               isDark
                 ? "text-red-400 hover:bg-red-500/10"
@@ -313,4 +314,6 @@ export default function Sidebar() {
       </div>
     </motion.aside>
   );
+
+  return sidebarContent;
 }

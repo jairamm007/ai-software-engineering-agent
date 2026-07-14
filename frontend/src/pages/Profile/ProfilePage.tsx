@@ -157,7 +157,7 @@ export default function ProfilePage() {
     <DashboardLayout>
       <div className="mx-auto max-w-3xl space-y-6">
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className={`text-3xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Profile</h1>
+          <h1 className={`text-2xl font-bold sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>Profile</h1>
           <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             Manage your account and view activity
           </p>

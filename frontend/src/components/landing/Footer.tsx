@@ -26,7 +26,7 @@ export default function Footer() {
   const isDark = theme === "dark";
 
   return (
-    <footer id="contact" className={`border-t px-8 py-20 ${isDark ? "border-white/10" : "border-slate-200"}`}>
+    <footer id="contact" className={`border-t px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20 ${isDark ? "border-white/10" : "border-slate-200"}`}>
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-12 md:grid-cols-4">
           <div>

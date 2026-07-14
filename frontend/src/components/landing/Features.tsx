@@ -48,13 +48,13 @@ export default function Features() {
   const isDark = theme === "dark";
 
   return (
-    <section id="features" className="px-8 py-32">
+    <section id="features" className="px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-32">
       <div className="mx-auto max-w-7xl" style={{ perspective: "1200px" }}>
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-16 text-center">
           <span className={`mb-4 inline-block rounded-full border px-4 py-1.5 text-sm ${
             isDark ? "border-violet-500/30 bg-violet-500/10 text-violet-300" : "border-violet-200 bg-violet-100 text-violet-700"
           }`}>Powerful Features</span>
-          <h2 className="mt-4 text-5xl font-bold">
+          <h2 className="mt-4 text-3xl font-bold sm:text-4xl md:text-5xl">
             Everything You Need to <span className="bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent">Ship Faster</span>
           </h2>
           <p className={`mx-auto mt-6 max-w-2xl text-lg ${isDark ? "text-slate-400" : "text-slate-500"}`}>
@@ -69,7 +69,7 @@ export default function Features() {
             return (
               <motion.div key={feature.title} variants={cardVariants}>
                 <TiltCard className="h-full">
-                  <div className={`group h-full rounded-2xl border p-8 backdrop-blur-sm transition-colors ${
+                  <div className={`group h-full rounded-2xl border p-5 backdrop-blur-sm transition-colors sm:p-6 md:p-8 ${
                     isDark ? "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-lg"
                   }`}>
                     <div className={`mb-5 inline-flex rounded-xl bg-gradient-to-br ${feature.gradient} p-3 shadow-lg`} style={{ transform: "translateZ(20px)" }}>

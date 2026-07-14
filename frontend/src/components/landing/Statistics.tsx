@@ -31,7 +31,7 @@ function AnimatedCounter({ end, suffix, label, duration = 2 }: StatProps) {
     <motion.div ref={ref} initial={{ opacity: 0, y: 40, rotateX: -15 }} whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       viewport={{ once: true }} whileHover={{ scale: 1.08, rotateY: 8, z: 20 }} transition={{ duration: 0.5 }}
       className="cursor-default text-center" style={{ transformStyle: "preserve-3d" }}>
-      <div className="text-6xl font-black">{count}{suffix}</div>
+      <div className="text-4xl font-black sm:text-5xl md:text-6xl">{count}{suffix}</div>
       <div className="mt-3 text-lg text-slate-400">{label}</div>
     </motion.div>
   );
@@ -53,14 +53,14 @@ export default function Statistics() {
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.95, 1, 0.95]);
 
   return (
-    <section className="px-8 py-32" ref={containerRef}>
+    <section className="px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-32" ref={containerRef}>
       <div className="mx-auto max-w-7xl">
         <motion.div style={{ rotateX, scale, transformStyle: "preserve-3d" }}
-          className={`rounded-3xl border p-16 backdrop-blur-xl ${
+          className={`rounded-3xl border p-8 backdrop-blur-xl sm:p-12 md:p-16 ${
             isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-xl"
           }`}>
           <div className="mb-16 text-center">
-            <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-5xl font-bold">
+            <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl font-bold sm:text-4xl md:text-5xl">
               Trusted by <span className="bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent">Thousands</span>
             </motion.h2>
             <p className={`mx-auto mt-6 max-w-xl text-lg ${isDark ? "text-slate-400" : "text-slate-500"}`}>

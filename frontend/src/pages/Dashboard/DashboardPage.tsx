@@ -81,7 +81,7 @@ export default function DashboardPage() {
             <Sparkles size={20} className="text-white" />
           </div>
           <div>
-            <h1 className={`text-3xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
+            <h1 className={`text-2xl font-bold sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
               Dashboard
             </h1>
             <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
@@ -96,7 +96,7 @@ export default function DashboardPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="mb-10 grid grid-cols-4 gap-5"
+        className="mb-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4"
       >
         <motion.div variants={itemVariants}>
           <StatCard title="Repositories" value={totalRepositories} icon={<FolderGit2 size={20} />} gradient="from-violet-500 to-purple-600" index={0} />
@@ -113,13 +113,13 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Main content grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Recent Repositories */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="col-span-2"
+          className="lg:col-span-2"
         >
           <div className="mb-4 flex items-center justify-between">
             <h2 className={`text-lg font-semibold ${isDark ? "text-white" : "text-slate-800"}`}>
@@ -166,10 +166,10 @@ export default function DashboardPage() {
               </Link>
             </motion.div>
           ) : (
-            <div className={`overflow-hidden rounded-2xl border shadow-sm ${
+            <div className={`overflow-x-auto rounded-2xl border shadow-sm ${
               isDark ? "border-slate-700 bg-slate-800/80" : "border-slate-200 bg-white"
             }`}>
-              <table className="w-full border-collapse">
+              <table className="w-full border-collapse min-w-[500px]">
                 <thead className={isDark ? "bg-slate-700/50" : "bg-slate-50/80"}>
                   <tr>
                     {["Repository", "Files", "Chunks", "Created"].map((h) => (
