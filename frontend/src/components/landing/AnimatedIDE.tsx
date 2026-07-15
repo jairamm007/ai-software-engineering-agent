@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
+import { useTheme } from "@/context/ThemeContext";
 import {
   CheckCircle2,
   ChevronRight,
@@ -14,19 +15,20 @@ const Github = ({ size = 15, ...props }: { size?: number } & React.SVGProps<SVGS
   </svg>
 );
 
-const code = `import { analyzeRepository } from "@/ai";
+const code = `import { analyzeRepository } from "@/repo-verify";
 
-const score = await analyzeRepository(repo);
+const result = await analyzeRepository({
+  repo: "github.com/user/project",
+  deep: true,
+});
 
-export function shipFaster() {
-  return score.insights;
-}`;
+console.log(result.insights);`;
 
 const files = [
   { name: "src", folder: true },
-  { name: "app", folder: true },
+  { name: "components", folder: true },
   { name: "utils", folder: true },
-  { name: "main.ts", folder: false },
+  { name: "repo-verify.ts", folder: false },
   { name: "index.ts", folder: false },
 ];
 
@@ -40,6 +42,8 @@ const terminalItems = [
 
 export default function AnimatedIDE() {
   const [typedLength, setTypedLength] = useState(0);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -51,9 +55,10 @@ export default function AnimatedIDE() {
 
   return (
     <div className="relative w-full max-w-[720px] py-10">
-      <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-700/30 blur-[180px]" />
-      <div className="absolute right-0 top-10 h-48 w-48 rounded-full bg-pink-600/20 blur-[130px]" />
-      <div className="absolute bottom-8 left-0 h-44 w-44 rounded-full bg-cyan-500/20 blur-[120px]" />
+      {/* Background glows */}
+      <div className={`absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[180px] ${isDark ? "bg-purple-700/30" : "bg-purple-400/15"}`} />
+      <div className={`absolute right-0 top-10 h-48 w-48 rounded-full blur-[130px] ${isDark ? "bg-pink-600/20" : "bg-pink-300/15"}`} />
+      <div className={`absolute bottom-8 left-0 h-44 w-44 rounded-full blur-[120px] ${isDark ? "bg-cyan-500/20" : "bg-cyan-300/15"}`} />
 
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -63,126 +68,188 @@ export default function AnimatedIDE() {
       >
         <Tilt
           glareEnable
-          glareMaxOpacity={0.18}
-          glareColor="#c084fc"
+          glareMaxOpacity={isDark ? 0.18 : 0.1}
+          glareColor={isDark ? "#c084fc" : "#8b5cf6"}
           tiltMaxAngleX={8}
           tiltMaxAngleY={8}
           perspective={1200}
           className="rounded-3xl"
         >
-          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
-            {/* Title bar */}
-            <div className="flex h-12 items-center border-b border-white/10 bg-slate-950/70 px-5">
-              <div className="flex gap-2">
-                <div className="h-3 w-3 rounded-full bg-red-500" />
-                <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                <div className="h-3 w-3 rounded-full bg-green-500" />
+          {/* ─── Outer shell ─── */}
+          <div className={`overflow-hidden rounded-3xl ${
+            isDark
+              ? "border border-white/10 bg-white/5 shadow-[0_0_80px_rgba(139,92,246,0.08)]"
+              : "border border-slate-200/80 bg-slate-50 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.12),0_2px_12px_-2px_rgba(0,0,0,0.06)]"
+          }`}>
+            {/* ─── Title bar ─── */}
+            <div className={`flex h-11 items-center px-4 ${
+              isDark
+                ? "border-b border-white/10 bg-slate-950/70"
+                : "border-b border-slate-200 bg-gradient-to-b from-slate-100 to-slate-50"
+            }`}>
+              <div className="flex gap-1.5">
+                <div className="h-3 w-3 rounded-full bg-red-400 ring-1 ring-red-400/20" />
+                <div className="h-3 w-3 rounded-full bg-yellow-400 ring-1 ring-yellow-400/20" />
+                <div className="h-3 w-3 rounded-full bg-green-400 ring-1 ring-green-400/20" />
               </div>
-              <div className="ml-5 flex flex-1 items-center gap-2 text-sm font-medium text-slate-200">
-                <FileCode2 size={16} className="text-violet-400" />
-                Smart-Coin-Optimizer
+              <div className={`ml-4 flex flex-1 items-center gap-2 text-[13px] font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                <FileCode2 size={14} className="text-violet-500" />
+                repo-verify.ts
               </div>
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <Github size={15} /> GitHub
+              <div className={`flex items-center gap-2 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                <Github size={13} /> GitHub
               </div>
             </div>
 
-            {/* Main content */}
-            <div className="grid min-h-[390px] grid-cols-[0.85fr_1.45fr_0.9fr]">
-              {/* File tree */}
+            {/* ─── Main grid ─── */}
+            <div className="grid min-h-[380px] grid-cols-[0.85fr_1.45fr_0.9fr]">
+
+              {/* ─── File tree ─── */}
               <motion.aside
                 initial={{ opacity: 0, x: -40 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.25, duration: 0.5 }}
-                className="border-r border-white/10 bg-slate-950/50 p-4"
+                className={`p-3.5 ${
+                  isDark
+                    ? "border-r border-white/[0.06] bg-slate-950/50"
+                    : "border-r border-slate-200/80 bg-white"
+                }`}
               >
-                <p className="mb-4 text-sm font-semibold tracking-wider text-slate-500">REPOSITORY</p>
-                <div className="space-y-2 text-sm text-slate-300">
+                <p className={`mb-3 text-[10px] font-semibold tracking-widest uppercase ${isDark ? "text-slate-600" : "text-slate-400"}`}>Repository</p>
+                <div className="space-y-0.5 text-[13px]">
                   {files.map((file) => (
                     <motion.div
                       key={file.name}
-                      whileHover={{ x: 6, backgroundColor: "rgba(255,255,255,0.08)" }}
-                      className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5"
+                      whileHover={{ x: 4, backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(139,92,246,0.06)" }}
+                      className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors ${
+                        isDark ? "text-slate-300" : "text-slate-600"
+                      }`}
                     >
                       {file.folder ? (
                         <motion.span whileHover={{ rotate: 8 }}>
-                          <Folder size={16} className="text-violet-400" />
+                          <Folder size={15} className="text-violet-500" />
                         </motion.span>
                       ) : (
-                        <FileCode2 size={16} className="text-cyan-400" />
+                        <FileCode2 size={15} className="text-cyan-500" />
                       )}
-                      {file.folder && <ChevronRight size={14} className="text-slate-500" />}
-                      {file.name}
+                      {file.folder && <ChevronRight size={13} className={isDark ? "text-slate-600" : "text-slate-300"} />}
+                      <span className={file.folder ? (isDark ? "text-slate-200" : "text-slate-700 font-medium") : (isDark ? "text-slate-400" : "text-slate-500")}>
+                        {file.name}
+                      </span>
                     </motion.div>
                   ))}
                 </div>
               </motion.aside>
 
-              {/* Code editor */}
+              {/* ─── Code editor (always dark) ─── */}
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
-                className="min-w-0 bg-[#080B18] p-5"
+                className="min-w-0 bg-[#0c101c] p-4"
               >
-                <div className="mb-4 border-b border-white/10 pb-3 text-sm text-slate-400">code.ts</div>
-                <pre className="whitespace-pre-wrap break-words font-mono text-sm leading-7 text-slate-300">
-                  {code.substring(0, typedLength)}
-                  <motion.span
-                    animate={{ opacity: [1, 0, 1, 0] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                    className="text-violet-300"
-                  >
-                    |
-                  </motion.span>
-                </pre>
+                <div className="mb-3 flex items-center gap-2 border-b border-white/[0.06] pb-2.5 text-[13px]">
+                  <FileCode2 size={13} className="text-cyan-400" />
+                  <span className="text-slate-300">repo-verify.ts</span>
+                  <span className="ml-auto text-[11px] text-slate-500">TypeScript</span>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex flex-col items-end text-[11px] leading-6 text-slate-600 select-none">
+                    {code.substring(0, typedLength).split("\n").map((_, i) => (
+                      <span key={i}>{i + 1}</span>
+                    ))}
+                  </div>
+                  <pre className="whitespace-pre-wrap break-words font-mono text-[13px] leading-6 text-slate-300">
+                    {code.substring(0, typedLength)}
+                    <motion.span
+                      animate={{ opacity: [1, 0, 1, 0] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                      className="text-violet-400"
+                    >
+                      |
+                    </motion.span>
+                  </pre>
+                </div>
               </motion.div>
 
-              {/* AI panel */}
+              {/* ─── AI panel ─── */}
               <motion.aside
                 initial={{ opacity: 0, x: 40 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.55, duration: 0.5 }}
-                className="border-l border-white/10 bg-slate-950/50 p-4"
+                className={`p-3.5 ${
+                  isDark
+                    ? "border-l border-white/[0.06] bg-slate-950/50"
+                    : "border-l border-slate-200/80 bg-white"
+                }`}
               >
-                <div className="mb-4 flex items-center gap-2 text-sm font-semibold tracking-wider text-slate-400">
-                  <Sparkles size={15} className="text-fuchsia-400" /> AI ASSISTANT
+                <div className={`mb-3 flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                  <Sparkles size={13} className="text-fuchsia-500" /> AI Assistant
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {actions.map((action, index) => (
                     <motion.button
                       key={action}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7 + index * 0.1 }}
-                      whileHover={{ scale: 1.03, boxShadow: "0 0 20px rgba(168, 85, 247, 0.45)" }}
-                      className="flex w-full items-center gap-2 rounded-lg border border-violet-400/20 bg-violet-500/10 px-3 py-2 text-left text-sm text-violet-100"
+                      whileHover={{ scale: 1.03, boxShadow: "0 0 16px rgba(168,85,247,0.3)" }}
+                      className={`flex w-full items-center gap-2 rounded-lg border px-2.5 py-[7px] text-left text-xs font-medium transition-colors ${
+                        isDark
+                          ? "border-violet-400/15 bg-violet-500/[0.08] text-violet-200 hover:bg-violet-500/15"
+                          : "border-violet-200/80 bg-violet-50 text-violet-600 hover:bg-violet-100"
+                      }`}
                     >
-                      <CheckCircle2 size={15} className="text-violet-300" /> {action}
+                      <CheckCircle2 size={13} className={isDark ? "text-violet-400" : "text-violet-500"} /> {action}
                     </motion.button>
                   ))}
+                </div>
+                <div className={`mt-3 rounded-lg p-2.5 ${
+                  isDark
+                    ? "border border-white/[0.06] bg-white/[0.04]"
+                    : "border border-slate-200/80 bg-slate-50"
+                }`}>
+                  <p className={`mb-1 text-[11px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>AI Suggestion</p>
+                  <p className={`text-[11px] leading-relaxed ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                    Repository structure looks clean. Consider adding error handling in{" "}
+                    <span className="text-cyan-500 font-medium">repo-verify.ts</span>.
+                  </p>
                 </div>
               </motion.aside>
             </div>
 
-            {/* Status bar */}
-            <div className="grid grid-cols-3 border-t border-white/10 bg-slate-950/60 px-5 py-3 text-sm text-slate-300">
-              <div>Repository Indexed</div>
-              <div className="text-center"><span className="text-emerald-400">98%</span> Health</div>
-              <div className="text-right"><Counter end={420} duration={2.5} /> Files</div>
+            {/* ─── Status bar ─── */}
+            <div className={`grid grid-cols-3 items-center px-4 py-2 text-[12px] ${
+              isDark
+                ? "border-t border-white/[0.06] bg-slate-950/60 text-slate-400"
+                : "border-t border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100 text-slate-500"
+            }`}>
+              <div className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]" />
+                Repository Indexed
+              </div>
+              <div className="flex items-center justify-center gap-1.5">
+                <Sparkles size={12} className="text-violet-500" />
+                <span className={`font-semibold ${isDark ? "text-emerald-400" : "text-emerald-500"}`}>98%</span> Health
+              </div>
+              <div className="text-right"><Counter end={420} duration={2.5} /> Files Analyzed</div>
             </div>
 
-            {/* Terminal bar */}
-            <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-white/10 bg-black/20 px-5 py-3 text-sm text-slate-400">
+            {/* ─── Terminal bar ─── */}
+            <div className={`flex flex-wrap gap-x-4 gap-y-1.5 border-t px-4 py-2 text-[12px] ${
+              isDark
+                ? "border-white/[0.06] bg-[#0a0e1a] text-slate-500"
+                : "border-slate-200/80 bg-slate-100/80 text-slate-400"
+            }`}>
               {terminalItems.map((item, index) => (
                 <motion.div
                   key={item}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.1 + index * 0.4 }}
-                  className="flex items-center gap-1.5"
+                  className="flex items-center gap-1"
                 >
-                  <CheckCircle2 size={14} className="text-emerald-400" /> {item}
+                  <CheckCircle2 size={12} className="text-emerald-500" /> {item}
                 </motion.div>
               ))}
             </div>
@@ -190,19 +257,21 @@ export default function AnimatedIDE() {
         </Tilt>
       </motion.div>
 
-      {/* Floating cards — positioned around the edges */}
-      <FloatingCard className="-right-3 top-2" duration={4}>
-        ✓ Repository Indexed
-      </FloatingCard>
-      <FloatingCard className="-left-4 bottom-1/4" duration={5}>
-        98% AI Health
-      </FloatingCard>
-      <FloatingCard className="-right-2 bottom-0" duration={4.5}>
-        <Counter end={420} duration={2.5} /> Files
-      </FloatingCard>
-      <FloatingCard className="-left-3 top-1/2 -translate-y-1/2" duration={6}>
-        Architecture Generated
-      </FloatingCard>
+      {/* ─── Floating cards ─── */}
+      <div className="relative mt-6 flex flex-wrap items-center justify-center gap-3">
+        <FloatingCard duration={4} isDark={isDark}>
+          ✓ Repository Indexed
+        </FloatingCard>
+        <FloatingCard duration={5} isDark={isDark}>
+          98% AI Health
+        </FloatingCard>
+        <FloatingCard duration={4.5} isDark={isDark}>
+          <Counter end={420} duration={2.5} /> Files
+        </FloatingCard>
+        <FloatingCard duration={6} isDark={isDark}>
+          Architecture Generated
+        </FloatingCard>
+      </div>
     </div>
   );
 }
@@ -242,18 +311,22 @@ function Counter({ end, duration }: { end: number; duration: number }) {
 
 function FloatingCard({
   children,
-  className,
   duration,
+  isDark,
 }: {
   children: React.ReactNode;
-  className: string;
   duration: number;
+  isDark: boolean;
 }) {
   return (
     <motion.div
-      animate={{ y: [0, -10, 0] }}
-      transition={{ repeat: Infinity, duration }}
-      className={`absolute rounded-2xl border border-white/10 bg-slate-900/90 px-4 py-2.5 text-sm font-medium text-white shadow-xl backdrop-blur-xl ${className}`}
+      animate={{ y: [0, -8, 0] }}
+      transition={{ repeat: Infinity, duration, ease: "easeInOut" }}
+      className={`rounded-xl border px-3.5 py-2 text-xs font-medium backdrop-blur-xl ${
+        isDark
+          ? "border-white/[0.08] bg-slate-900/80 text-slate-300 shadow-lg shadow-black/20"
+          : "border-slate-200/80 bg-white/80 text-slate-600 shadow-md shadow-slate-200/60"
+      }`}
     >
       {children}
     </motion.div>

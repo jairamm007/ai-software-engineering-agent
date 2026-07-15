@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -89,7 +89,7 @@ export default function RegisterPage() {
             Create your account and unlock AI-powered code analysis
           </p>
           <div className="mt-8 space-y-3">
-            {["Free tier with 5 repositories", "AI code review and documentation", "Security vulnerability scanning"].map((f) => (
+            {["Free to start, no credit card", "AI code review and documentation", "Security vulnerability scanning"].map((f) => (
               <div key={f} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
                 isDark ? "bg-white/5 text-slate-300" : "bg-white text-slate-600 shadow-sm"
               }`}>
@@ -100,6 +100,9 @@ export default function RegisterPage() {
               </div>
             ))}
           </div>
+          <Link to="/" className={`mt-8 inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+            <ArrowLeft size={14} /> Back to Home
+          </Link>
         </div>
       </div>
 
@@ -108,7 +111,7 @@ export default function RegisterPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`w-full max-w-md space-y-6 rounded-2xl border p-5 shadow-sm sm:p-6 md:p-8 ${
+          className={`relative w-full max-w-md space-y-6 rounded-2xl border p-5 shadow-sm sm:p-6 md:p-8 ${
             isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
           }`}
         >
@@ -117,6 +120,10 @@ export default function RegisterPage() {
               <Sparkles size={22} className="text-white" />
             </div>
           </div>
+
+          <Link to="/" className={`absolute top-4 left-4 inline-flex items-center gap-1.5 text-xs font-medium transition-colors ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+            <ArrowLeft size={14} /> Home
+          </Link>
 
           <div>
             <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Create Account</h2>

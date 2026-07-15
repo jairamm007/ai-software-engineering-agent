@@ -105,8 +105,109 @@ body,
 }
 
 body {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: background 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Outfit", system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: white;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Custom Scrollbar ── */
+* {
+  scrollbar-width: thin;
+}
+
+/* Dark theme scrollbar (default) */
+* {
+  scrollbar-color: rgba(139, 92, 246, 0.4) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgba(139, 92, 246, 0.4) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Dark theme scrollbar thumb */
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.35);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:active {
+  background: rgba(139, 92, 246, 0.8);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Light theme scrollbar thumb */
+:root:not(.dark) ::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.25);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+:root:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.45);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+:root:not(.dark) ::-webkit-scrollbar-thumb:active {
+  background: rgba(139, 92, 246, 0.65);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Light theme scrollbar track subtle background */
+:root:not(.dark) ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 9999px;
+}
+
+/* Light theme scrollbar-color for Firefox */
+:root:not(.dark) {
+  scrollbar-color: rgba(139, 92, 246, 0.3) rgba(0, 0, 0, 0.06);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── Shimmer animation for gradient text ── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }

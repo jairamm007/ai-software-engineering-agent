@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, Sparkles, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -92,6 +92,9 @@ export default function LoginPage() {
               </div>
             ))}
           </div>
+          <Link to="/" className={`mt-8 inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+            <ArrowLeft size={14} /> Back to Home
+          </Link>
         </div>
       </div>
 
@@ -100,7 +103,7 @@ export default function LoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`w-full max-w-md space-y-6 rounded-2xl border p-5 shadow-sm sm:p-6 md:p-8 ${
+          className={`relative w-full max-w-md space-y-6 rounded-2xl border p-5 shadow-sm sm:p-6 md:p-8 ${
             isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
           }`}
         >
@@ -109,6 +112,10 @@ export default function LoginPage() {
               <Sparkles size={22} className="text-white" />
             </div>
           </div>
+
+          <Link to="/" className={`absolute top-4 left-4 inline-flex items-center gap-1.5 text-xs font-medium transition-colors ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+            <ArrowLeft size={14} /> Home
+          </Link>
 
           <div>
             <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Sign In</h2>

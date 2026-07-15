@@ -20,6 +20,7 @@ model user {
   sessions  session[]
   accounts  account[]
   repositories Repository[]
+  conversations Conversation[]
 }
 
 model session {
@@ -119,4 +120,33 @@ model CodeSymbol {
   @@index([name])
 
   @@index([kind])
+}
+
+// ─── Chat / Conversations ───────────────────────────────────────────
+
+model Conversation {
+  id             String   @id @default(cuid())
+  title          String
+  userId         String
+  repositoryId   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user     user        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@index([userId])
+  @@index([repositoryId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String   // "user" | "assistant" | "system"
+  content        String
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }

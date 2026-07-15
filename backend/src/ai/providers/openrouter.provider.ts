@@ -31,4 +31,25 @@ export class OpenRouterProvider
       response.choices[0]?.message?.content ?? ""
     );
   }
+
+  async *generateTextStream(
+    systemPrompt: string,
+    userPrompt: string
+  ): AsyncGenerator<string> {
+    const stream = await client.chat.completions.create({
+      model: "meta-llama/llama-3.3-70b-instruct",
+      max_tokens: 4096,
+      temperature: 0.3,
+      stream: true,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content;
+      if (text) yield text;
+    }
+  }
 }

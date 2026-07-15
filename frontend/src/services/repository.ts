@@ -1,11 +1,11 @@
 import api from "@/lib/axios";
 
 import type { ApiResponse } from "@/types/api";
-import type { Repository } from "@/types/repository";
+import type { Repository, RepositoryListItem } from "@/types/repository";
 
-export const getRepositories = async (): Promise<Repository[]> => {
+export const getRepositories = async (): Promise<RepositoryListItem[]> => {
   const response =
-    await api.get<ApiResponse<Repository[]>>(
+    await api.get<ApiResponse<RepositoryListItem[]>>(
       "/repository"
     );
 

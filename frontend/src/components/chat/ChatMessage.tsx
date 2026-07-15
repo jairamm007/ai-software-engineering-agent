@@ -2,7 +2,7 @@ import MarkdownMessage from "./MarkdownMessage";
 import { useTheme } from "@/context/ThemeContext";
 
 interface Props {
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "system";
   message: string;
 }
 

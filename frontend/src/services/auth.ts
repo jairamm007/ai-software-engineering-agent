@@ -1,7 +1,6 @@
 import type { User, LoginCredentials, RegisterData } from "@/types/auth";
 import { authClient } from "@/lib/auth-client";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const FRONTEND_URL = window.location.origin;
 
 function mapUser(data: Record<string, unknown>): User {
@@ -121,13 +120,18 @@ export async function apiLogout(): Promise<void> {
 }
 
 export async function apiForgotPassword(email: string): Promise<void> {
-  const { error } = await authClient.forgetPassword({
-    email,
-    redirectTo: `${FRONTEND_URL}/reset-password`,
+  const res = await fetch("/api/auth/forget-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email,
+      redirectTo: `${FRONTEND_URL}/reset-password`,
+    }),
   });
 
-  if (error) {
-    throw new Error(error.message || "Failed to send reset email");
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error || "Failed to send reset email");
   }
 }
 
@@ -143,7 +147,7 @@ export async function apiResetPassword(token: string, newPassword: string): Prom
 }
 
 export async function apiVerifyEmail(token: string): Promise<void> {
-  const res = await fetch(`${API_URL}/api/auth/verify-email`, {
+    const res = await fetch("/api/auth/verify-email", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token }),
@@ -156,7 +160,7 @@ export async function apiVerifyEmail(token: string): Promise<void> {
 }
 
 export async function apiDeleteAccount(): Promise<void> {
-  const res = await fetch(`${API_URL}/api/user/account`, {
+    const res = await fetch("/api/user/account", {
     method: "DELETE",
     credentials: "include",
   });
@@ -168,7 +172,7 @@ export async function apiDeleteAccount(): Promise<void> {
 }
 
 export async function apiChangePassword(currentPassword: string, newPassword: string): Promise<void> {
-  const res = await fetch(`${API_URL}/api/user/change-password`, {
+    const res = await fetch("/api/user/change-password", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -182,7 +186,7 @@ export async function apiChangePassword(currentPassword: string, newPassword: st
 }
 
 export async function apiExportData(): Promise<Record<string, unknown>> {
-  const res = await fetch(`${API_URL}/api/user/export`, {
+    const res = await fetch("/api/user/export", {
     method: "GET",
     credentials: "include",
   });
@@ -197,7 +201,7 @@ export async function apiExportData(): Promise<Record<string, unknown>> {
 }
 
 export async function apiClearCache(): Promise<void> {
-  const res = await fetch(`${API_URL}/api/user/clear-cache`, {
+    const res = await fetch("/api/user/clear-cache", {
     method: "POST",
     credentials: "include",
   });

@@ -60,7 +60,6 @@ export default function ProfilePage() {
   });
 
   const totalFiles = repos?.reduce((sum, r) => sum + r.files.length, 0) ?? 0;
-  const totalChunks = repos?.reduce((sum, r) => sum + r.files.reduce((s, f) => s + f.chunks.length, 0), 0) ?? 0;
 
   const timeAgo = (date: string | Date) => {
     const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
@@ -84,7 +83,7 @@ export default function ProfilePage() {
       icon: FolderGit2,
       color: "text-amber-500" as const,
     })),
-  ].filter(Boolean).slice(0, 5);
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item)).slice(0, 5);
 
   const stats = [
     { icon: FolderGit2, label: "Repositories", value: repos?.length ?? 0, color: "from-violet-500 to-purple-600" },

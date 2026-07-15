@@ -81,3 +81,29 @@ export const generateText = async (
 
   throw lastError;
 };
+
+export const generateTextStream = async function* (
+  systemPrompt: string,
+  userPrompt: string
+): AsyncGenerator<string> {
+  const providers = ProviderFactory.getProviders();
+
+  for (const provider of providers) {
+    if (!provider.generateTextStream) continue;
+
+    try {
+      console.log(`🤖 Streaming with ${provider.name}...`);
+      yield* provider.generateTextStream(systemPrompt, userPrompt);
+      console.log(`✅ ${provider.name} stream completed`);
+      return;
+    } catch (error) {
+      console.error(`❌ ${provider.name} stream failed`);
+      continue;
+    }
+  }
+
+  // Fallback: use non-streaming and yield the full response
+  console.log("⚠️ No streaming provider available, falling back to non-streaming");
+  const text = await generateText(systemPrompt, userPrompt);
+  yield text;
+};

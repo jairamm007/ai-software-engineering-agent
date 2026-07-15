@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTheme } from "@/context/ThemeContext";
 import CodeBlock from "@/components/ui/CodeBlock";
-import { ChevronDown, ChevronUp, Copy, Check, Download, FileText, FileType, FileImage } from "lucide-react";
+import { ChevronDown, Copy, Check, Download, FileText, FileType, FileImage } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 

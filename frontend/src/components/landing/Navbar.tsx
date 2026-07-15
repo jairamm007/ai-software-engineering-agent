@@ -1,15 +1,14 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X, Sparkles } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 
 const navigationLinks = [
   { href: "#features", label: "Features" },
-  { href: "#workflow", label: "Workflow" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#contact", label: "Contact" },
+  { href: "#how-it-works", label: "How It Works" },
+  { href: "#use-cases", label: "Who It's For" },
 ];
 
 export default function Navbar() {
@@ -20,85 +19,95 @@ export default function Navbar() {
 
   return (
     <motion.header
-      initial={{ y: -60 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6 }}
-      className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-colors duration-300 ${
+      initial={{ y: -60, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={`fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl transition-colors duration-300 ${
         isDark
-          ? "border-white/10 bg-black/50"
-          : "border-slate-200/80 bg-white/80"
+          ? "border-white/[0.06] bg-black/40"
+          : "border-slate-200/60 bg-white/70"
       }`}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 md:px-8">
-        <h1 className={`text-lg font-bold sm:text-2xl ${isDark ? "text-white" : "text-slate-900"}`}>
-          AI Software Engineering Agent
-        </h1>
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-18 sm:px-6 md:px-8">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-md shadow-violet-500/20">
+            <Sparkles size={16} className="text-white" />
+          </div>
+          <div>
+            <h1 className={`font-[Outfit] text-base font-bold leading-tight sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
+              Repo Verify
+            </h1>
+            <p className={`hidden text-[10px] font-[Inter] leading-none sm:block ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+              AI Software Engineering Agent
+            </p>
+          </div>
+        </div>
 
-        <nav className="hidden gap-10 md:flex">
+        {/* Desktop nav */}
+        <nav className="hidden gap-8 md:flex">
           {navigationLinks.map((link) => (
-            <motion.a
+            <a
               key={link.href}
-              whileHover={{ scale: 1.08, color: "#A855F7" }}
               href={link.href}
-              className={`transition-colors ${
-                isDark ? "text-slate-300" : "text-slate-600"
+              className={`text-sm font-medium transition-colors font-[Inter] ${
+                isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"
               }`}
             >
               {link.label}
-            </motion.a>
+            </a>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <motion.button
-            whileHover={{ scale: 1.1, rotate: 15 }}
-            whileTap={{ scale: 0.9 }}
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
             onClick={toggleTheme}
-            className={`flex h-9 w-9 items-center justify-center rounded-full border transition-colors sm:h-10 sm:w-10 ${
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className={`flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${
               isDark
-                ? "border-white/20 text-yellow-400 hover:bg-white/10"
+                ? "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"
                 : "border-slate-200 text-slate-500 hover:bg-slate-100"
             }`}
           >
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
-          </motion.button>
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
-            <Link
-              to={isAuthenticated ? "/dashboard" : "/login"}
-              className={`rounded-full border px-5 py-2 text-sm font-medium transition-colors ${
-                isDark
-                  ? "border-white/20 text-white hover:bg-white/10"
-                  : "border-slate-200 text-slate-700 hover:bg-slate-100"
-              }`}
-            >
-              {isAuthenticated ? "Dashboard" : "Sign In"}
-            </Link>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
-            <Link
-              to={isAuthenticated ? "/dashboard" : "/register"}
-              className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-shadow hover:shadow-xl hover:shadow-violet-500/40"
-            >
-              {isAuthenticated ? "Dashboard" : "Get Started"}
-            </Link>
-          </motion.div>
-
-          <button
-            type="button"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className={`flex h-10 w-10 items-center justify-center rounded-full border transition-colors md:hidden ${
+          <Link
+            to={isAuthenticated ? "/dashboard" : "/login"}
+            className={`hidden rounded-full border px-4 py-2 text-sm font-medium transition-all font-[Inter] sm:inline-block ${
               isDark
-                ? "border-white/20 text-white hover:bg-white/10"
+                ? "border-white/10 text-white hover:bg-white/5"
                 : "border-slate-200 text-slate-700 hover:bg-slate-100"
             }`}
           >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            {isAuthenticated ? "Dashboard" : "Sign In"}
+          </Link>
+
+          <Link
+            to={isAuthenticated ? "/dashboard" : "/register"}
+            className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/20 transition-all hover:shadow-lg hover:shadow-violet-500/30 hover:scale-[1.03] font-[Inter]"
+          >
+            {isAuthenticated ? "Dashboard" : "Get Started"}
+          </Link>
+
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className={`flex h-9 w-9 items-center justify-center rounded-full border transition-colors md:hidden ${
+              isDark
+                ? "border-white/10 text-white hover:bg-white/5"
+                : "border-slate-200 text-slate-700 hover:bg-slate-100"
+            }`}
+          >
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -107,7 +116,7 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className={`overflow-hidden border-t md:hidden ${
-              isDark ? "border-white/10 bg-black/80" : "border-slate-200 bg-white/95"
+              isDark ? "border-white/[0.06] bg-black/60" : "border-slate-200 bg-white/95"
             }`}
           >
             <nav className="flex flex-col gap-1 p-4">
@@ -116,18 +125,18 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] ${
                     isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   {link.label}
                 </a>
               ))}
-              <div className="my-2 border-t border-slate-200/10" />
+              <div className={`my-2 border-t ${isDark ? "border-white/5" : "border-slate-200"}`} />
               <Link
                 to={isAuthenticated ? "/dashboard" : "/login"}
                 onClick={() => setMobileOpen(false)}
-                className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] ${
                   isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
@@ -136,7 +145,7 @@ export default function Navbar() {
               <Link
                 to={isAuthenticated ? "/dashboard" : "/register"}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-center text-sm font-medium text-white shadow-lg shadow-violet-500/25"
+                className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-violet-500/25 font-[Inter]"
               >
                 {isAuthenticated ? "Dashboard" : "Get Started"}
               </Link>

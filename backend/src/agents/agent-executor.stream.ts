@@ -1,0 +1,26 @@
+import { generateTextStream } from "../ai/providers/llm.service.js";
+import { AGENTS } from "./prompts.js";
+import { AgentType } from "./agent.types.js";
+
+const MAX_CONTEXT_CHARS = 12_000;
+
+const truncateContext = (context: string): string => {
+  if (context.length <= MAX_CONTEXT_CHARS) {
+    return context;
+  }
+  return (
+    context.slice(0, MAX_CONTEXT_CHARS) +
+    "\n\n... [Context truncated for optimal processing] ..."
+  );
+};
+
+export const executeAgentStream = function* (
+  type: AgentType,
+  context: string,
+  question: string
+): Generator<Promise<string>> {
+  const agent = AGENTS[type];
+  const truncatedContext = truncateContext(context);
+  const userPrompt = `Repository Context:\n\n${truncatedContext}\n\nQuestion: ${question}`;
+  return generateTextStream(agent.systemPrompt, userPrompt);
+};

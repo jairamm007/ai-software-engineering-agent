@@ -28,4 +28,25 @@ export class GroqProvider implements LLMProvider {
       response.choices[0]?.message?.content ?? ""
     );
   }
+
+  async *generateTextStream(
+    systemPrompt: string,
+    userPrompt: string
+  ): AsyncGenerator<string> {
+    const stream = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      max_tokens: 4096,
+      temperature: 0.3,
+      stream: true,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content;
+      if (text) yield text;
+    }
+  }
 }

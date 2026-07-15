@@ -1,4 +1,5 @@
 import api from "@/lib/axios";
+import type { Conversation, StreamEvent } from "@/types/chat";
 
 interface AskRepositoryInput {
   question: string;
@@ -11,11 +12,124 @@ export const askRepository = async ({
   repositoryId,
   filePath,
 }: AskRepositoryInput) => {
-  const response = await api.post("/chat", {
-    question,
-    repositoryId,
-    filePath,
+  const response = await api.post("/chat", { question, repositoryId, filePath });
+  return response.data.data;
+};
+
+// ── Conversation CRUD ──
+
+export const getConversations = async (): Promise<Conversation[]> => {
+  const response = await api.get("/conversations");
+  return response.data.data;
+};
+
+export const getConversation = async (id: string): Promise<Conversation> => {
+  const response = await api.get(`/conversations/${id}`);
+  return response.data.data;
+};
+
+export const createConversation = async (
+  title: string,
+  repositoryId?: string
+): Promise<Conversation> => {
+  const response = await api.post("/conversations", { title, repositoryId });
+  return response.data.data;
+};
+
+export const deleteConversation = async (id: string): Promise<void> => {
+  await api.delete(`/conversations/${id}`);
+};
+
+export const renameConversation = async (
+  id: string,
+  title: string
+): Promise<void> => {
+  await api.patch(`/conversations/${id}`, { title });
+};
+
+// ── Streaming Chat ──
+
+export interface StreamChatInput {
+  question: string;
+  repositoryId?: string;
+  filePath?: string;
+  conversationId?: string;
+  onToken: (token: string) => void;
+  onDone: (data: { conversationId: string; messageType: string; source: any }) => void;
+  onError: (message: string) => void;
+}
+
+export const streamChat = async ({
+  question,
+  repositoryId,
+  filePath,
+  conversationId,
+  onToken,
+  onDone,
+  onError,
+}: StreamChatInput): Promise<void> => {
+  const token = localStorage.getItem("better-auth.session_token") || "";
+
+  const response = await fetch("/api/chat/stream", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include",
+    body: JSON.stringify({ question, repositoryId, filePath, conversationId }),
   });
 
-  return response.data.data;
+  if (!response.ok) {
+    onError("Failed to connect to chat service");
+    return;
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    onError("Failed to read response stream");
+    return;
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() ?? "";
+
+    for (const line of lines) {
+      if (!line.startsWith("data: ")) continue;
+      const jsonStr = line.slice(6).trim();
+      if (!jsonStr) continue;
+
+      try {
+        const event: StreamEvent = JSON.parse(jsonStr);
+        switch (event.type) {
+          case "token":
+            if (event.token) onToken(event.token);
+            break;
+          case "done":
+            onDone({
+              conversationId: event.conversationId ?? "",
+              messageType: event.messageType ?? "answer",
+              source: event.source ?? null,
+            });
+            break;
+          case "error":
+            onError(event.message ?? "Unknown error");
+            break;
+          case "conversation_id":
+            // Handled via onDone
+            break;
+        }
+      } catch {
+        // Skip malformed JSON
+      }
+    }
+  }
 };

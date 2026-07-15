@@ -41,4 +41,24 @@ export class GeminiProvider
 
     return response.text ?? "";
   }
+
+  async *generateTextStream(
+    systemPrompt: string,
+    userPrompt: string
+  ): AsyncGenerator<string> {
+    const response = await ai.models.generateContentStream({
+      model: "gemini-2.5-flash",
+      config: {
+        systemInstruction: systemPrompt,
+        maxOutputTokens: 4096,
+        temperature: 0.3,
+      },
+      contents: userPrompt,
+    });
+
+    for await (const chunk of response) {
+      const text = chunk.text;
+      if (text) yield text;
+    }
+  }
 }
