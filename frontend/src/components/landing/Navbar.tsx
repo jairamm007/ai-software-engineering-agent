@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Sun, Moon, Menu, X, Sparkles } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
+import Logo from "@/components/common/Logo";
 
 const navigationLinks = [
   { href: "#features", label: "Features" },
@@ -31,9 +32,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-18 sm:px-6 md:px-8">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-md shadow-violet-500/20">
-            <Sparkles size={16} className="text-white" />
-          </div>
+          <Logo size="md" />
           <div>
             <h1 className={`font-[Outfit] text-base font-bold leading-tight sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
               Repo Verify
@@ -87,7 +86,7 @@ export default function Navbar() {
 
           <Link
             to={isAuthenticated ? "/dashboard" : "/register"}
-            className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/20 transition-all hover:shadow-lg hover:shadow-violet-500/30 hover:scale-[1.03] font-[Inter]"
+            className="rounded-full accent-gradient px-4 py-2 text-sm font-semibold text-white accent-shadow transition-all hover:scale-[1.03] font-[Inter]"
           >
             {isAuthenticated ? "Dashboard" : "Get Started"}
           </Link>
@@ -145,7 +144,7 @@ export default function Navbar() {
               <Link
                 to={isAuthenticated ? "/dashboard" : "/register"}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-violet-500/25 font-[Inter]"
+                className="rounded-lg accent-gradient px-4 py-3 text-center text-sm font-semibold text-white accent-shadow-lg font-[Inter]"
               >
                 {isAuthenticated ? "Dashboard" : "Get Started"}
               </Link>

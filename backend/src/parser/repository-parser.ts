@@ -23,7 +23,8 @@ export const parseRepository = (
       if (
         !fullPath.endsWith(".ts") &&
         !fullPath.endsWith(".tsx") &&
-        !fullPath.endsWith(".js")
+        !fullPath.endsWith(".js") &&
+        !fullPath.endsWith(".jsx")
       ) {
         continue;
       }
@@ -33,9 +34,10 @@ export const parseRepository = (
         "utf8"
       );
 
+      // Match: import ... from "path" | export ... from "path" | require("path") | import("path")
       const imports = Array.from(
         content.matchAll(
-          /from\s+["'](.+)["']/g
+          /(?:from\s+["']|require\s*\(\s*["']|import\s*\(\s*["'])(.+?)["']/g
         )
       ).map((m) => m[1]);
 

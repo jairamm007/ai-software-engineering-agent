@@ -38,8 +38,8 @@ export default function AIHistory({ items, selectedItemId, onSelect, onClear }: 
               className={`w-full rounded-lg border p-3 text-left transition ${
                 item.id === selectedItemId
                   ? isDark
-                    ? "border-violet-500 bg-violet-500/20"
-                    : "border-violet-500 bg-violet-50"
+                    ? "accent-border accent-bg-light"
+                    : "accent-border accent-bg-light"
                   : isDark
                     ? "border-white/10 hover:bg-white/5"
                     : "border-slate-200 hover:bg-slate-50"

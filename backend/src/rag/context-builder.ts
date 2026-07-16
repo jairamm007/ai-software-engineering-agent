@@ -1,6 +1,6 @@
 import { RetrievedChunk } from "../vector/vector.repository.js";
 
-const MAX_CHUNK_CONTENT_CHARS = 2000;
+const MAX_CHUNK_CONTENT_CHARS = 8000;
 
 export const buildContext = (
   chunks: RetrievedChunk[]
@@ -18,7 +18,25 @@ export const buildContext = (
     return true;
   });
 
-  return uniqueChunks
+  const fileSummary = new Map<string, number[]>();
+  for (const chunk of uniqueChunks) {
+    const existing = fileSummary.get(chunk.filePath) ?? [];
+    existing.push(chunk.startLine);
+    fileSummary.set(chunk.filePath, existing);
+  }
+
+  const fileList = [...fileSummary.entries()]
+    .map(([fp, lines]) => {
+      const range = lines.length === 1
+        ? `L${lines[0]}`
+        : `L${Math.min(...lines)}-${Math.max(...lines)}`;
+      return `  - ${fp} (${range})`;
+    })
+    .join("\n");
+
+  let context = `## Files in context (${uniqueChunks.length} chunks from ${fileSummary.size} files):\n${fileList}\n\n---\n\n`;
+
+  context += uniqueChunks
     .map(
       (chunk, i) => {
         const content =
@@ -38,4 +56,6 @@ ${content}`;
       }
     )
     .join("\n\n---\n\n");
+
+  return context;
 };

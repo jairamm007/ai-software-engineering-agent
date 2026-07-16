@@ -5,6 +5,9 @@ export interface User {
   image?: string;
   role?: string;
   bio?: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  portfolioUrl?: string;
   emailVerified: boolean;
   createdAt: string;
 }
@@ -38,7 +41,7 @@ export interface AuthContextValue extends AuthState {
   verifyEmail: (token: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
-  updateProfile: (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image">>) => Promise<void>;
+  updateProfile: (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>) => Promise<void>;
   deleteAccount: () => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }

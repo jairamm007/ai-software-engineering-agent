@@ -29,7 +29,7 @@ export default function RepositoryTabs({ repositoryId }: Props) {
           className={({ isActive }) =>
             `pb-3 transition-colors ${
               isActive
-                ? "border-b-2 border-violet-500 font-semibold text-violet-500"
+                ? "border-b-2 border-[var(--accent)] font-semibold text-[var(--accent)]"
                 : isDark
                   ? "text-slate-400 hover:text-white"
                   : "text-slate-500 hover:text-slate-900"

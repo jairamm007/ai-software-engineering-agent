@@ -1,31 +1,22 @@
 import OpenAI from "openai";
 
-import { EmbeddingProvider, LLMProvider } from "./provider.types.js";
+import { LLMProvider } from "./provider.types.js";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const client = new OpenAI({
+  apiKey: process.env.TOGETHER_API_KEY,
+  baseURL: "https://api.together.xyz/v1",
 });
 
-export class OpenAIProvider
-  implements EmbeddingProvider, LLMProvider
-{
-  readonly name = "OpenAI";
-
-  async generateEmbedding(text: string): Promise<number[]> {
-    const response = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: text,
-    });
-    return response.data[0]?.embedding ?? [];
-  }
+export class TogetherProvider implements LLMProvider {
+  readonly name = "Together";
 
   async generateText(
     systemPrompt: string,
     userPrompt: string
   ): Promise<string> {
     const response =
-      await openai.chat.completions.create({
-        model: "gpt-4.1-mini",
+      await client.chat.completions.create({
+        model: "meta-llama/Llama-3-70b-chat-hf",
         max_tokens: 16384,
         temperature: 0.3,
         messages: [
@@ -43,9 +34,9 @@ export class OpenAIProvider
     systemPrompt: string,
     userPrompt: string
   ): AsyncGenerator<string> {
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      max_tokens: 4096,
+    const stream = await client.chat.completions.create({
+      model: "meta-llama/Llama-3-70b-chat-hf",
+      max_tokens: 16384,
       temperature: 0.3,
       stream: true,
       messages: [

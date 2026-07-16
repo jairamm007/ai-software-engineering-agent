@@ -13,7 +13,7 @@ export default function StatCard({
   title,
   value,
   icon,
-  gradient = "from-violet-500 to-fuchsia-600",
+  gradient = "accent-gradient",
   index = 0,
 }: StatCardProps) {
   const { theme } = useTheme();
@@ -60,8 +60,8 @@ export default function StatCard({
           ? "border-slate-700 bg-slate-800/80"
           : "border-slate-200 bg-white shadow-sm shadow-slate-200/50"
       }`}>
-        <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${gradient}`} />
-        <div className={`absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${gradient} opacity-10 blur-2xl`} />
+        <div className={`absolute left-0 top-0 h-1 w-full ${gradient.startsWith('accent-') ? gradient : `bg-gradient-to-r ${gradient}`}`} />
+        <div className={`absolute -right-8 -top-8 h-24 w-24 rounded-full ${gradient.startsWith('accent-') ? gradient : `bg-gradient-to-br ${gradient}`} opacity-10 blur-2xl`} />
 
         <div className="relative flex items-start justify-between">
           <div>
@@ -77,7 +77,7 @@ export default function StatCard({
           </div>
           {icon && (
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-md`}
+              className={`flex h-10 w-10 items-center justify-center rounded-xl ${gradient.startsWith('accent-') ? gradient : `bg-gradient-to-br ${gradient}`} text-white shadow-md`}
               style={{ transform: "translateZ(15px)" }}
             >
               {icon}

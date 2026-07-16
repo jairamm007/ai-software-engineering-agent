@@ -3,13 +3,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTheme } from "@/context/ThemeContext";
 import CodeBlock from "@/components/ui/CodeBlock";
-import { ChevronDown, Copy, Check, Download, FileText, FileType, FileImage } from "lucide-react";
+import { ChevronDown, Copy, Check, Download, FileText, FileType, FileImage, Bot } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
 interface Props {
   title: string;
   content: string;
+  loading?: boolean;
   source?: {
     filePath: string;
     startLine: number;
@@ -18,7 +19,7 @@ interface Props {
   } | null;
 }
 
-export default function AIResult({ title, content, source }: Props) {
+export default function AIResult({ title, content, loading = false, source }: Props) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [collapsed, setCollapsed] = useState(false);
@@ -144,7 +145,7 @@ export default function AIResult({ title, content, source }: Props) {
                     PDF (.pdf)
                   </button>
                   <button type="button" onClick={() => void downloadDOCX()} className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-medium transition-colors ${isDark ? "text-slate-300 hover:bg-white/10" : "text-slate-700 hover:bg-slate-50"}`}>
-                    <FileImage size={13} className="text-violet-500" />
+                    <FileImage size={13} className="text-[var(--accent)]" />
                     Word (.docx)
                   </button>
                 </div>
@@ -155,8 +156,47 @@ export default function AIResult({ title, content, source }: Props) {
       </button>
 
       {!collapsed && (
-        <div className={content ? "max-h-[600px] overflow-y-auto p-6" : "flex h-28 items-center justify-center p-4"}>
-          {content ? (
+        <div className={content ? "max-h-[600px] overflow-y-auto p-6" : "flex min-h-[180px] items-center justify-center p-4"}>
+          {loading && !content ? (
+            <div className="flex w-full flex-col items-center gap-4 py-4">
+              {/* Animated AI icon */}
+              <div className="relative">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/20">
+                  <Bot size={22} className={isDark ? "text-[var(--accent)]" : "text-[var(--accent)]"} />
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent)] opacity-75" />
+                  <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-[var(--accent)]" />
+                </span>
+              </div>
+
+              {/* Typing dots */}
+              <div className="flex items-center gap-1.5">
+                {[0, 150, 300].map((d) => (
+                  <span
+                    key={d}
+                    className={`h-2 w-2 animate-bounce rounded-full ${isDark ? "bg-[var(--accent)]" : "bg-[var(--accent)]"}`}
+                    style={{ animationDelay: `${d}ms` }}
+                  />
+                ))}
+              </div>
+
+              <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                AI is generating...
+              </p>
+
+              {/* Skeleton lines */}
+              <div className="w-full max-w-md space-y-2.5">
+                {[100, 85, 70, 90, 60].map((w, i) => (
+                  <div
+                    key={i}
+                    className={`h-2.5 rounded-full animate-pulse ${isDark ? "bg-white/[0.06]" : "bg-slate-200"}`}
+                    style={{ width: `${w}%`, animationDelay: `${i * 100}ms` }}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : content ? (
             <>
               {source && (
                 <div className={`mb-5 rounded-lg border p-4 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
@@ -187,6 +227,10 @@ export default function AIResult({ title, content, source }: Props) {
                   {content}
                 </ReactMarkdown>
               </article>
+              {/* Streaming cursor */}
+              {loading && (
+                <span className="inline-block h-4 w-0.5 animate-pulse bg-[var(--accent)] ml-0.5 align-middle" />
+              )}
             </>
           ) : (
             <div className={`text-center ${isDark ? "text-slate-400" : "text-slate-500"}`}>

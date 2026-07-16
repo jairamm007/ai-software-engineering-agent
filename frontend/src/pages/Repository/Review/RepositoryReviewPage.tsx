@@ -55,8 +55,9 @@ export default function RepositoryReviewPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center">
-          <p className={`text-lg font-medium ${isDark ? "text-white" : "text-slate-900"}`}>Loading repository...</p>
+        <div className="flex h-64 flex-col items-center justify-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 accent-border border-t-transparent" />
+          <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>Loading repository...</p>
         </div>
       </DashboardLayout>
     );
@@ -114,8 +115,8 @@ export default function RepositoryReviewPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className={`w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm outline-none ${
                   isDark
-                    ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-violet-500"
-                    : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+                    ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:accent-border"
+                    : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:accent-border"
                 }`}
               />
             </div>
@@ -137,18 +138,18 @@ export default function RepositoryReviewPage() {
                   onClick={() => setSelectedFile(file.path)}
                   className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all ${
                     isSelected
-                      ? isDark
-                        ? "bg-violet-500/15 text-white shadow-sm ring-1 ring-violet-500/20"
-                        : "bg-violet-50 text-violet-700 shadow-sm ring-1 ring-violet-200"
+                        ? isDark
+                          ? "accent-bg-light text-white shadow-sm accent-ring"
+                          : "accent-bg-light accent-text-base shadow-sm accent-ring"
                       : isDark
                         ? "text-slate-400 hover:bg-white/[0.03] hover:text-slate-200"
                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
                   <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
-                    isSelected ? (isDark ? "bg-violet-500/20" : "bg-violet-100") : typeInfo.bg
+                    isSelected ? (isDark ? "accent-bg-light" : "accent-bg-light") : typeInfo.bg
                   }`}>
-                    <Icon size={13} className={isSelected ? "text-violet-500" : typeInfo.color} />
+                    <Icon size={13} className={isSelected ? "accent-text-base" : typeInfo.color} />
                   </div>
                   <span className="truncate">{file.path}</span>
                   <span className={`ml-auto shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium ${
@@ -167,7 +168,7 @@ export default function RepositoryReviewPage() {
                 type="button"
                 onClick={() => void runReview()}
                 disabled={!selectedFile || loading}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:shadow-none"
+                className="flex items-center gap-2 rounded-xl accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:shadow-none"
               >
                 {loading ? (
                   <>
@@ -192,7 +193,7 @@ export default function RepositoryReviewPage() {
 
         {(result || loading) && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <AIResult title="Code Review" content={result} />
+            <AIResult title="Code Review" content={result} loading={loading} />
           </motion.div>
         )}
       </div>

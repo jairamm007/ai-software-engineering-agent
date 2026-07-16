@@ -55,8 +55,9 @@ export default function RepositoryDocumentationPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center">
-          <p className={`text-lg font-medium ${isDark ? "text-white" : "text-slate-900"}`}>Loading repository...</p>
+        <div className="flex h-64 flex-col items-center justify-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+          <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>Loading repository...</p>
         </div>
       </DashboardLayout>
     );
@@ -199,7 +200,7 @@ export default function RepositoryDocumentationPage() {
 
         {(result || loading) && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <AIResult title="Documentation" content={result} />
+            <AIResult title="Documentation" content={result} loading={loading} />
           </motion.div>
         )}
       </div>

@@ -19,7 +19,7 @@ export default function FileNode({ data }: NodeProps<FileNodeData>) {
         js: "border-amber-500/30 bg-amber-500/10 text-amber-300",
         jsx: "border-orange-500/30 bg-orange-500/10 text-orange-300",
         json: "border-orange-500/30 bg-orange-500/10 text-orange-300",
-        md: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+        md: "border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent-light)]",
         css: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
       }
     : {
@@ -28,7 +28,7 @@ export default function FileNode({ data }: NodeProps<FileNodeData>) {
         js: "border-amber-300 bg-amber-50 text-amber-950",
         jsx: "border-orange-300 bg-orange-50 text-orange-950",
         json: "border-orange-300 bg-orange-50 text-orange-950",
-        md: "border-violet-300 bg-violet-50 text-violet-950",
+        md: "border-[var(--accent-light)] bg-[var(--accent-light)] text-[var(--accent)]",
         css: "border-emerald-300 bg-emerald-50 text-emerald-950",
       };
 
@@ -38,7 +38,7 @@ export default function FileNode({ data }: NodeProps<FileNodeData>) {
       ? "border-red-500 bg-red-500/10 text-red-300 ring-2 ring-red-500/30"
       : "border-red-400 bg-red-50 text-red-700 ring-2 ring-red-400/30"
     : color;
-  const searchClass = data.isSearchMatch ? "ring-2 ring-violet-500 ring-offset-2" : "";
+  const searchClass = data.isSearchMatch ? "ring-2 ring-[var(--accent)] ring-offset-2" : "";
 
   return (
     <div title={data.label} className={`min-w-[220px] rounded-xl border px-4 py-3 shadow-sm transition-shadow hover:shadow-md ${circularClass} ${searchClass}`}>

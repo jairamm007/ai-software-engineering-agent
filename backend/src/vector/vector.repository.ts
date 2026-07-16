@@ -52,7 +52,7 @@ export const searchNearestChunks = async (
       )}`
     : Prisma.empty;
 
-  const fetchLimit = Math.min(limit * 2, 20);
+  const fetchLimit = Math.min(limit * 3, 40);
 
   const results = await prisma.$queryRaw<RetrievedChunk[]>`
     SELECT
@@ -69,7 +69,7 @@ export const searchNearestChunks = async (
       ON cc."fileId" = rf.id
     JOIN "Repository" r
       ON rf."repositoryId" = r.id
-    ${whereClause}
+      ${whereClause}
     ORDER BY ce.embedding <=> ${vector}::vector
     LIMIT ${fetchLimit}
   `;
@@ -78,7 +78,7 @@ export const searchNearestChunks = async (
 
   return results
     .filter((chunk) => {
-      if (chunk.distance >= 0.75) return false;
+      if (chunk.distance >= 0.85) return false;
       const key = `${chunk.filePath}:${chunk.startLine}-${chunk.endLine}`;
       if (seen.has(key)) return false;
       seen.add(key);

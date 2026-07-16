@@ -170,7 +170,7 @@ export default function RepositoryChatPage() {
             <ArrowLeft size={16} />
           </Link>
           <div className="flex items-center gap-2">
-            <MessageSquare size={16} className="text-violet-500" />
+            <MessageSquare size={16} className="text-[var(--accent)]" />
             <span className={`text-sm font-semibold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>
               {selectedRepo?.name ?? "Repository"} — AI Chat
             </span>
@@ -181,7 +181,7 @@ export default function RepositoryChatPage() {
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 && !streaming ? (
             <div className="flex h-full flex-col items-center justify-center p-8">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl accent-gradient">
                 <MessageSquare size={28} className="text-white" />
               </div>
               <h3 className={`mb-2 text-lg font-semibold font-[Outfit] ${isDark ? "text-white" : "text-slate-800"}`}>
@@ -198,8 +198,8 @@ export default function RepositoryChatPage() {
                     onClick={() => send(q)}
                     className={`rounded-xl border px-4 py-3 text-left text-sm font-[Inter] transition-colors ${
                       isDark
-                        ? "border-white/10 bg-white/5 text-slate-300 hover:border-violet-500/50 hover:bg-violet-500/10 hover:text-violet-300"
-                        : "border-slate-200 bg-slate-50 text-slate-600 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
+                        ? "border-white/10 bg-white/5 text-slate-300 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent-light)]"
+                        : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[var(--accent-light)] hover:bg-[var(--accent-light)] hover:text-[var(--accent)]"
                     }`}
                   >
                     {q}
@@ -220,7 +220,7 @@ export default function RepositoryChatPage() {
               )}
               {streaming && !streamingContent && (
                 <div className="mb-6 flex gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-xs font-bold text-white font-[Inter]">AI</div>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full accent-gradient text-xs font-bold text-white font-[Inter]">AI</div>
                   <div className={`rounded-2xl border px-5 py-4 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
                     <div className="flex gap-1.5">
                       {[0, 150, 300].map((d) => (
@@ -252,7 +252,7 @@ export default function RepositoryChatPage() {
                 <Square size={14} />
               </button>
             ) : (
-              <button type="submit" disabled={!input.trim()} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:shadow-lg disabled:opacity-50">
+              <button type="submit" disabled={!input.trim()} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl accent-gradient text-white hover:shadow-lg disabled:opacity-50">
                 <Send size={14} />
               </button>
             )}
@@ -278,7 +278,7 @@ function MessageBubble({
   return (
     <div className={`mb-6 flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""} w-full max-w-full`}>
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white font-[Inter] ${isUser ? "bg-blue-600" : "bg-gradient-to-br from-violet-500 to-fuchsia-600"}`}>
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white font-[Inter] ${isUser ? "bg-blue-600" : "accent-gradient"}`}>
           {isUser ? "U" : "AI"}
         </div>
         <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} min-w-0 flex-1`}>
@@ -288,7 +288,7 @@ function MessageBubble({
             ) : (
               <MarkdownMessage content={message.content} />
             )}
-            {streaming && <span className="inline-block h-4 w-0.5 animate-pulse bg-violet-400 ml-0.5" />}
+            {streaming && <span className="inline-block h-4 w-0.5 animate-pulse bg-[var(--accent)] ml-0.5" />}
           </div>
           {!isUser && !streaming && message.content && (
             <div className="mt-1.5 flex items-center gap-1">
@@ -305,7 +305,7 @@ function MessageBubble({
                   {menuOpen && (
                     <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
                       className={`absolute left-0 top-full z-50 mt-1 w-36 overflow-hidden rounded-xl border shadow-xl ${isDark ? "border-white/10 bg-[#110C1D]" : "border-slate-200 bg-white"}`}>
-                      {([["txt", "Plain Text", FileText, "text-blue-500"], ["md", "Markdown", FileText, "text-violet-500"], ["pdf", "PDF", FileType, "text-red-500"], ["docx", "Word", FileType, "text-blue-400"]] as const).map(([fmt, label, Icon, color]) => (
+                      {([["txt", "Plain Text", FileText, "text-blue-500"], ["md", "Markdown", FileText, "text-[var(--accent)]"], ["pdf", "PDF", FileType, "text-red-500"], ["docx", "Word", FileType, "text-blue-400"]] as const).map(([fmt, label, Icon, color]) => (
                         <button key={fmt} type="button" onClick={() => { onDownload(message.content, fmt); setMenuOpen(false); }}
                           className={`flex w-full items-center gap-2 px-3 py-2 text-xs font-medium font-[Inter] ${isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-50"}`}>
                           <Icon size={12} className={color} /> {label}

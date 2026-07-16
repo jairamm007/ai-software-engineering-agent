@@ -80,8 +80,8 @@ export default function CommandPalette({ onClose, onSelect }: Props) {
               key={command.action}
               className={`cursor-pointer rounded-lg px-3 py-2.5 text-sm outline-none ${
                 isDark
-                  ? "text-slate-200 data-[selected=true]:bg-violet-600 data-[selected=true]:text-white"
-                  : "text-slate-700 data-[selected=true]:bg-violet-600 data-[selected=true]:text-white"
+                  ? "text-slate-200 data-[selected=true]:accent-bg data-[selected=true]:text-white"
+                  : "text-slate-700 data-[selected=true]:accent-bg data-[selected=true]:text-white"
               }`}
               onSelect={() => handleSelect(command.action)}
               value={command.label}

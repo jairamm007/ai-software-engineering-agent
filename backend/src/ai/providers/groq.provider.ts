@@ -16,7 +16,7 @@ export class GroqProvider implements LLMProvider {
     const response =
       await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
-        max_tokens: 4096,
+        max_tokens: 16384,
         temperature: 0.3,
         messages: [
           { role: "system", content: systemPrompt },

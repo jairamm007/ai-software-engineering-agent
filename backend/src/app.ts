@@ -13,6 +13,7 @@ import chatRoutes from "./routes/chat.routes.js";
 import conversationRoutes from "./routes/conversation.routes.js";
 import agentRoutes from "./routes/agent.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import userPreferenceRoutes from "./routes/user-preference.routes.js";
 const app = express();
 
 app.use(cors({
@@ -34,6 +35,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/user/preferences", userPreferenceRoutes);
 
 app.use(errorHandler);
 

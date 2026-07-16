@@ -98,18 +98,28 @@ export const deleteRepository = async (
     throw new Error("Repository not found or access denied");
   }
 
+  // Delete embeddings outside the transaction — if the table doesn't exist
+  // or the query fails, we don't want to poison the transaction.
+  await prisma.$executeRaw`
+    DELETE FROM code_embeddings
+    WHERE chunk_id IN (
+      SELECT cc.id
+      FROM "CodeChunk" cc
+      JOIN "RepositoryFile" rf
+        ON cc."fileId" = rf.id
+      WHERE rf."repositoryId" = ${repositoryId}
+    )
+  `.catch(() => {});
+
   await prisma.$transaction(async (tx) => {
-    // Delete embeddings first
-    await tx.$executeRaw`
-      DELETE FROM code_embeddings
-      WHERE chunk_id IN (
-        SELECT cc.id
-        FROM "CodeChunk" cc
-        JOIN "RepositoryFile" rf
-          ON cc."fileId" = rf.id
-        WHERE rf."repositoryId" = ${repositoryId}
-      )
-    `.catch(() => {});
+    // Delete symbols
+    await tx.codeSymbol.deleteMany({
+      where: {
+        file: {
+          repositoryId,
+        },
+      },
+    });
 
     // Delete chunks
     await tx.codeChunk.deleteMany({

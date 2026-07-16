@@ -9,6 +9,11 @@ function mapUser(data: Record<string, unknown>): User {
     name: data.name as string,
     email: data.email as string,
     image: data.image as string | undefined,
+    role: data.role as string | undefined,
+    bio: data.bio as string | undefined,
+    linkedinUrl: data.linkedinUrl as string | undefined,
+    githubUrl: data.githubUrl as string | undefined,
+    portfolioUrl: data.portfolioUrl as string | undefined,
     emailVerified: data.emailVerified as boolean,
     createdAt: (data.createdAt as string) ?? new Date().toISOString(),
   };
@@ -210,4 +215,21 @@ export async function apiClearCache(): Promise<void> {
     const body = await res.json().catch(() => ({}));
     throw new Error((body as { error?: string }).error || "Failed to clear cache");
   }
+}
+
+export async function apiUpdateProfile(updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>): Promise<User> {
+  const res = await fetch("/api/user/profile", {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error || "Failed to update profile");
+  }
+
+  const json = await res.json();
+  return mapUser(json.user as Record<string, unknown>);
 }

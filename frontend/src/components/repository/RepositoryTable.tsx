@@ -61,15 +61,15 @@ export default function RepositoryTable({ repositories }: Props) {
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-                      isDark ? "bg-violet-500/15" : "bg-violet-50"
+                      isDark ? "bg-[var(--accent)]/15" : "bg-[var(--accent-light)]"
                     }`}>
-                      <FolderGit2 size={16} className="text-violet-500" />
+                      <FolderGit2 size={16} className="text-[var(--accent)]" />
                     </div>
                     <div>
                       <Link
                         to={`/repositories/${repo.id}`}
                         className={`flex items-center gap-1.5 font-semibold transition-colors ${
-                          isDark ? "text-white hover:text-violet-400" : "text-slate-900 hover:text-violet-600"
+                          isDark ? "text-white hover:text-[var(--accent)]" : "text-slate-900 hover:text-[var(--accent)]"
                         }`}
                       >
                         {repo.name}
@@ -91,7 +91,7 @@ export default function RepositoryTable({ repositories }: Props) {
                 </td>
                 <td className="px-5 py-4">
                   <div className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${
-                    isDark ? "bg-fuchsia-500/10 text-fuchsia-400" : "bg-fuchsia-50 text-fuchsia-600"
+                    isDark ? "bg-[var(--accent)]/10 text-[var(--accent)]" : "bg-[var(--accent-light)] text-[var(--accent)]"
                   }`}>
                     <Layers size={12} />
                     {chunks}

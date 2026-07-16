@@ -3,6 +3,68 @@ import { hashPassword, verifyPassword } from "better-auth/crypto";
 import type { AuthRequest } from "../auth/auth.middleware.js";
 import type { Response } from "express";
 
+export async function updateProfileController(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({ success: false, error: "Unauthorized" });
+      return;
+    }
+
+    const { name, email, bio, role, image, linkedinUrl, githubUrl, portfolioUrl } = req.body;
+
+    const data: Record<string, string | null> = {};
+    if (name !== undefined) data.name = name;
+    if (email !== undefined) data.email = email;
+    if (bio !== undefined) data.bio = bio || null;
+    if (role !== undefined) data.role = role || null;
+    if (image !== undefined) data.image = image || null;
+    if (linkedinUrl !== undefined) data.linkedinUrl = linkedinUrl || null;
+    if (githubUrl !== undefined) data.githubUrl = githubUrl || null;
+    if (portfolioUrl !== undefined) data.portfolioUrl = portfolioUrl || null;
+
+    if (Object.keys(data).length === 0) {
+      res.status(400).json({ success: false, error: "No fields to update" });
+      return;
+    }
+
+    // Check email uniqueness if changing
+    if (data.email) {
+      const existing = await prisma.user.findFirst({
+        where: { email: data.email as string, NOT: { id: userId } },
+      });
+      if (existing) {
+        res.status(409).json({ success: false, error: "Email already in use" });
+        return;
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        bio: true,
+        role: true,
+        linkedinUrl: true,
+        githubUrl: true,
+        portfolioUrl: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error("[USER] Update profile error:", error);
+    res.status(500).json({ success: false, error: "Failed to update profile" });
+  }
+}
+
 export async function deleteAccountController(req: AuthRequest, res: Response) {
   try {
     const userId = req.userId;

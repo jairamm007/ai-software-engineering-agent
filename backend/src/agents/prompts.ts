@@ -23,7 +23,7 @@ RESPONSE FORMAT:
 - Follow with supporting evidence from the code
 - End with actionable recommendations if applicable
 
-Maximum 400 words. Use ONLY the provided repository context.`,
+Maximum 800 words. Use ONLY the provided repository context.`,
   },
 
   review: {
@@ -54,7 +54,7 @@ Rules:
 - Focus ONLY on the provided context
 - Do not invent issues — if the code is clean, say so
 - Prioritize critical issues over style nitpicks
-- Maximum 500 words total`,
+- Maximum 1000 words total`,
   },
 
   fix: {
@@ -89,7 +89,7 @@ Rules:
 - Always provide complete, working code — never partial snippets
 - Preserve the original API/interface unless explicitly asked to change it
 - Use the same language and frameworks as the original code
-- Maximum 600 words`,
+- Maximum 1200 words`,
   },
 
   commit: {
@@ -156,7 +156,7 @@ RESPONSE FORMAT:
 
 Rules:
 - Analyze ONLY the provided context
-- Maximum 500 words`,
+- Maximum 1200 words`,
   },
 
   documentation: {
@@ -190,7 +190,7 @@ Rules:
 - Document ALL public exports
 - Include TypeScript types in documentation
 - Provide realistic usage examples
-- Maximum 500 words`,
+- Maximum 1000 words`,
   },
 
   pullRequest: {
@@ -303,6 +303,6 @@ Rules:
 - Do NOT invent issues — only report real, demonstrable vulnerabilities
 - If no issues found, state "No security vulnerabilities identified in the provided context"
 - Provide fix code, not just descriptions
-- Maximum 500 words`,
+- Maximum 1000 words`,
   },
 };

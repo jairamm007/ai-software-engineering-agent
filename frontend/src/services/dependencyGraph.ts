@@ -6,6 +6,7 @@ export interface DependencyGraphNode {
   id: string;
   label: string;
   isCircular: boolean;
+  depth?: number;
 }
 
 export interface DependencyGraphEdge {
@@ -22,12 +23,31 @@ export interface DependencyGraphAnalytics {
   averageDependencies: number;
   circularDependencies: number;
   disconnectedFiles: number;
+  stronglyConnectedComponents: number;
 }
 
 export interface DependencyGraph {
   nodes: DependencyGraphNode[];
   edges: DependencyGraphEdge[];
   analytics: DependencyGraphAnalytics;
+}
+
+export interface BlastRadiusNode {
+  file: string;
+  depth: number;
+}
+
+export interface BlastRadiusResult {
+  file: string;
+  depth: number;
+  affected: BlastRadiusNode[];
+  totalAffected: number;
+}
+
+export interface FileDependencies {
+  file: string;
+  dependents: string[];
+  dependencies: string[];
 }
 
 export const getDependencyGraph = async (
@@ -38,6 +58,35 @@ export const getDependencyGraph = async (
   );
 
   return response.data.data;
+};
+
+export const getFileDependencies = async (
+  id: string,
+  filePath: string
+): Promise<FileDependencies> => {
+  const response = await api.get<ApiResponse<FileDependencies>>(
+    `/repository/${id}/dependency-graph/dependents`,
+    { params: { file: filePath } }
+  );
+
+  return response.data.data;
+};
+
+export const getBlastRadius = async (
+  id: string,
+  filePath: string,
+  depth: number = 2
+): Promise<BlastRadiusResult> => {
+  const response = await api.get<ApiResponse<BlastRadiusResult>>(
+    `/repository/${id}/dependency-graph/blast-radius`,
+    { params: { file: filePath, depth } }
+  );
+
+  return response.data.data;
+};
+
+export const invalidateGraphCache = async (id: string): Promise<void> => {
+  await api.post(`/repository/${id}/dependency-graph/invalidate`);
 };
 
 export const summarizeDependencyGraph = async (id: string) => {

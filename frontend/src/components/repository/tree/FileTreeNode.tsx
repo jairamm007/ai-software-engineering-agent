@@ -60,17 +60,17 @@ export default function FileTreeNode({ node, selectedFileId, onSelect }: Props) 
       className={`group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs transition-all ${
         isSelected
           ? isDark
-            ? "bg-violet-500/15 text-white shadow-sm ring-1 ring-violet-500/20"
-            : "bg-violet-50 text-violet-700 shadow-sm ring-1 ring-violet-200"
+            ? "bg-[var(--accent)]/15 text-white shadow-sm ring-1 ring-[var(--accent)]/20"
+            : "bg-[var(--accent-light)] text-[var(--accent)] shadow-sm ring-1 ring-[var(--accent-light)]"
           : isDark
             ? "text-slate-400 hover:bg-white/5 hover:text-slate-200"
             : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
       }`}
     >
       <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded ${
-        isSelected ? (isDark ? "bg-violet-500/20" : "bg-violet-100") : typeInfo.bg
+        isSelected ? (isDark ? "bg-[var(--accent)]/20" : "bg-[var(--accent-light)]") : typeInfo.bg
       }`}>
-        <Icon size={11} className={isSelected ? "text-violet-500" : typeInfo.color} />
+        <Icon size={11} className={isSelected ? "text-[var(--accent)]" : typeInfo.color} />
       </div>
       <span className="truncate">{node.name}</span>
       {node.file && (

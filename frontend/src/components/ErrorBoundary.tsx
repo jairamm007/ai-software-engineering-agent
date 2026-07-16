@@ -54,7 +54,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={this.handleGoHome}
-                className="rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-700"
+                className="rounded-lg accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-colors"
               >
                 Go Home
               </button>

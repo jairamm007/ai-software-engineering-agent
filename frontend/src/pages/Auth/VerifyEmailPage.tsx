@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Check, X, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import Logo from "@/components/common/Logo";
 
 export default function VerifyEmailPage() {
   const { theme } = useTheme();
@@ -27,7 +28,7 @@ export default function VerifyEmailPage() {
   }, [token, verifyEmail]);
 
   const icons = {
-    verifying: <div className="h-16 w-16 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />,
+    verifying: <div className="h-16 w-16 animate-spin rounded-full border-4 border-[var(--accent)] border-t-transparent" />,
     success: (
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15">
         <Check size={28} className="text-emerald-500" />
@@ -71,8 +72,8 @@ export default function VerifyEmailPage() {
         }`}
       >
         <div className="mx-auto mb-4">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600">
-            <Sparkles size={22} className="text-white" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl">
+            <Logo size="md" />
           </div>
         </div>
 
@@ -85,7 +86,7 @@ export default function VerifyEmailPage() {
           {(status === "success") && (
             <Link
               to="/dashboard"
-              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-xl"
+              className="inline-flex items-center justify-center rounded-xl accent-gradient px-6 py-2.5 text-sm font-medium text-white accent-shadow transition-all hover:shadow-xl"
             >
               Go to Dashboard
             </Link>
@@ -93,7 +94,7 @@ export default function VerifyEmailPage() {
           {(status === "error" || status === "no-token") && (
             <Link
               to="/login"
-              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-xl"
+              className="inline-flex items-center justify-center rounded-xl accent-gradient px-6 py-2.5 text-sm font-medium text-white accent-shadow transition-all hover:shadow-xl"
             >
               Back to Sign In
             </Link>

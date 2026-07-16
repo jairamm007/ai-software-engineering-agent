@@ -73,7 +73,7 @@ export default function RepositoryAnalytics({ repositoryId }: Props) {
                   <span className={`font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{language.percentage}%</span>
                 </div>
                 <div className={`mt-1 h-2 overflow-hidden rounded-full ${isDark ? "bg-white/10" : "bg-slate-100"}`}>
-                  <div className="h-full rounded-full bg-violet-500" style={{ width: `${language.percentage}%` }} />
+                  <div className="h-full rounded-full accent-bg" style={{ width: `${language.percentage}%` }} />
                 </div>
               </div>
             ))}

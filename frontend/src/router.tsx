@@ -15,6 +15,7 @@ const DashboardPage = lazy(() => import("@/pages/Dashboard/DashboardPage"));
 const SearchPage = lazy(() => import("@/pages/Dashboard/SearchPage"));
 const CodeReviewPage = lazy(() => import("@/pages/Dashboard/CodeReviewPage"));
 const ArchitecturePage = lazy(() => import("@/pages/Dashboard/ArchitecturePage"));
+const DocumentationPage = lazy(() => import("@/pages/Dashboard/DocumentationPage"));
 const TestingPage = lazy(() => import("@/pages/Dashboard/TestingPage"));
 const AnalyticsPage = lazy(() => import("@/pages/Dashboard/AnalyticsPage"));
 const FavoritesPage = lazy(() => import("@/pages/Dashboard/FavoritesPage"));
@@ -44,7 +45,7 @@ const TermsPage = lazy(() => import("@/pages/Info/TermsPage"));
 function PageLoader() {
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 accent-border border-t-transparent" />
     </div>
   );
 }
@@ -65,7 +66,7 @@ function NotFoundPage() {
         <p className="mb-6 text-lg text-slate-500">Page not found</p>
         <a
           href="/"
-          className="inline-block rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-700"
+          className="inline-block rounded-lg accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-colors"
         >
           Go Home
         </a>
@@ -103,6 +104,7 @@ export const router = createBrowserRouter([
   { path: "/chat", element: <LazyPage><ProtectedRoute><AIChatPage /></ProtectedRoute></LazyPage> },
   { path: "/code-review", element: <LazyPage><ProtectedRoute><CodeReviewPage /></ProtectedRoute></LazyPage> },
   { path: "/architecture", element: <LazyPage><ProtectedRoute><ArchitecturePage /></ProtectedRoute></LazyPage> },
+  { path: "/documentation", element: <LazyPage><ProtectedRoute><DocumentationPage /></ProtectedRoute></LazyPage> },
   { path: "/testing", element: <LazyPage><ProtectedRoute><TestingPage /></ProtectedRoute></LazyPage> },
   { path: "/analytics", element: <LazyPage><ProtectedRoute><AnalyticsPage /></ProtectedRoute></LazyPage> },
   { path: "/favorites", element: <LazyPage><ProtectedRoute><FavoritesPage /></ProtectedRoute></LazyPage> },

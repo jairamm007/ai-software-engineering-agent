@@ -190,7 +190,7 @@ export default function CodeBlock({ language = "text", children, filename }: Pro
                     isDark ? "text-slate-300 hover:bg-white/10" : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  <FileImage size={13} className="text-violet-500" />
+                  <FileImage size={13} className="accent-text-base" />
                   Word (.docx)
                 </button>
               </div>

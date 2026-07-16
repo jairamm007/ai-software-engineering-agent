@@ -12,6 +12,7 @@ const routeLabels: Record<string, string> = {
   "/chat": "AI Chat",
   "/code-review": "Code Review",
   "/architecture": "Architecture",
+  "/documentation": "Documentation",
   "/testing": "Testing",
   "/analytics": "Analytics",
   "/favorites": "Favorites",
@@ -101,7 +102,7 @@ export default function TopBar() {
                   : "hover:bg-slate-100"
               }`}
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-[11px] font-bold text-white font-[Inter]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full accent-gradient text-[11px] font-bold text-white font-[Inter]">
                 {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
               </div>
               <span className={`hidden text-xs font-medium font-[Inter] sm:block ${

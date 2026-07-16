@@ -6,7 +6,7 @@ import {
   AgentType,
 } from "./agent.types.js";
 
-const MAX_CONTEXT_CHARS = 12_000;
+const MAX_CONTEXT_CHARS = 100_000;
 
 const truncateContext = (context: string): string => {
   if (context.length <= MAX_CONTEXT_CHARS) {

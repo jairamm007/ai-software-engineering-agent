@@ -285,7 +285,7 @@ export default function AIChatPage() {
                         key={conv.id}
                         className={`group flex items-center gap-2 rounded-lg px-3 py-2.5 text-left transition-colors cursor-pointer ${
                           activeConversationId === conv.id
-                            ? isDark ? "bg-violet-500/10 text-white" : "bg-violet-50 text-violet-700"
+                            ? isDark ? "accent-bg-light text-white" : "accent-bg-light accent-text-base"
                             : isDark ? "text-slate-400 hover:bg-white/[0.04] hover:text-white" : "text-slate-600 hover:bg-slate-50"
                         }`}
                         onClick={() => {
@@ -341,7 +341,7 @@ export default function AIChatPage() {
                     : "border-slate-200 bg-white text-slate-600 hover:border-violet-300"
                 }`}
               >
-                <FolderGit2 size={13} className="text-violet-500" />
+                <FolderGit2 size={13} className="accent-text-base" />
                 {selectedRepo ? selectedRepo.name : "Select repo"}
                 <ChevronDown size={12} className={`transition-transform ${showRepoDropdown ? "rotate-180" : ""}`} />
               </button>
@@ -364,7 +364,7 @@ export default function AIChatPage() {
                           </p>
                           <Link
                             to="/repositories"
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-3 py-1.5 text-xs font-medium text-white"
+                            className="inline-flex items-center gap-1.5 rounded-lg accent-gradient px-3 py-1.5 text-xs font-medium text-white"
                           >
                             <FolderGit2 size={12} /> Add Repository
                           </Link>
@@ -377,13 +377,13 @@ export default function AIChatPage() {
                             onClick={() => handleSelectRepo(repo)}
                             className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs transition-colors ${
                               selectedRepo?.id === repo.id
-                                ? isDark ? "bg-violet-500/20 text-white" : "bg-violet-50 text-violet-700"
+                                ? isDark ? "accent-bg-light text-white" : "accent-bg-light accent-text-base"
                                 : isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-50"
                             }`}
                           >
-                            <FolderGit2 size={13} className={selectedRepo?.id === repo.id ? "text-violet-500" : isDark ? "text-slate-500" : "text-slate-400"} />
+                            <FolderGit2 size={13} className={selectedRepo?.id === repo.id ? "accent-text-base" : isDark ? "text-slate-500" : "text-slate-400"} />
                             <span className="flex-1 truncate">{repo.name}</span>
-                            {selectedRepo?.id === repo.id && <Check size={13} className="text-violet-500" />}
+                            {selectedRepo?.id === repo.id && <Check size={13} className="accent-text-base" />}
                           </button>
                         ))
                       )}
@@ -398,8 +398,8 @@ export default function AIChatPage() {
           <div className="flex-1 overflow-y-auto">
             {!selectedRepo ? (
               <div className="flex h-full flex-col items-center justify-center p-8">
-                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20">
-                  <Sparkles size={32} className="text-violet-500" />
+                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl accent-bg-light">
+                  <Sparkles size={32} className="accent-text-base" />
                 </div>
                 <h3 className={`mb-2 text-xl font-semibold font-[Outfit] ${isDark ? "text-white" : "text-slate-800"}`}>
                   Select a Repository to Start
@@ -410,7 +410,7 @@ export default function AIChatPage() {
                 {repositories.length === 0 && !reposLoading && (
                   <Link
                     to="/repositories"
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-shadow hover:shadow-xl"
+                    className="inline-flex items-center gap-2 rounded-xl accent-gradient accent-shadow px-6 py-3 text-sm font-medium text-white transition-shadow hover:shadow-xl"
                   >
                     <FolderGit2 size={16} /> Add Your First Repository <ArrowRight size={14} />
                   </Link>
@@ -418,7 +418,7 @@ export default function AIChatPage() {
               </div>
             ) : messages.length === 0 && !streaming ? (
               <div className="flex h-full flex-col items-center justify-center p-8">
-                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl accent-gradient">
                   <MessageSquare size={28} className="text-white" />
                 </div>
                 <h3 className={`mb-2 text-lg font-semibold font-[Outfit] ${isDark ? "text-white" : "text-slate-800"}`}>
@@ -435,8 +435,8 @@ export default function AIChatPage() {
                       onClick={() => send(q)}
                       className={`rounded-xl border px-4 py-3 text-left text-sm font-[Inter] transition-colors ${
                         isDark
-                          ? "border-white/10 bg-white/5 text-slate-300 hover:border-violet-500/50 hover:bg-violet-500/10 hover:text-violet-300"
-                          : "border-slate-200 bg-slate-50 text-slate-600 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
+                          ? "border-white/10 bg-white/5 text-slate-300 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
+                          : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
                       }`}
                     >
                       {q}
@@ -466,7 +466,7 @@ export default function AIChatPage() {
                 )}
                 {streaming && !streamingContent && (
                   <div className="mb-6 flex gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-xs font-bold text-white font-[Inter]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full accent-gradient text-xs font-bold text-white font-[Inter]">
                       AI
                     </div>
                     <div className={`rounded-2xl border px-5 py-4 ${
@@ -522,7 +522,7 @@ export default function AIChatPage() {
                 <button
                   type="submit"
                   disabled={!input.trim() || !selectedRepo}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white transition-all hover:shadow-lg disabled:opacity-50"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl accent-gradient text-white transition-all hover:shadow-lg disabled:opacity-50"
                 >
                   <Send size={14} />
                 </button>
@@ -564,7 +564,7 @@ function MessageBubble({
     <div className={`mb-6 flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div className={`flex max-w-full gap-3 ${isUser ? "flex-row-reverse" : ""} w-full`}>
         <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white font-[Inter] ${
-          isUser ? "bg-blue-600" : "bg-gradient-to-br from-violet-500 to-fuchsia-600"
+          isUser ? "bg-blue-600" : "accent-gradient"
         }`}>
           {isUser ? "U" : "AI"}
         </div>
@@ -581,7 +581,7 @@ function MessageBubble({
               <MarkdownMessage content={message.content} />
             )}
             {streaming && (
-              <span className="inline-block h-4 w-0.5 animate-pulse bg-violet-400 ml-0.5" />
+              <span className="inline-block h-4 w-0.5 animate-pulse accent-text-base ml-0.5" />
             )}
           </div>
 
@@ -623,7 +623,7 @@ function MessageBubble({
                     >
                       {([
                         ["txt", "Plain Text", FileText, "text-blue-500"],
-                        ["md", "Markdown", FileText, "text-violet-500"],
+                        ["md", "Markdown", FileText, "accent-text-base"],
                         ["pdf", "PDF", FileType, "text-red-500"],
                         ["docx", "Word", FileType, "text-blue-400"],
                       ] as const).map(([fmt, label, Icon, color]) => (

@@ -43,7 +43,7 @@ export const getConversation = async (
   }
 
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const conversation = await getConversationById(id, userId);
     if (!conversation) {
       return res.status(404).json(errorResponse("Conversation not found"));
@@ -91,7 +91,7 @@ export const removeConversation = async (
   }
 
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     await deleteConversation(id, userId);
     return res.json(successResponse(null, "Conversation deleted"));
   } catch (error) {
@@ -112,7 +112,7 @@ export const renameConversation = async (
   }
 
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { title } = req.body;
     if (!title) {
       return res.status(400).json(errorResponse("Title is required"));

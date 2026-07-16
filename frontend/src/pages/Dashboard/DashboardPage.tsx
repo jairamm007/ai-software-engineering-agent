@@ -23,8 +23,8 @@ import { getRepositories } from "@/services/repository";
 import type { RepositoryListItem } from "@/types/repository";
 
 const capabilities = [
-  { icon: GitBranch, label: "Code Review & Analysis", color: "text-violet-500" },
-  { icon: BookOpen, label: "Architecture Documentation", color: "text-fuchsia-500" },
+  { icon: GitBranch, label: "Code Review & Analysis", color: "accent-text-base" },
+  { icon: BookOpen, label: "Architecture Documentation", color: "accent-text-base" },
   { icon: Layers, label: "Dependency Graph Analysis", color: "text-cyan-500" },
   { icon: MessageSquare, label: "AI Chat Assistant", color: "text-emerald-500", link: "/chat" },
   { icon: Shield, label: "Security Scanning", color: "text-amber-500" },
@@ -77,7 +77,7 @@ export default function DashboardPage() {
         className="mb-8"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg shadow-violet-500/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl accent-gradient shadow-lg accent-shadow">
             <Sparkles size={20} className="text-white" />
           </div>
           <div>
@@ -99,10 +99,10 @@ export default function DashboardPage() {
         className="mb-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4"
       >
         <motion.div variants={itemVariants}>
-          <StatCard title="Repositories" value={totalRepositories} icon={<FolderGit2 size={20} />} gradient="from-violet-500 to-purple-600" index={0} />
+          <StatCard title="Repositories" value={totalRepositories} icon={<FolderGit2 size={20} />} gradient="accent-gradient" index={0} />
         </motion.div>
         <motion.div variants={itemVariants}>
-          <StatCard title="Files Indexed" value={totalFiles} icon={<FileCode2 size={20} />} gradient="from-fuchsia-500 to-pink-600" index={1} />
+          <StatCard title="Files Indexed" value={totalFiles} icon={<FileCode2 size={20} />} gradient="accent-gradient" index={1} />
         </motion.div>
         <motion.div variants={itemVariants}>
           <StatCard title="Code Chunks" value={totalChunks} icon={<Layers size={20} />} gradient="from-cyan-500 to-blue-600" index={2} />
@@ -126,7 +126,7 @@ export default function DashboardPage() {
               Recent Repositories
             </h2>
             {data.length > 0 && (
-              <Link to="/repositories" className="flex items-center gap-1 text-sm font-medium text-violet-500 hover:text-violet-400">
+              <Link to="/repositories" className="flex items-center gap-1 text-sm font-medium accent-text-base hover:opacity-80">
                 View all <ArrowRight size={14} />
               </Link>
             )}
@@ -136,7 +136,7 @@ export default function DashboardPage() {
             <div className={`rounded-2xl border p-10 text-center shadow-sm ${
               isDark ? "border-slate-700 bg-slate-800/80" : "border-slate-200 bg-white"
             }`}>
-              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
               <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-400"}`}>Loading repositories...</p>
             </div>
           ) : recentRepos.length === 0 ? (
@@ -147,10 +147,8 @@ export default function DashboardPage() {
                 isDark ? "border-slate-600 bg-slate-800/50" : "border-slate-300 bg-white"
               }`}
             >
-              <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${
-                isDark ? "bg-violet-500/10" : "bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10"
-              }`}>
-                <FolderGit2 size={28} className="text-violet-500" />
+              <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl accent-bg-light`}>
+                <FolderGit2 size={28} className="accent-text-base" />
               </div>
               <p className={`mb-2 text-lg font-semibold ${isDark ? "text-white" : "text-slate-700"}`}>
                 No repositories yet
@@ -160,7 +158,7 @@ export default function DashboardPage() {
               </p>
               <Link
                 to="/repositories"
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-shadow hover:shadow-xl hover:shadow-violet-500/40"
+                className="inline-flex items-center gap-2 rounded-xl accent-gradient px-6 py-3 text-sm font-medium text-white shadow-lg accent-shadow transition-shadow hover:shadow-xl hover:accent-shadow-lg"
               >
                 <Plus size={16} /> Add Repository
               </Link>
@@ -198,7 +196,7 @@ export default function DashboardPage() {
                         }`}
                       >
                         <td className="p-4">
-                          <Link to={`/repositories/${repo.id}`} className="flex items-center gap-2 font-medium text-violet-500 hover:text-violet-400">
+                          <Link to={`/repositories/${repo.id}`} className="flex items-center gap-2 font-medium accent-text-base hover:opacity-80">
                             <FolderGit2 size={16} className={isDark ? "text-slate-500" : "text-slate-400"} />
                             {repo.name}
                           </Link>
@@ -238,11 +236,11 @@ export default function DashboardPage() {
                 to="/repositories"
                 className={`group flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
                   isDark
-                    ? "border-slate-600 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 text-slate-200 hover:border-violet-500/30 hover:shadow-md"
-                    : "border-slate-100 bg-gradient-to-r from-violet-50 to-fuchsia-50 text-slate-700 hover:border-violet-200 hover:shadow-md"
+                    ? "border-slate-600 accent-bg-light text-slate-200 hover:border-[var(--accent)]/30 hover:shadow-md"
+                    : "border-slate-100 accent-bg-light text-slate-700 hover:border-[var(--accent)]/20 hover:shadow-md"
                 }`}
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg accent-gradient text-white shadow-sm">
                   <Plus size={14} />
                 </div>
                 Add New Repository
@@ -266,11 +264,11 @@ export default function DashboardPage() {
                 to="/chat"
                 className={`group flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
                   isDark
-                    ? "border-slate-600 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 text-slate-200 hover:border-violet-500/30 hover:shadow-md"
-                    : "border-slate-100 bg-gradient-to-r from-violet-50 to-fuchsia-50 text-slate-700 hover:border-violet-200 hover:shadow-md"
+                    ? "border-slate-600 accent-bg-light text-slate-200 hover:border-[var(--accent)]/30 hover:shadow-md"
+                    : "border-slate-100 accent-bg-light text-slate-700 hover:border-[var(--accent)]/20 hover:shadow-md"
                 }`}
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg accent-gradient text-white shadow-sm">
                   <MessageSquare size={14} />
                 </div>
                 Start AI Chat

@@ -13,6 +13,7 @@ import {
   apiLogout,
   apiDeleteAccount,
   apiChangePassword,
+  apiUpdateProfile,
 } from "@/services/auth";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -79,11 +80,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(result.token);
   }, []);
 
-  const updateProfile = useCallback(async (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image">>) => {
-    // Update locally for instant UI feedback
+  const updateProfile = useCallback(async (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>) => {
+    // Optimistic update
     setUser((prev) => (prev ? { ...prev, ...updates } : null));
 
-    // TODO: Call backend profile update endpoint when available
+    try {
+      const updated = await apiUpdateProfile(updates);
+      setUser(updated);
+    } catch {
+      // Revert on failure — refetch from server
+      const session = await apiGetSession();
+      if (session) setUser(session.user);
+    }
   }, []);
 
   const deleteAccount = useCallback(async () => {

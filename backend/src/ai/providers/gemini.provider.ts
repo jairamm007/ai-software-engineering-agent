@@ -33,7 +33,7 @@ export class GeminiProvider
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: systemPrompt,
-        maxOutputTokens: 4096,
+        maxOutputTokens: 65536,
         temperature: 0.3,
       },
       contents: userPrompt,
@@ -50,7 +50,7 @@ export class GeminiProvider
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: systemPrompt,
-        maxOutputTokens: 4096,
+        maxOutputTokens: 65536,
         temperature: 0.3,
       },
       contents: userPrompt,

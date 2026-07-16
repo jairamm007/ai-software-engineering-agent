@@ -3,6 +3,7 @@ import type { Request } from "express";
 import { auth } from "./auth.config.js";
 
 const router = Router();
+const authBaseURL = process.env.BETTER_AUTH_URL || "http://localhost:3000";
 
 function toHeaders(req: Request): Headers {
   const headers = new Headers();
@@ -16,10 +17,7 @@ function toHeaders(req: Request): Headers {
 
 router.all("/{*path}", async (req: Request, res) => {
   try {
-    const host = req.headers.host ?? "localhost";
-    // Use req.originalUrl to preserve the full path including the mount prefix.
-    // Express strips "/api/auth" from req.url, but Better Auth needs the full path.
-    const url = new URL(req.originalUrl, `http://${host}`);
+    const url = new URL(req.originalUrl, authBaseURL);
 
     const init: RequestInit = {
       method: req.method,
@@ -32,19 +30,17 @@ router.all("/{*path}", async (req: Request, res) => {
 
     const response = await auth.handler(new Request(url.toString(), init));
 
-    // Forward Set-Cookie headers properly (getSetCookie returns individual cookies)
     const setCookieHeaders = response.headers.getSetCookie?.() ?? [];
     if (setCookieHeaders.length > 0) {
       res.setHeader("set-cookie", setCookieHeaders);
     }
 
-    // Forward Location header for redirects (3xx responses like OAuth callbacks)
     const location = response.headers.get("location");
     if (location) {
-      res.setHeader("location", location);
+      res.redirect(response.status, location);
+      return;
     }
 
-    // Read the body as text first, then parse as JSON if applicable
     const bodyText = await response.text();
 
     if (bodyText) {

@@ -432,8 +432,9 @@ export default function RepositoryDetailsPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center">
-          <p className={`text-lg font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
+        <div className="flex h-64 flex-col items-center justify-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+          <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             Loading repository...
           </p>
         </div>
@@ -510,6 +511,7 @@ export default function RepositoryDetailsPage() {
               <AIResult
                 title="AI Output"
                 content={aiResult}
+                loading={loading}
               />
               <AIHistory
                 items={history}

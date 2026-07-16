@@ -1,6 +1,7 @@
 import path from "path";
 
 import { scanRepository } from "../repository/repository.scanner.js";
+import { shouldIgnoreFile } from "../repository/repository.utils.js";
 import { chunkFile } from "../rag/chunker.js";
 
 import {
@@ -14,14 +15,20 @@ export const indexRepository = async (
   const scanResult = await scanRepository(repositoryPath);
 
   const indexedFiles: IndexedFile[] = [];
+  let skippedFiles = 0;
 
   for (const file of scanResult.files) {
+    const relativePath = path
+      .relative(repositoryPath, file.path)
+      .replace(/\\/g, "/");
+
+    if (shouldIgnoreFile(relativePath)) {
+      skippedFiles++;
+      continue;
+    }
+
     try {
       const chunks = await chunkFile(file.path);
-      const relativePath = path
-        .relative(repositoryPath, file.path)
-        .replace(/\\/g, "/");
-
       indexedFiles.push({
         path: relativePath,
         extension: path.extname(file.path),
@@ -32,6 +39,8 @@ export const indexRepository = async (
       // Skip unreadable or binary files
     }
   }
+
+  console.log(`  Skipped ${skippedFiles} binary/lock/generated files`);
 
   const totalChunks = indexedFiles.reduce(
     (sum, file) => sum + file.chunks.length,

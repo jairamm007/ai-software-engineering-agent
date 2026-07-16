@@ -34,9 +34,9 @@ export default function FileExplorer({ files, selectedFileId, onSelect }: Props)
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${
-              isDark ? "bg-violet-500/15" : "bg-violet-500/10"
+              isDark ? "bg-[var(--accent)]/15" : "bg-[var(--accent)]/10"
             }`}>
-              <FolderGit2 size={14} className="text-violet-500" />
+              <FolderGit2 size={14} className="text-[var(--accent)]" />
             </div>
             <div>
               <h2 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Files</h2>
@@ -67,8 +67,8 @@ export default function FileExplorer({ files, selectedFileId, onSelect }: Props)
                 onChange={(e) => setSearch(e.target.value)}
                 className={`w-full rounded-lg border py-2 pl-8 pr-3 text-xs outline-none transition-colors ${
                   isDark
-                    ? "border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-violet-500"
-                    : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+                    ? "border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-[var(--accent)]"
+                    : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)]"
                 }`}
               />
             </div>

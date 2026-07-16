@@ -211,3 +211,15 @@ html {
     background-position: 200% center;
   }
 }
+
+/* ── Accent utility classes ── */
+.accent-bg { background-color: var(--accent); }
+.accent-bg-light { background-color: var(--accent-light); }
+.accent-text { color: var(--accent-text); }
+.accent-text-base { color: var(--accent); }
+.accent-border { border-color: var(--accent); }
+.accent-ring { --tw-ring-color: var(--accent); }
+.accent-shadow { box-shadow: 0 4px 14px 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+.accent-shadow-lg { box-shadow: 0 10px 25px -3px color-mix(in srgb, var(--accent) 30%, transparent); }
+.accent-gradient { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #ec4899)); }
+.accent-gradient-text { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #ec4899)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }

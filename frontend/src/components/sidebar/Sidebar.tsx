@@ -12,7 +12,6 @@ import {
   BarChart3,
   Star,
   History,
-  Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
@@ -22,6 +21,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { useSidebar } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import Logo from "@/components/common/Logo";
 
 interface NavItem {
   icon: typeof LayoutDashboard;
@@ -47,7 +47,7 @@ const sections: NavSection[] = [
   {
     label: "Analysis",
     items: [
-      { icon: BookOpen, label: "Documentation", path: "/docs" },
+      { icon: BookOpen, label: "Documentation", path: "/documentation" },
       { icon: GitPullRequest, label: "Code Review", path: "/code-review" },
       { icon: Boxes, label: "Architecture", path: "/architecture" },
     ],
@@ -109,15 +109,13 @@ export default function Sidebar() {
       }`}
     >
       {/* Decorative left accent line */}
-      <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-violet-500/40 via-fuchsia-500/20 to-transparent" />
+      <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-[var(--accent)]/40 via-transparent to-transparent" />
 
       {/* Header: Logo + Settings + Collapse */}
       <div className={`flex items-center gap-3 border-b px-4 py-4 ${
         isDark ? "border-white/[0.06]" : "border-slate-100"
       }`}>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg shadow-violet-500/25">
-          <Sparkles size={17} className="text-white" />
-        </div>
+        <Logo size="md" />
         <AnimatePresence mode="wait">
           {!collapsed && (
             <motion.div
@@ -183,8 +181,8 @@ export default function Sidebar() {
                       className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 font-[Inter] ${
                         active
                           ? isDark
-                            ? "bg-violet-500/10 text-white"
-                            : "bg-violet-50 text-violet-700"
+                            ? "bg-[var(--accent)]/10 text-white"
+                            : "accent-bg-light accent-text-base"
                           : isDark
                             ? "text-slate-400 hover:bg-white/[0.04] hover:text-white"
                             : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
@@ -193,7 +191,7 @@ export default function Sidebar() {
                       {active && (
                         <motion.div
                           layoutId="sidebar-active-glow"
-                          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-gradient-to-b from-violet-400 to-fuchsia-500"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full accent-gradient"
                           transition={{ type: "spring", stiffness: 350, damping: 30 }}
                         />
                       )}
@@ -201,7 +199,7 @@ export default function Sidebar() {
                         size={17}
                         className={`shrink-0 transition-colors duration-200 ${
                           active
-                            ? "text-violet-400"
+                            ? "accent-text"
                             : isDark
                               ? "text-slate-500 group-hover:text-slate-300"
                               : "text-slate-400 group-hover:text-slate-600"
@@ -223,7 +221,7 @@ export default function Sidebar() {
                       {active && !collapsed && (
                         <motion.div
                           layoutId="sidebar-active-dot"
-                          className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400"
+                          className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full accent-bg"
                           transition={{ type: "spring", stiffness: 350, damping: 30 }}
                         />
                       )}
@@ -282,12 +280,12 @@ export default function Sidebar() {
                 transition={{ duration: 0.2 }}
                 className={`w-full overflow-hidden rounded-xl p-3 text-left transition-colors ${
                   isDark
-                    ? "bg-gradient-to-br from-violet-500/[0.06] to-fuchsia-500/[0.06] hover:from-violet-500/[0.10] hover:to-fuchsia-500/[0.10]"
-                    : "bg-gradient-to-br from-violet-50 to-fuchsia-50 hover:from-violet-100 hover:to-fuchsia-100"
+                    ? "bg-[var(--accent)]/[0.06] hover:bg-[var(--accent)]/[0.10]"
+                    : "bg-[var(--accent)]/[0.06] hover:bg-[var(--accent)]/[0.10]"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-xs font-bold text-white font-[Inter]">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full accent-gradient text-xs font-bold text-white font-[Inter]">
                     {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                   <div className="min-w-0">
@@ -311,7 +309,7 @@ export default function Sidebar() {
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="flex w-full justify-center"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-xs font-bold text-white font-[Inter]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full accent-gradient text-xs font-bold text-white font-[Inter]">
                   {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
                 </div>
               </motion.button>

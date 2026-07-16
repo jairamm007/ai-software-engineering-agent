@@ -16,7 +16,24 @@ import {
   X,
   Loader2,
   User,
+  Globe,
 } from "lucide-react";
+
+function LinkedinIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    </svg>
+  );
+}
+
+function GithubIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+    </svg>
+  );
+}
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
@@ -41,6 +58,9 @@ export default function ProfilePage() {
   const [email, setEmail] = useState(user?.email ?? "engineer@example.com");
   const [bio, setBio] = useState(user?.bio ?? "Full-stack developer building AI-powered tools.");
   const [role, setRole] = useState(user?.role ?? "Software Engineer");
+  const [linkedinUrl, setLinkedinUrl] = useState(user?.linkedinUrl ?? "");
+  const [githubUrl, setGithubUrl] = useState(user?.githubUrl ?? "");
+  const [portfolioUrl, setPortfolioUrl] = useState(user?.portfolioUrl ?? "");
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -75,7 +95,7 @@ export default function ProfilePage() {
   };
 
   const recentActivity = [
-    user?.createdAt ? { action: "Account created", target: user.email, time: timeAgo(user.createdAt), icon: User, color: "text-violet-500" } : null,
+    user?.createdAt ? { action: "Account created", target: user.email, time: timeAgo(user.createdAt), icon: User, color: "accent-text-base" } : null,
     ...(repos ?? []).slice(0, 5).map((repo) => ({
       action: "Indexed repository",
       target: repo.name,
@@ -86,7 +106,7 @@ export default function ProfilePage() {
   ].filter((item): item is NonNullable<typeof item> => Boolean(item)).slice(0, 5);
 
   const stats = [
-    { icon: FolderGit2, label: "Repositories", value: repos?.length ?? 0, color: "from-violet-500 to-purple-600" },
+    { icon: FolderGit2, label: "Repositories", value: repos?.length ?? 0, color: "accent-gradient" },
     { icon: FileCode2, label: "Files Indexed", value: totalFiles, color: "from-cyan-500 to-blue-600" },
     { icon: MessageSquare, label: "AI Questions", value: 0, color: "from-emerald-500 to-teal-600" },
     { icon: Shield, label: "Security Scans", value: 0, color: "from-rose-500 to-pink-600" },
@@ -94,7 +114,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
-      await updateProfile({ name, email, bio, role });
+      await updateProfile({ name, email, bio, role, linkedinUrl, githubUrl, portfolioUrl });
       setSaved(true);
       setEditing(false);
       setTimeout(() => setSaved(false), 2000);
@@ -171,14 +191,14 @@ export default function ProfilePage() {
             isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
           }`}
         >
-          <div className="relative h-28 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-500">
+          <div className="relative h-28 accent-gradient">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRhMiAyIDAgMSAxLTQgMCAyIDIgMCAwIDEgNCAwIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-40" />
           </div>
 
           <div className="relative px-6 pb-6">
             <div className="flex items-end gap-4 -mt-10">
               <div className="relative">
-                <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-2xl font-bold text-white shadow-lg ${
+                <div className={`flex h-20 w-20 items-center justify-center rounded-2xl accent-gradient text-2xl font-bold text-white shadow-lg ${
                   isDark ? "ring-4 ring-slate-900" : "ring-4 ring-white"
                 }`}>
                   {initials}
@@ -219,6 +239,34 @@ export default function ProfilePage() {
                 <ExternalLink size={10} />
               </button>
             </div>
+
+            {/* Social Links Display */}
+            {(user?.linkedinUrl || user?.githubUrl || user?.portfolioUrl) && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {user.linkedinUrl && (
+                  <a href={user.linkedinUrl} target="_blank" rel="noopener noreferrer"
+                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                      isDark ? "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                    }`}>
+                    <LinkedinIcon size={11} /> LinkedIn
+                  </a>
+                )}
+                {user.githubUrl && (
+                  <a href={user.githubUrl} target="_blank" rel="noopener noreferrer"
+                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                      isDark ? "bg-white/10 text-slate-300 hover:bg-white/15" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}>
+                    <GithubIcon size={11} /> GitHub
+                  </a>
+                )}
+                {user.portfolioUrl && (
+                  <a href={user.portfolioUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors accent-bg-light accent-text-base hover:opacity-80">
+                    <Globe size={11} /> Portfolio
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -260,7 +308,7 @@ export default function ProfilePage() {
                 saved
                   ? "bg-emerald-500/15 text-emerald-500"
                   : editing
-                    ? "bg-violet-600 text-white hover:bg-violet-500"
+                    ? "accent-bg text-white hover:opacity-90"
                     : isDark
                       ? "border border-white/10 text-slate-300 hover:bg-white/5"
                       : "border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -328,6 +376,66 @@ export default function ProfilePage() {
                     : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 disabled:opacity-60"
                 }`}
               />
+            </div>
+
+            {/* Social Links */}
+            <div className={`border-t pt-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
+              <p className={`mb-3 text-xs font-medium uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                Links <span className="normal-case tracking-normal">(optional)</span>
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <label className={`mb-1.5 flex items-center gap-1.5 text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    <LinkedinIcon size={12} /> LinkedIn Profile
+                  </label>
+                  <input
+                    type="url"
+                    value={linkedinUrl}
+                    onChange={(e) => setLinkedinUrl(e.target.value)}
+                    disabled={!editing}
+                    placeholder="https://linkedin.com/in/yourname"
+                    className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-[var(--accent)] disabled:opacity-60"
+                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)] disabled:opacity-60"
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className={`mb-1.5 flex items-center gap-1.5 text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    <GithubIcon size={12} /> GitHub Profile
+                  </label>
+                  <input
+                    type="url"
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    disabled={!editing}
+                    placeholder="https://github.com/yourname"
+                    className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-[var(--accent)] disabled:opacity-60"
+                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)] disabled:opacity-60"
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className={`mb-1.5 flex items-center gap-1.5 text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    <Globe size={12} /> Portfolio / Website
+                  </label>
+                  <input
+                    type="url"
+                    value={portfolioUrl}
+                    onChange={(e) => setPortfolioUrl(e.target.value)}
+                    disabled={!editing}
+                    placeholder="https://yourname.dev"
+                    className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-[var(--accent)] disabled:opacity-60"
+                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)] disabled:opacity-60"
+                    }`}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

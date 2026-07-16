@@ -55,8 +55,9 @@ export default function RepositoryOverviewPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center">
-          <div className={`text-lg font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
+        <div className="flex h-64 flex-col items-center justify-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+          <div className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             Loading repository...
           </div>
         </div>
@@ -96,8 +97,8 @@ export default function RepositoryOverviewPage() {
           className="grid grid-cols-2 gap-4 sm:grid-cols-4"
         >
           {[
-            { icon: FolderGit2, label: "Files", value: data.files.length, color: "from-violet-500 to-purple-600" },
-            { icon: Layers, label: "Chunks", value: totalChunks, color: "from-fuchsia-500 to-pink-600" },
+            { icon: FolderGit2, label: "Files", value: data.files.length, color: "from-[var(--accent)] to-purple-600" },
+            { icon: Layers, label: "Chunks", value: totalChunks, color: "from-[var(--accent)] to-pink-600" },
             { icon: FileCode2, label: "Languages", value: extensions.length, color: "from-cyan-500 to-blue-600" },
             { icon: Clock, label: "Created", value: new Date(data.createdAt).toLocaleDateString(), color: "from-emerald-500 to-teal-600" },
           ].map((stat) => (
@@ -154,8 +155,8 @@ export default function RepositoryOverviewPage() {
                     onChange={(e) => setFileSearch(e.target.value)}
                     className={`w-44 rounded-lg border py-1.5 pl-8 pr-3 text-xs outline-none transition-colors ${
                       isDark
-                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-violet-500"
-                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-[var(--accent)]"
+                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)]"
                     }`}
                   />
                 </div>
@@ -193,7 +194,7 @@ export default function RepositoryOverviewPage() {
                       </p>
                     </div>
                     <ArrowUpRight size={14} className={`shrink-0 opacity-0 transition-all group-hover:opacity-100 ${
-                      isDark ? "text-violet-400" : "text-violet-500"
+                      isDark ? "text-[var(--accent)]" : "text-[var(--accent)]"
                     }`} />
                   </Link>
                 );

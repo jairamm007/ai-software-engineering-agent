@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Mail, ArrowLeft, Sparkles, Check } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import Logo from "@/components/common/Logo";
 
 export default function ForgotPasswordPage() {
   const { theme } = useTheme();
@@ -45,8 +46,8 @@ export default function ForgotPasswordPage() {
         }`}
       >
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600">
-            <Sparkles size={22} className="text-white" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl">
+            <Logo size="md" />
           </div>
           <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
             {sent ? "Check your email" : "Forgot password?"}
@@ -68,7 +69,7 @@ export default function ForgotPasswordPage() {
             </div>
             <p className={`text-center text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               Didn&apos;t receive the email? Check your spam folder or{" "}
-              <button type="button" onClick={() => setSent(false)} className="font-medium text-violet-500 hover:text-violet-400">
+               <button type="button" onClick={() => setSent(false)} className="font-medium accent-text-base hover:opacity-80">
                 try again
               </button>
             </p>
@@ -93,8 +94,8 @@ export default function ForgotPasswordPage() {
                     placeholder="you@example.com"
                     className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-colors ${
                       isDark
-                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-violet-500"
-                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-[var(--accent)]"
+                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)]"
                     }`}
                   />
                 </div>
@@ -103,7 +104,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-xl hover:shadow-violet-500/30 disabled:opacity-50 disabled:shadow-none"
+                className="flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-medium text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none"
               >
                 {loading ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

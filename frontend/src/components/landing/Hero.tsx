@@ -4,7 +4,8 @@ import { TypeAnimation } from "react-type-animation";
 import { useRef } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import AnimatedIDE from "@/components/landing/AnimatedIDE";
-import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
+import { ArrowRight, Zap, Shield } from "lucide-react";
+import Logo from "@/components/common/Logo";
 
 const stats = [
   { value: "15K+", label: "Repositories" },
@@ -57,7 +58,7 @@ export default function Hero() {
             transition={{ delay: 0.1, duration: 0.5, type: "spring", stiffness: 200 }}
             className="inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 backdrop-blur-sm"
           >
-            <Sparkles size={14} className={isDark ? "text-violet-400" : "text-violet-600"} />
+            <Logo size="sm" />
             <span className={`text-sm font-medium ${isDark ? "text-violet-300" : "text-violet-700"}`}>AI Powered Software Engineering</span>
           </motion.div>
 
