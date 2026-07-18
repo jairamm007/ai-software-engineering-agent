@@ -78,7 +78,8 @@ export const searchNearestChunks = async (
 
   return results
     .filter((chunk) => {
-      if (chunk.distance >= 0.85) return false;
+      // More lenient threshold to capture more relevant results
+      if (chunk.distance >= 0.90) return false;
       const key = `${chunk.filePath}:${chunk.startLine}-${chunk.endLine}`;
       if (seen.has(key)) return false;
       seen.add(key);

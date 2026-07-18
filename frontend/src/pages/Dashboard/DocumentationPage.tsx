@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, Play, RotateCcw, BookOpen, FolderGit2, ArrowRight, FileCode2, Download, Copy, Check, FileText, Code2, Layers, Database, Route, Cpu } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Search, Play, RotateCcw, BookOpen, FolderGit2, ArrowRight,
+  FileCode2, Download, Copy, Check, FileText, Code2, Layers,
+  Database, Route, Cpu, File, FolderOpen, CheckSquare, Square,
+  FileStack, ListChecks,
+} from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import AIResult from "@/components/repository/AIResult";
@@ -11,26 +16,36 @@ import { askRepository } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, getFileExtension, formatFileSize } from "@/utils/fileIcons";
 
+type DocScope = "single" | "multiple" | "repository";
+
+const scopeOptions: { id: DocScope; label: string; icon: typeof File; description: string }[] = [
+  { id: "single", label: "Single File", icon: File, description: "Generate docs for one file" },
+  { id: "multiple", label: "Multiple Files", icon: FileStack, description: "Select several files to document" },
+  { id: "repository", label: "Entire Repository", icon: FolderOpen, description: "Generate docs for the whole repo" },
+];
+
+const categories = [
+  { id: "auto", label: "Auto", icon: Cpu, prompt: "Generate comprehensive documentation" },
+  { id: "readme", label: "README", icon: FileText, prompt: "Generate a README-style documentation" },
+  { id: "api", label: "API Reference", icon: Code2, prompt: "Generate API reference documentation" },
+  { id: "architecture", label: "Architecture", icon: Layers, prompt: "Document the architecture and design patterns" },
+  { id: "database", label: "Database", icon: Database, prompt: "Document database schemas and data models" },
+  { id: "routes", label: "Routes", icon: Route, prompt: "Document API routes and endpoints" },
+];
+
 export default function DocumentationPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
   const [selectedRepoId, setSelectedRepoId] = useState<string>("");
+  const [scope, setScope] = useState<DocScope>("single");
   const [selectedFile, setSelectedFile] = useState<string>("");
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>("auto");
   const [copied, setCopied] = useState(false);
-
-  const categories = [
-    { id: "auto", label: "Auto", icon: Cpu, prompt: "Generate comprehensive documentation" },
-    { id: "readme", label: "README", icon: FileText, prompt: "Generate a README-style documentation" },
-    { id: "api", label: "API Reference", icon: Code2, prompt: "Generate API reference documentation" },
-    { id: "architecture", label: "Architecture", icon: Layers, prompt: "Document the architecture and design patterns" },
-    { id: "database", label: "Database", icon: Database, prompt: "Document database schemas and data models" },
-    { id: "routes", label: "Routes", icon: Route, prompt: "Document API routes and endpoints" },
-  ];
 
   const { data: repos, isLoading: reposLoading } = useQuery({
     queryKey: ["repositories"],
@@ -43,29 +58,65 @@ export default function DocumentationPage() {
     enabled: !!selectedRepoId,
   });
 
-  const files =
-    repoData?.files.filter(
-      (f) => !search || f.path.toLowerCase().includes(search.toLowerCase())
-    ) ?? [];
+  const files = useMemo(
+    () => repoData?.files.filter((f) => !search || f.path.toLowerCase().includes(search.toLowerCase())) ?? [],
+    [repoData, search]
+  );
 
   const handleRepoSelect = (repoId: string) => {
     setSelectedRepoId(repoId);
     setSelectedFile("");
+    setSelectedFiles(new Set());
     setResult("");
     setSearch("");
+    setScope("single");
   };
 
+  const toggleFileSelection = (path: string) => {
+    setSelectedFiles((prev) => {
+      const next = new Set(prev);
+      next.has(path) ? next.delete(path) : next.add(path);
+      return next;
+    });
+  };
+
+  const toggleAllFiles = () => {
+    if (selectedFiles.size === files.length) {
+      setSelectedFiles(new Set());
+    } else {
+      setSelectedFiles(new Set(files.map((f) => f.path)));
+    }
+  };
+
+  const canGenerate = useMemo(() => {
+    if (!repoData) return false;
+    if (scope === "single") return !!selectedFile;
+    if (scope === "multiple") return selectedFiles.size > 0;
+    return true; // repository scope
+  }, [repoData, scope, selectedFile, selectedFiles]);
+
   const runDocs = async () => {
-    if (!selectedFile || !repoData) return;
+    if (!repoData || !canGenerate) return;
     setLoading(true);
     setResult("");
     try {
       const cat = categories.find((c) => c.id === activeCategory) ?? categories[0];
-      const response = await askRepository({
-        question: `${cat.prompt} for this file including purpose, parameters, return values, and usage examples: ${selectedFile}`,
-        repositoryId: repoData.id,
-        filePath: selectedFile,
-      });
+      let question = "";
+      let filePath: string | undefined;
+
+      if (scope === "single") {
+        question = `${cat.prompt} for this file including purpose, parameters, return values, and usage examples: ${selectedFile}`;
+        filePath = selectedFile;
+      } else if (scope === "multiple") {
+        const fileList = Array.from(selectedFiles).join(", ");
+        question = `${cat.prompt} for the following files including purpose, API references, parameters, return values, and usage examples: ${fileList}`;
+        filePath = undefined;
+      } else {
+        question = `${cat.prompt} for this entire repository including project overview, module descriptions, architecture, setup instructions, and API references`;
+        filePath = undefined;
+      }
+
+      const response = await askRepository({ question, repositoryId: repoData.id, filePath });
       setResult(response.answer ?? JSON.stringify(response));
     } catch {
       setResult("Failed to generate documentation. Please try again.");
@@ -87,7 +138,12 @@ export default function DocumentationPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `docs-${selectedFile.split("/").pop() ?? "file"}.md`;
+    const name = scope === "repository"
+      ? `docs-${repoData?.name ?? "repo"}`
+      : scope === "multiple"
+        ? `docs-${selectedFiles.size}-files`
+        : `docs-${selectedFile.split("/").pop() ?? "file"}`;
+    a.download = `${name}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -98,10 +154,21 @@ export default function DocumentationPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `docs-${selectedFile.split("/").pop() ?? "file"}.txt`;
+    const name = scope === "repository"
+      ? `docs-${repoData?.name ?? "repo"}`
+      : scope === "multiple"
+        ? `docs-${selectedFiles.size}-files`
+        : `docs-${selectedFile.split("/").pop() ?? "file"}`;
+    a.download = `${name}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const scopeSummary = useMemo(() => {
+    if (scope === "repository") return "Entire repository";
+    if (scope === "multiple") return `${selectedFiles.size} file${selectedFiles.size !== 1 ? "s" : ""} selected`;
+    return selectedFile || "No file selected";
+  }, [scope, selectedFile, selectedFiles]);
 
   return (
     <DashboardLayout>
@@ -117,7 +184,7 @@ export default function DocumentationPage() {
                 Documentation
               </h1>
               <p className={`text-sm font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                Select a repository, then generate AI-powered docs for any file
+                Generate AI-powered docs for files, multiple files, or entire repositories
               </p>
             </div>
           </div>
@@ -200,7 +267,7 @@ export default function DocumentationPage() {
                         {repo.name}
                       </p>
                       <p className={`mt-0.5 truncate text-[11px] font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                        {repo.githubUrl}
+                        {repo._count?.files ?? 0} files
                       </p>
                     </div>
                     <ArrowRight size={14} className={`shrink-0 transition-colors ${
@@ -215,7 +282,7 @@ export default function DocumentationPage() {
           </div>
         </motion.div>
 
-        {/* Step 2: Select File + Generate */}
+        {/* Step 2: Scope + File Selection + Generate */}
         {selectedRepoId && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -227,10 +294,10 @@ export default function DocumentationPage() {
           >
             <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
               <h2 className={`text-lg font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>
-                2. Select File to Document
+                2. Choose Documentation Scope
               </h2>
               <p className={`mt-0.5 text-xs font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                Choose a file, then generate AI documentation
+                Select what to document, then configure and generate
               </p>
             </div>
 
@@ -240,63 +307,169 @@ export default function DocumentationPage() {
               </div>
             ) : (
               <>
-                <div className="px-5 pt-4">
-                  <div className="relative">
-                    <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
-                    <input
-                      type="text"
-                      placeholder="Search files..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className={`w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm outline-none font-[Inter] ${
-                        isDark
-                          ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-emerald-500"
-                          : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500"
-                      }`}
-                    />
+                {/* Scope Selector */}
+                <div className="px-5 pt-5">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {scopeOptions.map((opt) => {
+                      const Icon = opt.icon;
+                      const isActive = scope === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            setScope(opt.id);
+                            setSelectedFile("");
+                            setSelectedFiles(new Set());
+                            setResult("");
+                          }}
+                          className={`group flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
+                            isActive
+                              ? isDark
+                                ? "border-emerald-500/30 bg-emerald-500/10 ring-1 ring-emerald-500/20"
+                                : "border-emerald-200 bg-emerald-50 ring-1 ring-emerald-200"
+                              : isDark
+                                ? "border-white/10 bg-white/[0.02] hover:border-white/20"
+                                : "border-slate-200 bg-white hover:border-slate-300"
+                          }`}
+                        >
+                          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                            isActive
+                              ? isDark ? "bg-emerald-500/20" : "bg-emerald-100"
+                              : isDark ? "bg-white/5" : "bg-slate-100"
+                          }`}>
+                            <Icon size={16} className={isActive ? "text-emerald-500" : isDark ? "text-slate-400" : "text-slate-500"} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className={`text-sm font-medium font-[Inter] ${isActive ? (isDark ? "text-white" : "text-emerald-700") : isDark ? "text-slate-200" : "text-slate-700"}`}>
+                              {opt.label}
+                            </p>
+                            <p className={`mt-0.5 text-[11px] font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                              {opt.description}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }} className="overflow-y-auto px-3 py-2">
-                  {files.length === 0 && (
-                    <p className={`py-4 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>No files found.</p>
-                  )}
-                  {files.map((file) => {
-                    const ext = getFileExtension(file.path);
-                    const typeInfo = getFileTypeInfo(ext);
-                    const Icon = typeInfo.icon;
-                    const isSelected = selectedFile === file.path;
-                    return (
-                      <button
-                        key={file.id}
-                        type="button"
-                        onClick={() => setSelectedFile(file.path)}
-                        className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all font-[Inter] ${
-                          isSelected
-                            ? isDark
-                              ? "bg-emerald-500/15 text-white shadow-sm ring-1 ring-emerald-500/20"
-                              : "bg-emerald-50 text-emerald-700 shadow-sm ring-1 ring-emerald-200"
-                            : isDark
-                              ? "text-slate-400 hover:bg-white/[0.03] hover:text-slate-200"
-                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                        }`}
-                      >
-                        <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
-                          isSelected ? (isDark ? "bg-emerald-500/20" : "bg-emerald-100") : typeInfo.bg
-                        }`}>
-                          <Icon size={13} className={isSelected ? "text-emerald-500" : typeInfo.color} />
-                        </div>
-                        <span className="truncate">{file.path}</span>
-                        <span className={`ml-auto shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium ${
-                          isDark ? "bg-white/5 text-slate-500" : "bg-slate-100 text-slate-400"
-                        }`}>
-                          {file.chunks.length} chunks · {formatFileSize(file.size)}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                {/* File List (hidden for repository scope) */}
+                {scope !== "repository" && (
+                  <>
+                    <div className="px-5 pt-4">
+                      <div className="relative">
+                        <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+                        <input
+                          type="text"
+                          placeholder="Search files..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                          className={`w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm outline-none font-[Inter] ${
+                            isDark
+                              ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-emerald-500"
+                              : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500"
+                          }`}
+                        />
+                      </div>
+                    </div>
 
+                    <div style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }} className="overflow-y-auto px-3 py-2">
+                      {scope === "multiple" && files.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={toggleAllFiles}
+                          className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all font-[Inter] ${
+                            isDark ? "text-slate-400 hover:bg-white/[0.03]" : "text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          {selectedFiles.size === files.length ? (
+                            <CheckSquare size={14} className="shrink-0 text-emerald-500" />
+                          ) : (
+                            <Square size={14} className="shrink-0" />
+                          )}
+                          <span className="font-medium">
+                            {selectedFiles.size === files.length ? "Deselect all" : `Select all (${files.length})`}
+                          </span>
+                        </button>
+                      )}
+
+                      {files.length === 0 && (
+                        <p className={`py-4 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>No files found.</p>
+                      )}
+
+                      {files.map((file) => {
+                        const ext = getFileExtension(file.path);
+                        const typeInfo = getFileTypeInfo(ext);
+                        const Icon = typeInfo.icon;
+                        const isSingleSelected = selectedFile === file.path;
+                        const isMultiSelected = selectedFiles.has(file.path);
+                        const isSelected = scope === "multiple" ? isMultiSelected : isSingleSelected;
+
+                        return (
+                          <button
+                            key={file.id}
+                            type="button"
+                            onClick={() => {
+                              if (scope === "multiple") {
+                                toggleFileSelection(file.path);
+                              } else {
+                                setSelectedFile(file.path);
+                              }
+                            }}
+                            className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all font-[Inter] ${
+                              isSelected
+                                ? isDark
+                                  ? "bg-emerald-500/15 text-white shadow-sm ring-1 ring-emerald-500/20"
+                                  : "bg-emerald-50 text-emerald-700 shadow-sm ring-1 ring-emerald-200"
+                                : isDark
+                                  ? "text-slate-400 hover:bg-white/[0.03] hover:text-slate-200"
+                                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                            }`}
+                          >
+                            {scope === "multiple" && (
+                              <span className="shrink-0">
+                                {isMultiSelected ? (
+                                  <CheckSquare size={14} className="text-emerald-500" />
+                                ) : (
+                                  <Square size={14} className={isDark ? "text-slate-600" : "text-slate-300"} />
+                                )}
+                              </span>
+                            )}
+                            <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
+                              isSelected ? (isDark ? "bg-emerald-500/20" : "bg-emerald-100") : typeInfo.bg
+                            }`}>
+                              <Icon size={13} className={isSelected ? "text-emerald-500" : typeInfo.color} />
+                            </div>
+                            <span className="truncate">{file.path}</span>
+                            <span className={`ml-auto shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium ${
+                              isDark ? "bg-white/5 text-slate-500" : "bg-slate-100 text-slate-400"
+                            }`}>
+                              {file.chunks.length} chunks · {formatFileSize(file.size)}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                {/* Repository scope info */}
+                {scope === "repository" && (
+                  <div className="px-5 py-4">
+                    <div className={`rounded-xl border border-dashed p-6 text-center ${isDark ? "border-emerald-500/20 bg-emerald-500/5" : "border-emerald-200 bg-emerald-50/50"}`}>
+                      <FolderOpen size={28} className={`mx-auto mb-2 ${isDark ? "text-emerald-400" : "text-emerald-500"}`} />
+                      <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-emerald-300" : "text-emerald-700"}`}>
+                        Documentation will cover the entire repository
+                      </p>
+                      <p className={`mt-1 text-xs font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                        AI will analyze all indexed files and generate comprehensive documentation
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Category + Generate */}
                 <div className={`border-t px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
                   <p className={`mb-2 text-xs font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     Documentation Category
@@ -325,11 +498,11 @@ export default function DocumentationPage() {
                       );
                     })}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => void runDocs()}
-                      disabled={!selectedFile || loading}
+                      disabled={!canGenerate || loading}
                       className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:shadow-none font-[Inter]"
                     >
                       {loading ? (
@@ -344,11 +517,9 @@ export default function DocumentationPage() {
                         </>
                       )}
                     </button>
-                    {selectedFile && (
-                      <span className={`self-center text-xs font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                        {selectedFile}
-                      </span>
-                    )}
+                    <span className={`text-xs font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                      {scopeSummary}
+                    </span>
                   </div>
                 </div>
               </>

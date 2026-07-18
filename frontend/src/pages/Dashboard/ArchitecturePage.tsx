@@ -128,7 +128,7 @@ function TreeItem({ node, depth, expanded, toggle, isDark }: {
       >
         {node.isDir ? (
           isOpen ? <ChevronDown size={12} className="shrink-0 text-slate-500" /> : <ChevronRight size={12} className="shrink-0 text-slate-500" />
-        ) : <span className="w-3" />
+        ) : <span className="w-3" />}
         {node.isDir ? (
           <FolderOpen size={13} className={`shrink-0 ${isOpen ? "accent-text-base" : isDark ? "text-slate-500" : "text-slate-400"}`} />
         ) : (

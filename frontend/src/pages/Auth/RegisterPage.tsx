@@ -159,7 +159,9 @@ export default function RegisterPage() {
     <>
       <style>{float1 + float2 + float3 + shimmer + particleDrift}</style>
       <div className={`flex min-h-screen overflow-hidden transition-colors duration-300 ${
-        isDark ? "bg-slate-950" : "bg-slate-100"
+        isDark
+          ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+          : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
       }`}>
 
         {/* Left Panel */}
@@ -278,10 +280,10 @@ export default function RegisterPage() {
               perspective: "1000px",
               transform: `rotateX(${-mousePos.y * 0.15}deg) rotateY(${mousePos.x * 0.15}deg)`,
             }}
-            className={`relative w-full max-w-md rounded-3xl border p-6 sm:p-8 shadow-2xl transition-transform duration-300 ease-out ${
+            className={`relative w-full max-w-md rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out ${
               isDark
-                ? "border-white/10 bg-white/5 backdrop-blur-xl shadow-black/40"
-                : "border-slate-200/50 bg-white/60 backdrop-blur-xl shadow-slate-300/40"
+                ? "border-white/10 bg-white/[0.07] shadow-black/40"
+                : "border-slate-200/50 bg-white/60 shadow-slate-300/40"
             }`}
           >
             {/* Mobile Logo */}

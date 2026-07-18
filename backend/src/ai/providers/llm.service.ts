@@ -14,7 +14,6 @@ const isRetryableError = (error: unknown): boolean => {
     message.includes("ECONNREFUSED") ||
     message.includes("503") ||
     message.includes("502") ||
-    message.includes("500") ||
     message.includes("overloaded") ||
     message.includes("Too Many Requests") ||
     message.includes("request limit") ||
@@ -26,9 +25,9 @@ const isRetryableError = (error: unknown): boolean => {
 const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-const PROVIDER_TIMEOUT_MS = 60_000;
+const PROVIDER_TIMEOUT_MS = 25_000;
 const MAX_RETRIES_PER_PROVIDER = 1;
-const COOLDOWN_MS = 60_000;
+const COOLDOWN_MS = 15_000;
 
 const cooldowns = new Map<string, number>();
 
@@ -69,29 +68,26 @@ export const generateText = async (
 
   for (const provider of providers) {
     if (isOnCooldown(provider.name)) {
-      console.log(`⏭️ Skipping ${provider.name} (on cooldown)`);
       continue;
     }
 
     for (let attempt = 0; attempt <= MAX_RETRIES_PER_PROVIDER; attempt++) {
       try {
         if (attempt > 0) {
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 4000);
-          console.log(`⏳ Retrying ${provider.name} in ${delay}ms (attempt ${attempt + 1})...`);
-          await sleep(delay);
+          await sleep(500);
         }
 
-        console.log(`🤖 Trying ${provider.name}...`);
+        console.log(`🤖 ${provider.name}...`);
 
         const response = await withTimeout(
           provider.generateText(systemPrompt, userPrompt),
           PROVIDER_TIMEOUT_MS
         );
 
-        console.log(`✅ ${provider.name} succeeded`);
+        console.log(`✅ ${provider.name} done`);
         return response;
       } catch (error) {
-        console.error(`❌ ${provider.name} failed${attempt > 0 ? ` (attempt ${attempt + 1})` : ""}`);
+        console.error(`❌ ${provider.name} failed`);
         lastError = error;
 
         if (isRetryableError(error)) {
@@ -115,24 +111,21 @@ export const generateTextStream = async function* (
     if (!provider.generateTextStream) continue;
 
     if (isOnCooldown(provider.name)) {
-      console.log(`⏭️ Skipping ${provider.name} stream (on cooldown)`);
       continue;
     }
 
     for (let attempt = 0; attempt <= MAX_RETRIES_PER_PROVIDER; attempt++) {
       try {
         if (attempt > 0) {
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 4000);
-          console.log(`⏳ Retrying ${provider.name} stream in ${delay}ms (attempt ${attempt + 1})...`);
-          await sleep(delay);
+          await sleep(500);
         }
 
-        console.log(`🤖 Streaming with ${provider.name}...`);
+        console.log(`🤖 Streaming ${provider.name}...`);
         yield* provider.generateTextStream(systemPrompt, userPrompt);
-        console.log(`✅ ${provider.name} stream completed`);
+        console.log(`✅ ${provider.name} stream done`);
         return;
       } catch (error) {
-        console.error(`❌ ${provider.name} stream failed${attempt > 0 ? ` (attempt ${attempt + 1})` : ""}`);
+        console.error(`❌ ${provider.name} stream failed`);
         if (isRetryableError(error)) {
           setCooldown(provider.name);
         }
@@ -141,7 +134,7 @@ export const generateTextStream = async function* (
     }
   }
 
-  console.log("⚠️ No streaming provider available, falling back to non-streaming");
+  console.log("⚠️ Falling back to non-streaming");
   const text = await generateText(systemPrompt, userPrompt);
   yield text;
 };

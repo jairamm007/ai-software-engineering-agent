@@ -6,7 +6,7 @@ import {
   AgentType,
 } from "./agent.types.js";
 
-const MAX_CONTEXT_CHARS = 100_000;
+const MAX_CONTEXT_CHARS = 60_000;
 
 const truncateContext = (context: string): string => {
   if (context.length <= MAX_CONTEXT_CHARS) {
@@ -28,7 +28,7 @@ export const executeAgent = async (
 
   const truncatedContext = truncateContext(context);
 
-  const userPrompt = `Repository Context:\n\n${truncatedContext}\n\nQuestion: ${question}`;
+  const userPrompt = `${agent.userContextPrefix ? agent.userContextPrefix + "\n\n" : ""}Repository Context:\n\n${truncatedContext}\n\n---\n\nTask: ${question}`;
 
   return generateText(agent.systemPrompt, userPrompt);
 };

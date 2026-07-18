@@ -17,7 +17,7 @@ export class CerebrasProvider implements LLMProvider {
     const response =
       await client.chat.completions.create({
         model: "llama-3.3-70b",
-        max_tokens: 16384,
+        max_tokens: 4096,
         temperature: 0.3,
         messages: [
           { role: "system", content: systemPrompt },
@@ -36,7 +36,7 @@ export class CerebrasProvider implements LLMProvider {
   ): AsyncGenerator<string> {
     const stream = await client.chat.completions.create({
       model: "llama-3.3-70b",
-      max_tokens: 16384,
+      max_tokens: 2048,
       temperature: 0.3,
       stream: true,
       messages: [

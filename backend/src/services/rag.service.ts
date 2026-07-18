@@ -12,11 +12,11 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 5 * 60 * 1000;
-const CACHE_MAX_SIZE = 100;
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes (was 5)
+const CACHE_MAX_SIZE = 200; // 200 entries (was 100)
 
 const getCacheKey = (input: AskRepositoryInput) =>
-  `${input.question}::${input.repositoryId ?? ""}::${input.filePath ?? ""}`;
+  `${input.question.toLowerCase().trim()}::${input.repositoryId ?? ""}::${input.filePath ?? ""}`;
 
 const getCached = (key: string) => {
   const entry = cache.get(key);
@@ -78,13 +78,21 @@ export const askRepository = async ({
 }: AskRepositoryInput) => {
   const cacheKey = getCacheKey({ question, repositoryId, filePath });
   const cached = getCached(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    console.log(`📦 Cache hit for: ${question.slice(0, 50)}...`);
+    return cached;
+  }
+
+  const startTime = Date.now();
 
   const result = await agentGraph.invoke({
     question,
     repositoryId,
     filePath,
   });
+
+  const elapsed = Date.now() - startTime;
+  console.log(`⏱️ Graph completed in ${elapsed}ms`);
 
   for (const field of RESULT_FIELDS) {
     if (result[field]) {

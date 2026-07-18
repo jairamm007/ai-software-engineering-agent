@@ -1,6 +1,7 @@
 import { RetrievedChunk } from "../vector/vector.repository.js";
 
-const MAX_CHUNK_CONTENT_CHARS = 8000;
+const MAX_CHUNK_CONTENT_CHARS = 6000;
+const MAX_TOTAL_CONTEXT_CHARS = 50_000;
 
 export const buildContext = (
   chunks: RetrievedChunk[]
@@ -18,44 +19,60 @@ export const buildContext = (
     return true;
   });
 
-  const fileSummary = new Map<string, number[]>();
+  // Group by file
+  const fileGroups = new Map<string, RetrievedChunk[]>();
   for (const chunk of uniqueChunks) {
-    const existing = fileSummary.get(chunk.filePath) ?? [];
-    existing.push(chunk.startLine);
-    fileSummary.set(chunk.filePath, existing);
+    const existing = fileGroups.get(chunk.filePath) ?? [];
+    existing.push(chunk);
+    fileGroups.set(chunk.filePath, existing);
   }
 
-  const fileList = [...fileSummary.entries()]
-    .map(([fp, lines]) => {
-      const range = lines.length === 1
-        ? `L${lines[0]}`
-        : `L${Math.min(...lines)}-${Math.max(...lines)}`;
-      return `  - ${fp} (${range})`;
+  // Sort files by relevance
+  const sortedFiles = [...fileGroups.entries()].sort((a, b) => {
+    const avgA = a[1].reduce((s, c) => s + c.distance, 0) / a[1].length;
+    const avgB = b[1].reduce((s, c) => s + c.distance, 0) / b[1].length;
+    return avgA - avgB;
+  });
+
+  // Compact file summary
+  const fileList = sortedFiles
+    .map(([fp, chunks]) => {
+      const lines = chunks.flatMap((c) => [c.startLine, c.endLine]);
+      return `  - ${fp} (L${Math.min(...lines)}-${Math.max(...lines)})`;
     })
     .join("\n");
 
-  let context = `## Files in context (${uniqueChunks.length} chunks from ${fileSummary.size} files):\n${fileList}\n\n---\n\n`;
+  let context = `Files (${fileGroups.size} files, ${uniqueChunks.length} chunks):\n${fileList}\n\n---\n\n`;
 
-  context += uniqueChunks
-    .map(
-      (chunk, i) => {
-        const content =
-          chunk.content.length > MAX_CHUNK_CONTENT_CHARS
-            ? chunk.content.slice(0, MAX_CHUNK_CONTENT_CHARS) + "\n... [truncated]"
-            : chunk.content;
+  // Build chunk content with size tracking
+  let totalChars = context.length;
+  const parts: string[] = [];
 
-        const relevance =
-          chunk.distance < 0.3
-            ? "highly relevant"
-            : chunk.distance < 0.5
-              ? "relevant"
-              : "possibly relevant";
+  for (const [filePath, chunks] of sortedFiles) {
+    const sorted = [...chunks].sort((a, b) => a.startLine - b.startLine);
 
-        return `### [${i + 1}] ${chunk.filePath} (Lines ${chunk.startLine}-${chunk.endLine}) [${relevance}]
-${content}`;
+    for (const chunk of sorted) {
+      const content =
+        chunk.content.length > MAX_CHUNK_CONTENT_CHARS
+          ? chunk.content.slice(0, MAX_CHUNK_CONTENT_CHARS) + "\n...[truncated]"
+          : chunk.content;
+
+      const rel = chunk.distance < 0.3 ? "★" : chunk.distance < 0.5 ? "●" : "○";
+
+      const part = `[${rel} ${filePath}:L${chunk.startLine}-${chunk.endLine}]\n${content}`;
+
+      if (totalChars + part.length > MAX_TOTAL_CONTEXT_CHARS) {
+        parts.push("\n...[context limit reached]...");
+        break;
       }
-    )
-    .join("\n\n---\n\n");
 
+      parts.push(part);
+      totalChars += part.length;
+    }
+
+    if (totalChars >= MAX_TOTAL_CONTEXT_CHARS) break;
+  }
+
+  context += parts.join("\n\n---\n\n");
   return context;
 };

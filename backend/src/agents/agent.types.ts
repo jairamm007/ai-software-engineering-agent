@@ -11,6 +11,6 @@ export type AgentType =
 
 export interface AgentDefinition {
   name: AgentType;
-
   systemPrompt: string;
+  userContextPrefix?: string;
 }

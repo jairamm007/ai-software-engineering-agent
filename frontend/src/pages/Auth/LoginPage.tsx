@@ -209,7 +209,7 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-10 text-lg text-slate-400"
+            className={`mb-10 text-lg ${isDark ? "text-slate-400" : "text-slate-500"}`}
           >
             Sign in to your AI engineering workspace
           </motion.p>
@@ -222,12 +222,16 @@ export default function LoginPage() {
                 initial={{ opacity: 0, x: -40 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 + i * 0.15 }}
-                className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 px-5 py-4 text-left backdrop-blur-sm"
+                className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left backdrop-blur-sm ${
+                  isDark
+                    ? "border-white/5 bg-white/5"
+                    : "border-slate-200/60 bg-white/60 shadow-sm"
+                }`}
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg accent-bg-light">
                   <feat.icon size={18} className="accent-text-base" />
                 </div>
-                <span className="text-sm font-medium text-slate-300">
+                <span className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}>
                   {feat.text}
                 </span>
                 <div className="ml-auto">
@@ -267,7 +271,9 @@ export default function LoginPage() {
           >
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-white"
+              className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${
+                isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"
+              }`}
             >
               <ArrowLeft size={14} /> Back to Home
             </Link>
@@ -454,8 +460,8 @@ export default function LoginPage() {
               <span
                 className={`px-2 ${
                   isDark
-                    ? "bg-transparent text-slate-500"
-                    : "bg-transparent text-slate-400"
+                    ? "bg-white/[0.07] text-slate-500"
+                    : "bg-white/60 text-slate-400"
                 }`}
               >
                 or continue with email
