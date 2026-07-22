@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Trash2, FolderGit2, FileCode2, Layers, ExternalLink } from "lucide-react";
+import { Trash2, FolderGit2, FileCode2, Layers, ExternalLink, Star, RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { deleteRepository } from "@/services/repository";
+import { deleteRepository, toggleFavorite, reindexRepository } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
 import type { RepositoryListItem } from "@/types/repository";
 
@@ -13,6 +14,7 @@ export default function RepositoryTable({ repositories }: Props) {
   const queryClient = useQueryClient();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [reindexingId, setReindexingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
     const confirmed = window.confirm("Delete this repository?\n\nThis action cannot be undone.");
@@ -22,6 +24,29 @@ export default function RepositoryTable({ repositories }: Props) {
       queryClient.invalidateQueries({ queryKey: ["repositories"] });
     } catch {
       alert("Failed to delete repository.");
+    }
+  };
+
+  const handleToggleFavorite = async (id: string) => {
+    try {
+      await toggleFavorite(id);
+      queryClient.invalidateQueries({ queryKey: ["repositories"] });
+    } catch {
+      alert("Failed to toggle favorite.");
+    }
+  };
+
+  const handleReindex = async (id: string) => {
+    const confirmed = window.confirm("Re-index this repository?\n\nThis may take a while.");
+    if (!confirmed) return;
+    setReindexingId(id);
+    try {
+      await reindexRepository(id);
+      queryClient.invalidateQueries({ queryKey: ["repositories"] });
+    } catch {
+      alert("Failed to re-index repository.");
+    } finally {
+      setReindexingId(null);
     }
   };
 
@@ -101,18 +126,49 @@ export default function RepositoryTable({ repositories }: Props) {
                   {new Date(repo.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-5 py-4">
-                  <button
-                    type="button"
-                    title="Delete Repository"
-                    onClick={() => handleDelete(repo.id)}
-                    className={`rounded-lg p-2 transition-all ${
-                      isDark
-                        ? "text-slate-500 hover:bg-red-500/10 hover:text-red-400"
-                        : "text-slate-400 hover:bg-red-50 hover:text-red-500"
-                    }`}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      title={repo.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                      onClick={() => handleToggleFavorite(repo.id)}
+                      className={`rounded-lg p-2 transition-all ${
+                        isDark
+                          ? repo.isFavorite
+                            ? "text-amber-400 hover:bg-amber-500/10"
+                            : "text-slate-500 hover:bg-amber-500/10 hover:text-amber-400"
+                          : repo.isFavorite
+                            ? "text-amber-500 hover:bg-amber-50"
+                            : "text-slate-400 hover:bg-amber-50 hover:text-amber-500"
+                      }`}
+                    >
+                      <Star size={16} fill={repo.isFavorite ? "currentColor" : "none"} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Re-index Repository"
+                      disabled={reindexingId === repo.id}
+                      onClick={() => handleReindex(repo.id)}
+                      className={`rounded-lg p-2 transition-all disabled:opacity-50 ${
+                        isDark
+                          ? "text-slate-500 hover:bg-violet-500/10 hover:text-violet-400"
+                          : "text-slate-400 hover:bg-violet-50 hover:text-violet-500"
+                      }`}
+                    >
+                      <RefreshCw size={16} className={reindexingId === repo.id ? "animate-spin" : ""} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Delete Repository"
+                      onClick={() => handleDelete(repo.id)}
+                      className={`rounded-lg p-2 transition-all ${
+                        isDark
+                          ? "text-slate-500 hover:bg-red-500/10 hover:text-red-400"
+                          : "text-slate-400 hover:bg-red-50 hover:text-red-500"
+                      }`}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             );

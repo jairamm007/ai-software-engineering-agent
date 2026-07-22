@@ -27,29 +27,41 @@ export default defineConfig({
   },
 
   build: {
+    target: "es2022",
+    cssCodeSplit: true,
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
-            return "vendor-react";
-          }
-          if (id.includes("node_modules/@tanstack/react-query")) {
-            return "vendor-query";
-          }
-          if (id.includes("node_modules/framer-motion") || id.includes("node_modules/lucide-react") || id.includes("node_modules/clsx") || id.includes("node_modules/tailwind-merge")) {
-            return "vendor-ui";
-          }
-          if (id.includes("node_modules/react-markdown") || id.includes("node_modules/remark-gfm") || id.includes("node_modules/react-syntax-highlighter")) {
-            return "vendor-markdown";
-          }
-          if (id.includes("node_modules/reactflow") || id.includes("node_modules/dagre")) {
-            return "vendor-graph";
-          }
-          if (id.includes("node_modules/jspdf") || id.includes("node_modules/docx")) {
-            return "vendor-docs";
+          if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("react-dom") || id.includes("react-router")) {
+              return "vendor-react";
+            }
+            if (id.includes("@tanstack/react-query")) {
+              return "vendor-query";
+            }
+            if (id.includes("framer-motion") || id.includes("lucide-react")) {
+              return "vendor-motion";
+            }
+            if (id.includes("react-markdown") || id.includes("remark-gfm") || id.includes("react-syntax-highlighter")) {
+              return "vendor-markdown";
+            }
+            if (id.includes("reactflow") || id.includes("dagre")) {
+              return "vendor-graph";
+            }
+            if (id.includes("jspdf") || id.includes("docx") || id.includes("html2canvas")) {
+              return "vendor-docs";
+            }
+            if (id.includes("cmdk") || id.includes("sonner") || id.includes("react-resizable-panels")) {
+              return "vendor-ui-extra";
+            }
+            if (id.includes("zod") || id.includes("axios") || id.includes("better-auth")) {
+              return "vendor-utils";
+            }
           }
         },
       },
     },
+    chunkSizeWarningLimit: 600,
   },
 });

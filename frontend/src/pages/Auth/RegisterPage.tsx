@@ -60,7 +60,7 @@ export default function RegisterPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const navigate = useNavigate();
-  const { register, loginWithGoogle, loginWithGithub } = useAuth();
+  const { register, loginWithGoogle, loginWithGithub, user } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -72,6 +72,7 @@ export default function RegisterPage() {
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   const passwordStrength = useMemo(() => {
     if (!password) return { level: 0, label: "", color: "" };
@@ -112,7 +113,11 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register({ name, email, password, confirmPassword });
-      navigate("/dashboard", { replace: true });
+      if (!user?.emailVerified) {
+        setNeedsVerification(true);
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -323,6 +328,27 @@ export default function RegisterPage() {
               )}
             </AnimatePresence>
 
+            <AnimatePresence>
+              {needsVerification && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4 text-center"
+                >
+                  <Mail size={24} className="mx-auto mb-2 text-emerald-400" />
+                  <p className="text-sm font-medium text-emerald-400">
+                    Verification email sent!
+                  </p>
+                  <p className={`mt-1 text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    Check your inbox and click the verification link to activate your account.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {!needsVerification && (
+              <>
             <div className="mt-6 grid grid-cols-2 gap-3">
               <motion.button
                 whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(167,139,250,0.2)" }}
@@ -548,6 +574,8 @@ export default function RegisterPage() {
                 Sign in
               </Link>
             </motion.p>
+              </>
+            )}
           </motion.div>
         </div>
       </div>

@@ -19,8 +19,21 @@ import "./index.css";
 
 import { router } from "./router";
 
-const client =
-  new QueryClient();
+const client = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 15 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
+      retryDelay: 1000,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 createRoot(
   document.getElementById("root")!

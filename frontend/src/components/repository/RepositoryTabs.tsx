@@ -13,6 +13,10 @@ const tabs = [
   { label: "Architecture", path: "architecture" },
   { label: "Documentation", path: "documentation" },
   { label: "Dependency Graph", path: "dependency-graph" },
+  { label: "Intelligence", path: "intelligence" },
+  { label: "Doc Generator", path: "doc-generator" },
+  { label: "Search", path: "semantic-search" },
+  { label: "Multi-Agent", path: "multi-agent" },
 ];
 
 export default function RepositoryTabs({ repositoryId }: Props) {

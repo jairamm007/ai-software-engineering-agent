@@ -46,8 +46,8 @@ export interface BlastRadiusNode {
   depth: number;
 }
 
-// Cache keyed by repository path
 const graphCache = new Map<string, { graph: DependencyGraph; mtime: number }>();
+const fileContentCache = new Map<string, string>();
 
 const toGraphPath = (repositoryPath: string, filePath: string) =>
   path.relative(repositoryPath, filePath).replaceAll("\\", "/");
@@ -77,20 +77,32 @@ const resolveImport = (
   return candidates.find((candidate) => availablePaths.has(candidate)) ?? null;
 };
 
-const getImportStatement = (sourcePath: string, importPath: string) => {
-  try {
-    const content = fs.readFileSync(sourcePath, "utf8");
-    const statement = content
-      .split(/\r?\n/)
-      .find((line) =>
-        line.includes(importPath) &&
-        (/^\s*import\b/.test(line) || /^\s*export\b/.test(line))
-      );
+const getFileContent = (filePath: string): string => {
+  const cached = fileContentCache.get(filePath);
+  if (cached !== undefined) return cached;
 
-    return statement?.trim() ?? `import … from "${importPath}"`;
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    fileContentCache.set(filePath, content);
+    return content;
   } catch {
-    return `import … from "${importPath}"`;
+    fileContentCache.set(filePath, "");
+    return "";
   }
+};
+
+const getImportStatement = (sourcePath: string, importPath: string) => {
+  const content = getFileContent(sourcePath);
+  if (!content) return `import … from "${importPath}"`;
+
+  const statement = content
+    .split(/\r?\n/)
+    .find((line) =>
+      line.includes(importPath) &&
+      (/^\s*import\b/.test(line) || /^\s*export\b/.test(line))
+    );
+
+  return statement?.trim() ?? `import … from "${importPath}"`;
 };
 
 const findCircularNodes = (nodeIds: string[], edges: DependencyGraphEdge[]) => {
@@ -119,7 +131,6 @@ const findCircularNodes = (nodeIds: string[], edges: DependencyGraphEdge[]) => {
 };
 
 const countSCCs = (nodeIds: string[], edges: DependencyGraphEdge[]): number => {
-  // Tarjan's algorithm for strongly connected components
   const adj = new Map<string, string[]>();
   nodeIds.forEach((id) => adj.set(id, []));
   edges.forEach((e) => adj.get(e.source)?.push(e.target));
@@ -164,9 +175,6 @@ const countSCCs = (nodeIds: string[], edges: DependencyGraphEdge[]): number => {
   return sccCount;
 };
 
-/**
- * Check if a file has changed since last parse (by mtime)
- */
 const hasFileChanged = (filePath: string, cachedMtime: number): boolean => {
   try {
     const stat = fs.statSync(filePath);
@@ -176,10 +184,6 @@ const hasFileChanged = (filePath: string, cachedMtime: number): boolean => {
   }
 };
 
-/**
- * Build or incrementally update a dependency graph for a repository.
- * Uses mtime-based cache to avoid full re-parses on unchanged repos.
- */
 export const buildDependencyGraph = (
   repositoryPath: string
 ): DependencyGraphResult => {
@@ -189,18 +193,18 @@ export const buildDependencyGraph = (
   let graph: DependencyGraph;
 
   if (cached) {
-    // Check if any files changed since last build
     const allFiles = getAllSourceFiles(repositoryPath);
     const anyChanged = allFiles.some((f) => hasFileChanged(f, cached.mtime));
 
     if (!anyChanged) {
       graph = cached.graph;
     } else {
-      // Incremental: rebuild from scratch but log the optimization
+      fileContentCache.clear();
       graph = buildGraphFromFiles(repositoryPath);
       graphCache.set(repositoryPath, { graph, mtime: now });
     }
   } else {
+    fileContentCache.clear();
     graph = buildGraphFromFiles(repositoryPath);
     graphCache.set(repositoryPath, { graph, mtime: now });
   }
@@ -208,9 +212,6 @@ export const buildDependencyGraph = (
   return graphToResult(repositoryPath, graph);
 };
 
-/**
- * Get files that import a given file (dependents / reverse dependencies)
- */
 export const getDependents = (
   repositoryPath: string,
   filePath: string
@@ -232,9 +233,6 @@ const cachedGraphGetDependents = (repositoryPath: string, filePath: string): str
   return cached.graph.getDependents(graphPath);
 };
 
-/**
- * Get files that a given file imports (direct dependencies)
- */
 export const getFileDependencies = (
   repositoryPath: string,
   filePath: string
@@ -246,9 +244,6 @@ export const getFileDependencies = (
   return cached.graph.getDependencies(graphPath);
 };
 
-/**
- * Get the blast radius: all files affected within N hops if this file changes
- */
 export const getBlastRadius = (
   repositoryPath: string,
   filePath: string,
@@ -264,7 +259,6 @@ export const getBlastRadius = (
   const graphPath = toGraphPath(repositoryPath, path.resolve(repositoryPath, filePath));
   const affectedFiles = freshCache.graph.getBlastRadius(graphPath, depth);
 
-  // Track depth for each affected file
   const affected: BlastRadiusNode[] = [];
   let frontier = [graphPath];
   const seen = new Set<string>();
@@ -291,9 +285,6 @@ export const getBlastRadius = (
   };
 };
 
-/**
- * Invalidate cache for a repository (call after file changes)
- */
 export const invalidateGraphCache = (repositoryPath: string): void => {
   graphCache.delete(repositoryPath);
 };
@@ -312,11 +303,9 @@ const getAllSourceFiles = (dir: string): string[] => {
             files.push(full);
           }
         } catch {
-          // Skip unreadable files
         }
       }
     } catch {
-      // Skip unreadable directories
     }
   };
   walk(dir);

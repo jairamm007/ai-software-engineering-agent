@@ -25,6 +25,20 @@ export const insertEmbedding = async (
   `;
 };
 
+export const insertEmbeddingsBulk = async (
+  embeddings: { chunkId: string; vector: number[] }[]
+) => {
+  if (embeddings.length === 0) return;
+
+  const values = embeddings
+    .map((e) => `('${e.chunkId}', '[${e.vector.join(",")}]'::vector)`)
+    .join(", ");
+
+  await prisma.$executeRawUnsafe(
+    `INSERT INTO code_embeddings (chunk_id, embedding) VALUES ${values}`
+  );
+};
+
 export const searchNearestChunks = async (
   embedding: number[],
   limit = 10,
@@ -52,7 +66,7 @@ export const searchNearestChunks = async (
       )}`
     : Prisma.empty;
 
-  const fetchLimit = Math.min(limit * 3, 40);
+  const fetchLimit = Math.min(limit * 3, 30);
 
   const results = await prisma.$queryRaw<RetrievedChunk[]>`
     SELECT
@@ -63,11 +77,11 @@ export const searchNearestChunks = async (
       cc.content,
       ce.embedding <=> ${vector}::vector AS distance
     FROM code_embeddings ce
-    JOIN "CodeChunk" cc
+    INNER JOIN "CodeChunk" cc
       ON ce.chunk_id = cc.id
-    JOIN "RepositoryFile" rf
+    INNER JOIN "RepositoryFile" rf
       ON cc."fileId" = rf.id
-    JOIN "Repository" r
+    INNER JOIN "Repository" r
       ON rf."repositoryId" = r.id
       ${whereClause}
     ORDER BY ce.embedding <=> ${vector}::vector
@@ -78,7 +92,6 @@ export const searchNearestChunks = async (
 
   return results
     .filter((chunk) => {
-      // More lenient threshold to capture more relevant results
       if (chunk.distance >= 0.90) return false;
       const key = `${chunk.filePath}:${chunk.startLine}-${chunk.endLine}`;
       if (seen.has(key)) return false;

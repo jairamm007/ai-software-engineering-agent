@@ -8,16 +8,19 @@ import {
 
 import {
   createRepositoryFile,
+  createRepositoryFilesBulk,
 } from "../repository/repository-file.repository.js";
 
 import {
   createCodeChunk,
+  createCodeChunksBulk,
 } from "../repository/code-chunk.repository.js";
 
 import { createChunkEmbedding } from "./embedding.service.js";
 
-const EMBEDDING_BATCH_SIZE = 5;
-const EMBEDDING_DELAY_MS = 200;
+const EMBEDDING_BATCH_SIZE = 10;
+const EMBEDDING_DELAY_MS = 100;
+const DB_BATCH_SIZE = 50;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -67,41 +70,47 @@ export const indexGitHubRepository = async (
   console.log(`📁 Files found: ${indexResult.totalFiles}`);
   console.log(`📦 Total chunks: ${indexResult.totalChunks}`);
 
-  // Build and store file tree summary
   const fileTree = buildFileTree(
     indexResult.files.map((f) => ({ path: f.path }))
   );
   console.log(`🌳 File tree built (${fileTree.length} chars)`);
 
-  // Collect all chunks for batched embedding
   const allChunks: { chunkId: string; content: string }[] = [];
 
-  for (const file of indexResult.files) {
-    console.log(`\n📄 Processing file: ${file.path} (${file.chunks.length} chunks)`);
+  for (let i = 0; i < indexResult.files.length; i += DB_BATCH_SIZE) {
+    const fileBatch = indexResult.files.slice(i, i + DB_BATCH_SIZE);
 
-    const repositoryFile = await createRepositoryFile(
-      repository.id,
-      file.path,
-      file.extension,
-      file.size
+    const fileRecords = await Promise.all(
+      fileBatch.map(async (file) => {
+        const repoFile = await createRepositoryFile(
+          repository.id,
+          file.path,
+          file.extension,
+          file.size
+        );
+        return { file, repoFile };
+      })
     );
 
-    for (const chunk of file.chunks) {
-      const savedChunk = await createCodeChunk(
-        repositoryFile.id,
-        chunk.content,
-        chunk.startLine,
-        chunk.endLine
-      );
-
-      allChunks.push({
-        chunkId: savedChunk.id,
+    for (const { file, repoFile } of fileRecords) {
+      const chunkDataList = file.chunks.map((chunk) => ({
+        fileId: repoFile.id,
         content: chunk.content,
-      });
+        startLine: chunk.startLine,
+        endLine: chunk.endLine,
+      }));
+
+      const savedChunks = await createCodeChunksBulk(chunkDataList);
+
+      for (let j = 0; j < savedChunks.length; j++) {
+        allChunks.push({
+          chunkId: savedChunks[j].id,
+          content: file.chunks[j].content,
+        });
+      }
     }
   }
 
-  // Batched embedding generation with rate limiting
   console.log(`\n🧠 Generating embeddings for ${allChunks.length} chunks in batches of ${EMBEDDING_BATCH_SIZE}...`);
 
   for (let i = 0; i < allChunks.length; i += EMBEDDING_BATCH_SIZE) {
@@ -113,7 +122,6 @@ export const indexGitHubRepository = async (
       console.log(`  Batch ${batchNum}/${totalBatches}...`);
     }
 
-    // Process batch concurrently
     await Promise.allSettled(
       batch.map(async (c) => {
         try {
@@ -124,7 +132,6 @@ export const indexGitHubRepository = async (
       })
     );
 
-    // Rate limit between batches
     if (i + EMBEDDING_BATCH_SIZE < allChunks.length) {
       await sleep(EMBEDDING_DELAY_MS);
     }

@@ -2,6 +2,7 @@ import type { User, LoginCredentials, RegisterData } from "@/types/auth";
 import { authClient } from "@/lib/auth-client";
 
 const FRONTEND_URL = window.location.origin;
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function mapUser(data: Record<string, unknown>): User {
   return {
@@ -73,14 +74,10 @@ export async function apiLoginWithGoogle(): Promise<{ user: User; token: string 
 
   if (data?.url) {
     window.location.href = data.url;
-    return new Promise(() => {});
+    return new Promise<never>(() => {});
   }
 
-  const session = await apiGetSession();
-  if (!session) {
-    throw new Error("Failed to get session after Google sign-in");
-  }
-  return session;
+  throw new Error("Google sign-in failed: no redirect URL received");
 }
 
 export async function apiLoginWithGithub(): Promise<{ user: User; token: string }> {
@@ -95,25 +92,21 @@ export async function apiLoginWithGithub(): Promise<{ user: User; token: string 
 
   if (data?.url) {
     window.location.href = data.url;
-    return new Promise(() => {});
+    return new Promise<never>(() => {});
   }
 
-  const session = await apiGetSession();
-  if (!session) {
-    throw new Error("Failed to get session after GitHub sign-in");
-  }
-  return session;
+  throw new Error("GitHub sign-in failed: no redirect URL received");
 }
 
 export async function apiGetSession(): Promise<{ user: User; token: string } | null> {
   try {
     const { data } = await authClient.getSession();
 
-    if (!data?.session) return null;
+    if (!data?.session || !data.user) return null;
 
     return {
-      user: mapUser(data.user as unknown as Record<string, unknown>),
-      token: (data.session as unknown as Record<string, unknown>)?.token as string ?? "",
+      user: mapUser(data.user as Record<string, unknown>),
+      token: (data.session as { token?: string }).token ?? "",
     };
   } catch {
     return null;
@@ -125,7 +118,7 @@ export async function apiLogout(): Promise<void> {
 }
 
 export async function apiForgotPassword(email: string): Promise<void> {
-  const res = await fetch("/api/auth/forget-password", {
+  const res = await fetch(`${BACKEND_URL}/api/auth/forget-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -152,7 +145,7 @@ export async function apiResetPassword(token: string, newPassword: string): Prom
 }
 
 export async function apiVerifyEmail(token: string): Promise<void> {
-    const res = await fetch("/api/auth/verify-email", {
+    const res = await fetch(`${BACKEND_URL}/api/auth/verify-email`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token }),
@@ -165,7 +158,7 @@ export async function apiVerifyEmail(token: string): Promise<void> {
 }
 
 export async function apiDeleteAccount(): Promise<void> {
-    const res = await fetch("/api/user/account", {
+    const res = await fetch(`${BACKEND_URL}/api/user/account`, {
     method: "DELETE",
     credentials: "include",
   });
@@ -177,7 +170,7 @@ export async function apiDeleteAccount(): Promise<void> {
 }
 
 export async function apiChangePassword(currentPassword: string, newPassword: string): Promise<void> {
-    const res = await fetch("/api/user/change-password", {
+    const res = await fetch(`${BACKEND_URL}/api/user/change-password`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -191,7 +184,7 @@ export async function apiChangePassword(currentPassword: string, newPassword: st
 }
 
 export async function apiExportData(): Promise<Record<string, unknown>> {
-    const res = await fetch("/api/user/export", {
+    const res = await fetch(`${BACKEND_URL}/api/user/export`, {
     method: "GET",
     credentials: "include",
   });
@@ -206,7 +199,7 @@ export async function apiExportData(): Promise<Record<string, unknown>> {
 }
 
 export async function apiClearCache(): Promise<void> {
-    const res = await fetch("/api/user/clear-cache", {
+    const res = await fetch(`${BACKEND_URL}/api/user/clear-cache`, {
     method: "POST",
     credentials: "include",
   });
@@ -218,7 +211,7 @@ export async function apiClearCache(): Promise<void> {
 }
 
 export async function apiUpdateProfile(updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>): Promise<User> {
-  const res = await fetch("/api/user/profile", {
+  const res = await fetch(`${BACKEND_URL}/api/user/profile`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

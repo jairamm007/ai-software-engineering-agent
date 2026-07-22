@@ -16,6 +16,14 @@ export const createRepositoryFile = async (
   });
 };
 
+export const createRepositoryFilesBulk = async (
+  files: { repositoryId: string; path: string; extension: string; size: number }[]
+) => {
+  return prisma.repositoryFile.createManyAndReturn({
+    data: files,
+  });
+};
+
 export const getRepositoryFiles = async (
   repositoryId: string
 ) => {

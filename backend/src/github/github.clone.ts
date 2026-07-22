@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 import { simpleGit, SimpleGit } from "simple-git";
 
@@ -9,11 +10,10 @@ export const cloneRepository = async (
 ): Promise<string> => {
   const uniqueFolder = `${repoName}-${Date.now()}`;
 
-  const clonePath = path.resolve(
-    process.cwd(),
-    "temp",
-    uniqueFolder
-  );
+  const tempDir = path.resolve(process.cwd(), "temp");
+  fs.mkdirSync(tempDir, { recursive: true });
+
+  const clonePath = path.resolve(tempDir, uniqueFolder);
 
   await git.clone(repoUrl, clonePath);
 

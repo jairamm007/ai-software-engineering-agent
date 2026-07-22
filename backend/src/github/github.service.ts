@@ -8,9 +8,11 @@ export const parseGitHubUrl = (
     return null;
   }
 
-  const cleanedUrl = url.replace(/\.git$/, "");
+  const cleanedUrl = url
+    .replace(/\.git$/, "")
+    .replace(/^(https?:\/\/)(www\.)?/, "$1");
 
-  const parts = cleanedUrl.replace("https://github.com/", "").split("/");
+  const parts = cleanedUrl.replace("https://github.com/", "").replace("http://github.com/", "").split("/");
 
   return {
     owner: parts[0],

@@ -1,4 +1,6 @@
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Search, ArrowUpDown } from "lucide-react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import RepositoryForm from "@/components/repository/RepositoryForm";
 import RepositoryTable from "@/components/repository/RepositoryTable";
@@ -6,14 +8,34 @@ import { analyzeRepository, getRepositories } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
 import type { RepositoryListItem } from "@/types/repository";
 
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
+  { value: "name", label: "Name A-Z" },
+  { value: "files", label: "Most Files" },
+];
+
 export default function RepositoryPage() {
   const queryClient = useQueryClient();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(debounceTimer.current);
+  }, [search]);
+
   const { data = [], isLoading } = useQuery<RepositoryListItem[]>({
-    queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryKey: ["repositories", { search: debouncedSearch, sortBy }],
+    queryFn: () => getRepositories({ search: debouncedSearch, sortBy }),
   });
 
   const mutation = useMutation({
@@ -28,7 +50,58 @@ export default function RepositoryPage() {
       <h1 className={`mb-6 text-3xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
         Repository Management
       </h1>
-      <RepositoryForm onSubmit={(url) => mutation.mutateAsync(url)} />
+      <RepositoryForm
+        onSubmit={(url) => mutation.mutateAsync(url)}
+      />
+      {mutation.isPending && (
+        <div className={`mb-4 flex items-center gap-3 rounded-xl border p-4 ${
+          isDark ? "border-violet-500/20 bg-violet-500/5" : "border-violet-200 bg-violet-50"
+        }`}>
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+          <div>
+            <p className={`text-sm font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
+              Cloning & indexing repository...
+            </p>
+            <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              This may take a few minutes depending on repository size
+            </p>
+          </div>
+        </div>
+      )}
+      <div className="mb-4 flex gap-3">
+        <div className="relative flex-1">
+          <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+          <input
+            type="text"
+            placeholder="Search repositories..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`w-full rounded-lg border py-2 pl-9 pr-3 text-sm outline-none transition-colors ${
+              isDark
+                ? "border-white/20 bg-white/5 text-white placeholder:text-slate-500 focus:border-violet-500"
+                : "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-violet-500"
+            }`}
+          />
+        </div>
+        <div className="relative">
+          <ArrowUpDown size={14} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className={`appearance-none rounded-lg border py-2 pl-8 pr-8 text-sm outline-none cursor-pointer transition-colors ${
+              isDark
+                ? "border-white/20 bg-white/5 text-white focus:border-violet-500"
+                : "border-slate-300 bg-white text-slate-900 focus:border-violet-500"
+            }`}
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       {isLoading ? (
         <p className={isDark ? "text-slate-400" : "text-slate-500"}>Loading repositories...</p>
       ) : (

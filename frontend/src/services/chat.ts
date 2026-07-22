@@ -57,6 +57,7 @@ export interface StreamChatInput {
   onToken: (token: string) => void;
   onDone: (data: { conversationId: string; messageType: string; source: any }) => void;
   onError: (message: string) => void;
+  signal?: AbortSignal;
 }
 
 export const streamChat = async ({
@@ -67,18 +68,27 @@ export const streamChat = async ({
   onToken,
   onDone,
   onError,
+  signal,
 }: StreamChatInput): Promise<void> => {
   const token = localStorage.getItem("better-auth.session_token") || "";
 
-  const response = await fetch("/api/chat/stream", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    credentials: "include",
-    body: JSON.stringify({ question, repositoryId, filePath, conversationId }),
-  });
+  let response: Response;
+  try {
+    response = await fetch("/api/chat/stream", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+      body: JSON.stringify({ question, repositoryId, filePath, conversationId }),
+      signal,
+    });
+  } catch (err) {
+    if (signal?.aborted) return;
+    onError("Failed to connect to chat service");
+    return;
+  }
 
   if (!response.ok) {
     onError("Failed to connect to chat service");

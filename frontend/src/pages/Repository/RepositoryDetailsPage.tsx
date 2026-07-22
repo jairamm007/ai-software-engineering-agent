@@ -5,7 +5,7 @@ import {
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Trash2, Settings } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -470,16 +470,29 @@ export default function RepositoryDetailsPage() {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleDeleteRepository}
-            title="Delete Repository"
-            className={`rounded-xl border p-3 transition hover:border-red-500 hover:bg-red-50 hover:text-red-600 ${
-              isDark ? "border-white/20" : "border-slate-300"
-            }`}
-          >
-            <Trash2 size={20} />
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => navigate(`/repositories/${id}/settings`)}
+              title="Repository Settings"
+              className={`rounded-xl border p-3 transition hover:border-[var(--accent)] hover:bg-[var(--accent-light)] ${
+                isDark ? "border-white/20" : "border-slate-300"
+              }`}
+            >
+              <Settings size={20} />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDeleteRepository}
+              title="Delete Repository"
+              className={`rounded-xl border p-3 transition hover:border-red-500 hover:bg-red-50 hover:text-red-600 ${
+                isDark ? "border-white/20" : "border-slate-300"
+              }`}
+            >
+              <Trash2 size={20} />
+            </button>
+          </div>
         </div>
 
         <RepositoryTabs

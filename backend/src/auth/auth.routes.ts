@@ -5,10 +5,22 @@ import { auth } from "./auth.config.js";
 const router = Router();
 const authBaseURL = process.env.BETTER_AUTH_URL || "http://localhost:3000";
 
+const HOP_BY_HOP = new Set([
+  "connection",
+  "content-length",
+  "transfer-encoding",
+  "keep-alive",
+  "te",
+  "trailer",
+  "upgrade",
+  "proxy-authorization",
+  "proxy-authenticate",
+]);
+
 function toHeaders(req: Request): Headers {
   const headers = new Headers();
   for (const [key, value] of Object.entries(req.headers)) {
-    if (value !== undefined) {
+    if (value !== undefined && !HOP_BY_HOP.has(key)) {
       headers.set(key, Array.isArray(value) ? value.join(", ") : value);
     }
   }
@@ -31,17 +43,12 @@ router.all("/{*path}", async (req: Request, res) => {
     const response = await auth.handler(new Request(url.toString(), init));
 
     const setCookieHeaders = response.headers.getSetCookie?.() ?? [];
-    if (setCookieHeaders.length > 0) {
-      res.setHeader("set-cookie", setCookieHeaders);
-    }
-
-    const location = response.headers.get("location");
-    if (location) {
-      res.redirect(response.status, location);
-      return;
-    }
-
     const bodyText = await response.text();
+    const location = response.headers.get("location");
+
+    for (const cookie of setCookieHeaders) {
+      res.appendHeader("Set-Cookie", cookie);
+    }
 
     if (bodyText) {
       try {
@@ -50,6 +57,8 @@ router.all("/{*path}", async (req: Request, res) => {
       } catch {
         res.status(response.status).send(bodyText);
       }
+    } else if (location) {
+      res.redirect(response.status || 302, location);
     } else {
       res.status(response.status).end();
     }

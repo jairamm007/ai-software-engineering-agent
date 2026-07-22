@@ -20,6 +20,13 @@ import {
   Loader2,
   Send,
   Square,
+  RefreshCw,
+  Pencil,
+  Clock,
+  GitBranch,
+  Brain,
+  Search,
+  Code2,
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph, TextRun } from "docx";
@@ -29,6 +36,7 @@ import {
   getConversations,
   getConversation,
   deleteConversation,
+  renameConversation,
   streamChat,
 } from "@/services/chat";
 import { getRepositories } from "@/services/repository";
@@ -37,14 +45,55 @@ import MarkdownMessage from "@/components/chat/MarkdownMessage";
 import type { ChatMessage } from "@/types/chat";
 import type { RepositoryListItem } from "@/types/repository";
 
-const suggestedQuestions = [
-  "Explain the overall architecture of this repository",
-  "What are the main entry points and how do they connect?",
-  "Are there any potential security issues in the code?",
-  "Summarize the key modules and their responsibilities",
-  "What dependencies does this project use and why?",
-  "Generate documentation for the main functions",
+const PROMPT_CATEGORIES = [
+  {
+    title: "Understand",
+    icon: Brain,
+    color: "text-violet-400",
+    prompts: [
+      "Explain the overall architecture of this repository",
+      "What are the main entry points and how do they connect?",
+      "Summarize the key modules and their responsibilities",
+      "Walk me through the data flow of this application",
+    ],
+  },
+  {
+    title: "Analyze",
+    icon: Search,
+    color: "text-blue-400",
+    prompts: [
+      "Are there any potential security issues in the code?",
+      "What dependencies does this project use and why?",
+      "Identify any code smells or anti-patterns",
+      "What are the potential performance bottlenecks?",
+    ],
+  },
+  {
+    title: "Build",
+    icon: Code2,
+    color: "text-emerald-400",
+    prompts: [
+      "Generate documentation for the main functions",
+      "Write unit tests for the core modules",
+      "Suggest improvements for error handling",
+      "How would you add a new feature to this codebase?",
+    ],
+  },
 ];
+
+function formatRelativeTime(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = now - then;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString();
+}
 
 export default function AIChatPage() {
   const { theme } = useTheme();
@@ -63,6 +112,10 @@ export default function AIChatPage() {
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
+  const [thinkingStage, setThinkingStage] = useState<string | null>(null);
+  const [editingConvId, setEditingConvId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [hoveredMsgId, setHoveredMsgId] = useState<string | null>(null);
 
   // ── Queries ──
   const { data: repositories = [], isLoading: reposLoading } = useQuery({
@@ -83,6 +136,14 @@ export default function AIChatPage() {
         setActiveConversationId(null);
         setMessages([]);
       }
+    },
+  });
+
+  const renameMutation = useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) => renameConversation(id, title),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      setEditingConvId(null);
     },
   });
 
@@ -108,6 +169,27 @@ export default function AIChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingContent]);
 
+  // ── Thinking stages ──
+  useEffect(() => {
+    if (!streaming) {
+      setThinkingStage(null);
+      return;
+    }
+    if (streamingContent) {
+      setThinkingStage(null);
+      return;
+    }
+    const stages = [
+      { delay: 400, text: "Searching codebase..." },
+      { delay: 2000, text: "Analyzing relevant code..." },
+      { delay: 5000, text: "Generating response..." },
+    ];
+    const timers = stages.map((s) =>
+      setTimeout(() => setThinkingStage(s.text), s.delay)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [streaming, streamingContent]);
+
   // ── Send message ──
   const send = useCallback(
     (question: string) => {
@@ -123,12 +205,15 @@ export default function AIChatPage() {
       setStreaming(true);
       setStreamingContent("");
 
+      const controller = new AbortController();
+      abortRef.current = controller;
       let fullContent = "";
 
       streamChat({
         question,
         repositoryId: selectedRepo?.id,
         conversationId: activeConversationId ?? undefined,
+        signal: controller.signal,
         onToken: (token) => {
           fullContent += token;
           setStreamingContent(fullContent);
@@ -139,16 +224,30 @@ export default function AIChatPage() {
             role: "assistant",
             content: fullContent,
             source: data.source,
+            createdAt: new Date().toISOString(),
           };
           setMessages((prev) => [...prev, assistantMsg]);
           setStreamingContent("");
           setStreaming(false);
+          abortRef.current = null;
           if (data.conversationId) {
             setActiveConversationId(data.conversationId);
             queryClient.invalidateQueries({ queryKey: ["conversations"] });
           }
         },
         onError: (message) => {
+          if (controller.signal.aborted) {
+            if (fullContent) {
+              setMessages((prev) => [
+                ...prev,
+                { id: crypto.randomUUID(), role: "assistant", content: fullContent, createdAt: new Date().toISOString() },
+              ]);
+            }
+            setStreamingContent("");
+            setStreaming(false);
+            abortRef.current = null;
+            return;
+          }
           const errorMsg: ChatMessage = {
             id: crypto.randomUUID(),
             role: "assistant",
@@ -157,6 +256,7 @@ export default function AIChatPage() {
           setMessages((prev) => [...prev, errorMsg]);
           setStreamingContent("");
           setStreaming(false);
+          abortRef.current = null;
         },
       });
     },
@@ -175,6 +275,20 @@ export default function AIChatPage() {
     }
   };
 
+  // ── Stop generating ──
+  const handleStop = () => {
+    abortRef.current?.abort();
+  };
+
+  // ── Regenerate last response ──
+  const handleRegenerate = () => {
+    if (streaming || messages.length === 0) return;
+    const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
+    if (!lastUserMsg) return;
+    setMessages((prev) => prev.filter((m) => m.id !== lastUserMsg.id));
+    send(lastUserMsg.content);
+  };
+
   // ── New conversation ──
   const handleNewChat = () => {
     setActiveConversationId(null);
@@ -188,6 +302,19 @@ export default function AIChatPage() {
     setSelectedRepo(repo);
     setShowRepoDropdown(false);
     handleNewChat();
+  };
+
+  // ── Rename conversation ──
+  const startRename = (conv: { id: string; title: string }) => {
+    setEditingConvId(conv.id);
+    setEditTitle(conv.title);
+  };
+
+  const commitRename = () => {
+    if (editingConvId && editTitle.trim()) {
+      renameMutation.mutate({ id: editingConvId, title: editTitle.trim() });
+    }
+    setEditingConvId(null);
   };
 
   // ── Copy message ──
@@ -236,6 +363,10 @@ export default function AIChatPage() {
     el.style.height = Math.min(el.scrollHeight, 160) + "px";
   };
 
+  const repoConversations = conversations.filter((c) =>
+    selectedRepo ? c.repositoryId === selectedRepo.id : true
+  );
+
   return (
     <DashboardLayout>
       <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden -m-4 sm:-m-6 md:-m-8">
@@ -274,13 +405,13 @@ export default function AIChatPage() {
                   <div className="flex justify-center py-8">
                     <Loader2 size={18} className={`animate-spin ${isDark ? "text-slate-500" : "text-slate-400"}`} />
                   </div>
-                ) : conversations.length === 0 ? (
+                ) : repoConversations.length === 0 ? (
                   <p className={`px-3 py-8 text-center text-xs ${isDark ? "text-slate-600" : "text-slate-400"}`}>
                     No conversations yet
                   </p>
                 ) : (
                   <div className="space-y-0.5">
-                    {conversations.map((conv) => (
+                    {repoConversations.map((conv) => (
                       <div
                         key={conv.id}
                         className={`group flex items-center gap-2 rounded-lg px-3 py-2.5 text-left transition-colors cursor-pointer ${
@@ -289,21 +420,55 @@ export default function AIChatPage() {
                             : isDark ? "text-slate-400 hover:bg-white/[0.04] hover:text-white" : "text-slate-600 hover:bg-slate-50"
                         }`}
                         onClick={() => {
-                          setActiveConversationId(conv.id);
-                          setStreamingContent("");
+                          if (editingConvId !== conv.id) {
+                            setActiveConversationId(conv.id);
+                            setStreamingContent("");
+                          }
                         }}
                       >
                         <MessageSquare size={14} className="shrink-0" />
-                        <span className="flex-1 truncate text-xs font-[Inter]">{conv.title}</span>
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(conv.id); }}
-                          className={`hidden rounded p-1 transition-colors group-hover:block ${
-                            isDark ? "text-slate-500 hover:text-red-400" : "text-slate-400 hover:text-red-500"
-                          }`}
-                        >
-                          <Trash2 size={12} />
-                        </button>
+                        {editingConvId === conv.id ? (
+                          <input
+                            autoFocus
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            onBlur={commitRename}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") commitRename();
+                              if (e.key === "Escape") setEditingConvId(null);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className={`flex-1 rounded border bg-transparent px-1.5 py-0.5 text-xs font-[Inter] outline-none ${
+                              isDark ? "border-white/20 text-white" : "border-slate-300 text-slate-900"
+                            }`}
+                          />
+                        ) : (
+                          <span className="flex-1 truncate text-xs font-[Inter]">{conv.title}</span>
+                        )}
+                        {editingConvId !== conv.id && (
+                          <div className="hidden group-hover:flex items-center gap-0.5">
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); startRename(conv); }}
+                              className={`rounded p-1 transition-colors ${
+                                isDark ? "text-slate-500 hover:text-slate-300" : "text-slate-400 hover:text-slate-600"
+                              }`}
+                              title="Rename"
+                            >
+                              <Pencil size={11} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(conv.id); }}
+                              className={`rounded p-1 transition-colors ${
+                                isDark ? "text-slate-500 hover:text-red-400" : "text-slate-400 hover:text-red-500"
+                              }`}
+                              title="Delete"
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -392,6 +557,16 @@ export default function AIChatPage() {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Repo context badge */}
+            {selectedRepo && (
+              <div className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-medium ${
+                isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"
+              }`}>
+                <GitBranch size={11} />
+                Context: {selectedRepo.name}
+              </div>
+            )}
           </div>
 
           {/* Messages area */}
@@ -422,25 +597,40 @@ export default function AIChatPage() {
                   <MessageSquare size={28} className="text-white" />
                 </div>
                 <h3 className={`mb-2 text-lg font-semibold font-[Outfit] ${isDark ? "text-white" : "text-slate-800"}`}>
-                  What would you like to know about {selectedRepo.name}?
+                  Chat with {selectedRepo.name}
                 </h3>
                 <p className={`mb-8 text-center text-sm font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   Ask anything about the code, architecture, dependencies, or logic
                 </p>
-                <div className="grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
-                  {suggestedQuestions.map((q) => (
-                    <button
-                      key={q}
-                      type="button"
-                      onClick={() => send(q)}
-                      className={`rounded-xl border px-4 py-3 text-left text-sm font-[Inter] transition-colors ${
-                        isDark
-                          ? "border-white/10 bg-white/5 text-slate-300 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
-                          : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
-                      }`}
-                    >
-                      {q}
-                    </button>
+
+                <div className="w-full max-w-3xl space-y-6">
+                  {PROMPT_CATEGORIES.map((cat) => (
+                    <div key={cat.title}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <cat.icon size={14} className={cat.color} />
+                        <span className={`text-xs font-semibold uppercase tracking-wider font-[Inter] ${
+                          isDark ? "text-slate-500" : "text-slate-400"
+                        }`}>
+                          {cat.title}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {cat.prompts.map((q) => (
+                          <button
+                            key={q}
+                            type="button"
+                            onClick={() => send(q)}
+                            className={`rounded-xl border px-4 py-3 text-left text-sm font-[Inter] transition-all hover:scale-[1.01] ${
+                              isDark
+                                ? "border-white/10 bg-white/5 text-slate-300 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
+                                : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
+                            }`}
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -453,6 +643,13 @@ export default function AIChatPage() {
                     isDark={isDark}
                     onCopy={handleCopy}
                     onDownload={handleDownload}
+                    onRegenerate={msg.role === "assistant" ? handleRegenerate : undefined}
+                    isLastAssistant={
+                      msg.role === "assistant" &&
+                      msg === [...messages].reverse().find((m) => m.role === "assistant")
+                    }
+                    isHovered={hoveredMsgId === msg.id}
+                    onHover={setHoveredMsgId}
                   />
                 ))}
                 {streaming && streamingContent && (
@@ -472,15 +669,24 @@ export default function AIChatPage() {
                     <div className={`rounded-2xl border px-5 py-4 ${
                       isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                     }`}>
-                      <div className="flex gap-1.5">
-                        {[0, 150, 300].map((delay) => (
-                          <span
-                            key={delay}
-                            className={`h-2 w-2 animate-bounce rounded-full ${isDark ? "bg-slate-500" : "bg-slate-400"}`}
-                            style={{ animationDelay: `${delay}ms` }}
-                          />
-                        ))}
-                      </div>
+                      {thinkingStage ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 size={14} className="animate-spin accent-text-base" />
+                          <span className={`text-sm font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                            {thinkingStage}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex gap-1.5">
+                          {[0, 150, 300].map((delay) => (
+                            <span
+                              key={delay}
+                              className={`h-2 w-2 animate-bounce rounded-full ${isDark ? "bg-slate-500" : "bg-slate-400"}`}
+                              style={{ animationDelay: `${delay}ms` }}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -491,43 +697,58 @@ export default function AIChatPage() {
 
           {/* Input area */}
           <div className={`border-t px-4 py-3 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
-            <form
-              onSubmit={handleSubmit}
-              className={`mx-auto max-w-3xl flex items-end gap-2 rounded-2xl border p-2 ${
-                isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
-              }`}
-            >
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => { setInput(e.target.value); autoResize(e.target); }}
-                onKeyDown={handleKeyDown}
-                disabled={!selectedRepo}
-                placeholder={selectedRepo ? `Ask about ${selectedRepo.name}...` : "Select a repository first..."}
-                rows={1}
-                className={`flex-1 resize-none rounded-xl border-0 bg-transparent px-3 py-2 text-sm outline-none disabled:opacity-50 font-[Inter] ${
-                  isDark ? "text-white placeholder:text-slate-500" : "text-slate-800 placeholder:text-slate-400"
-                }`}
-              />
-              {streaming ? (
-                <button
-                  type="button"
-                  onClick={() => { abortRef.current?.abort(); setStreaming(false); setStreamingContent(""); }}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 transition-colors hover:bg-red-500/30"
-                  title="Stop generating"
-                >
-                  <Square size={14} />
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={!input.trim() || !selectedRepo}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl accent-gradient text-white transition-all hover:shadow-lg disabled:opacity-50"
-                >
-                  <Send size={14} />
-                </button>
+            <div className={`mx-auto max-w-3xl rounded-2xl border p-2 ${
+              isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
+            }`}>
+              <form onSubmit={handleSubmit} className="flex items-end gap-2">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => { setInput(e.target.value); autoResize(e.target); }}
+                  onKeyDown={handleKeyDown}
+                  disabled={!selectedRepo}
+                  placeholder={selectedRepo ? `Ask about ${selectedRepo.name}...` : "Select a repository first..."}
+                  rows={1}
+                  className={`flex-1 resize-none rounded-xl border-0 bg-transparent px-3 py-2 text-sm outline-none disabled:opacity-50 font-[Inter] ${
+                    isDark ? "text-white placeholder:text-slate-500" : "text-slate-800 placeholder:text-slate-400"
+                  }`}
+                />
+                {streaming ? (
+                  <button
+                    type="button"
+                    onClick={handleStop}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 transition-colors hover:bg-red-500/30"
+                    title="Stop generating"
+                  >
+                    <Square size={14} />
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || !selectedRepo}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl accent-gradient text-white transition-all hover:shadow-lg disabled:opacity-50"
+                  >
+                    <Send size={14} />
+                  </button>
+                )}
+              </form>
+
+              {/* Regenerate bar */}
+              {!streaming && messages.length > 0 && messages[messages.length - 1].role === "assistant" && (
+                <div className="flex justify-center pt-1">
+                  <button
+                    type="button"
+                    onClick={handleRegenerate}
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-[11px] font-medium transition-colors font-[Inter] ${
+                      isDark ? "text-slate-500 hover:text-slate-300 hover:bg-white/5" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    <RefreshCw size={11} />
+                    Regenerate response
+                  </button>
+                </div>
               )}
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -542,13 +763,21 @@ function MessageBubble({
   isDark,
   onCopy,
   onDownload,
+  onRegenerate,
   streaming = false,
+  isLastAssistant = false,
+  isHovered,
+  onHover,
 }: {
   message: ChatMessage;
   isDark: boolean;
   onCopy: (content: string) => void;
   onDownload: (content: string, format: "txt" | "pdf" | "docx" | "md") => void;
+  onRegenerate?: () => void;
   streaming?: boolean;
+  isLastAssistant?: boolean;
+  isHovered: boolean;
+  onHover: (id: string | null) => void;
 }) {
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -561,7 +790,11 @@ function MessageBubble({
   };
 
   return (
-    <div className={`mb-6 flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`group/msg mb-6 flex ${isUser ? "justify-end" : "justify-start"}`}
+      onMouseEnter={() => onHover(message.id)}
+      onMouseLeave={() => onHover(null)}
+    >
       <div className={`flex max-w-full gap-3 ${isUser ? "flex-row-reverse" : ""} w-full`}>
         <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white font-[Inter] ${
           isUser ? "bg-blue-600" : "accent-gradient"
@@ -588,6 +821,16 @@ function MessageBubble({
           {/* Action bar for assistant messages */}
           {!isUser && !streaming && message.content && (
             <div className="mt-1.5 flex items-center gap-1">
+              {/* Timestamp */}
+              {message.createdAt && (
+                <span className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-[Inter] ${
+                  isDark ? "text-slate-600" : "text-slate-400"
+                }`}>
+                  <Clock size={10} />
+                  {formatRelativeTime(message.createdAt)}
+                </span>
+              )}
+
               <button
                 type="button"
                 onClick={handleCopy}
@@ -642,6 +885,19 @@ function MessageBubble({
                   )}
                 </AnimatePresence>
               </div>
+
+              {/* Regenerate per-message (only on last assistant message) */}
+              {isLastAssistant && onRegenerate && (
+                <button
+                  type="button"
+                  onClick={onRegenerate}
+                  className={`flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition-all font-[Inter] ${
+                    isDark ? "text-slate-500 hover:text-slate-300" : "text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  <RefreshCw size={11} /> Regenerate
+                </button>
+              )}
 
               {message.source && (
                 <span className={`ml-2 text-[10px] font-[Inter] ${isDark ? "text-slate-600" : "text-slate-400"}`}>

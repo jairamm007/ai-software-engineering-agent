@@ -38,6 +38,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const from =
     (location.state as { from?: { pathname: string } })?.from?.pathname ||
@@ -479,41 +480,34 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.45, duration: 0.4 }}
-              className="group relative"
             >
-              <div
-                className={`relative rounded-xl border transition-all duration-300 ${
-                  isDark
-                    ? "border-white/10 bg-white/5 focus-within:border-[var(--accent)] focus-within:shadow-[0_0_15px_var(--accent-light)]"
-                    : "border-slate-200 bg-white/70 focus-within:border-[var(--accent)] focus-within:shadow-[0_0_15px_var(--accent-light)]"
-                }`}
-              >
+              <label className={`mb-1.5 block text-xs font-medium transition-colors ${
+                focusedField === "email" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+              }`}>
+                Email address
+              </label>
+              <div className="relative group">
                 <Mail
                   size={16}
                   className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                    isDark
-                      ? "text-slate-500 group-focus-within:text-[var(--accent)]"
-                      : "text-slate-400 group-focus-within:text-[var(--accent)]"
+                    focusedField === "email" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
                   }`}
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder=" "
-                  className={`peer w-full bg-transparent py-3 pl-10 pr-4 text-sm outline-none placeholder:text-transparent ${
-                    isDark ? "text-white" : "text-slate-900"
+                  onFocus={() => setFocusedField("email")}
+                  onBlur={() => setFocusedField(null)}
+                  placeholder="you@example.com"
+                  className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-all duration-300 ${
+                    focusedField === "email"
+                      ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                      : isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
+                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
                   }`}
                 />
-                <label
-                  className={`pointer-events-none absolute left-10 top-1/2 -translate-y-1/2 text-sm transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-[var(--accent)] peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs ${
-                    isDark
-                      ? "text-slate-500 peer-focus:text-[var(--accent)] peer-[:not(:placeholder-shown)]:text-slate-400"
-                      : "text-slate-400 peer-focus:text-[var(--accent)] peer-[:not(:placeholder-shown)]:text-slate-500"
-                  }`}
-                >
-                  Email address
-                </label>
               </div>
             </motion.div>
 
@@ -522,48 +516,39 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55, duration: 0.4 }}
-              className="group relative"
             >
-              <div
-                className={`relative rounded-xl border transition-all duration-300 ${
-                  isDark
-                    ? "border-white/10 bg-white/5 focus-within:border-[var(--accent)] focus-within:shadow-[0_0_15px_var(--accent-light)]"
-                    : "border-slate-200 bg-white/70 focus-within:border-[var(--accent)] focus-within:shadow-[0_0_15px_var(--accent-light)]"
-                }`}
-              >
+              <label className={`mb-1.5 block text-xs font-medium transition-colors ${
+                focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+              }`}>
+                Password
+              </label>
+              <div className="relative group">
                 <Lock
                   size={16}
                   className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                    isDark
-                      ? "text-slate-500 group-focus-within:text-[var(--accent)]"
-                      : "text-slate-400 group-focus-within:text-[var(--accent)]"
+                    focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
                   }`}
                 />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder=" "
-                  className={`peer w-full bg-transparent py-3 pl-10 pr-10 text-sm outline-none placeholder:text-transparent ${
-                    isDark ? "text-white" : "text-slate-900"
+                  onFocus={() => setFocusedField("password")}
+                  onBlur={() => setFocusedField(null)}
+                  placeholder="Enter your password"
+                  className={`w-full rounded-xl border py-3 pl-10 pr-11 text-sm outline-none transition-all duration-300 ${
+                    focusedField === "password"
+                      ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                      : isDark
+                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
+                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
                   }`}
                 />
-                <label
-                  className={`pointer-events-none absolute left-10 top-1/2 -translate-y-1/2 text-sm transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-[var(--accent)] peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs ${
-                    isDark
-                      ? "text-slate-500 peer-focus:text-[var(--accent)] peer-[:not(:placeholder-shown)]:text-slate-400"
-                      : "text-slate-400 peer-focus:text-[var(--accent)] peer-[:not(:placeholder-shown)]:text-slate-500"
-                  }`}
-                >
-                  Password
-                </label>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors ${
-                    isDark
-                      ? "text-slate-500 hover:text-slate-300"
-                      : "text-slate-400 hover:text-slate-600"
+                    isDark ? "text-slate-500 hover:text-slate-300" : "text-slate-400 hover:text-slate-600"
                   }`}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}

@@ -19,6 +19,7 @@ export interface RepositoryListItem {
   githubUrl: string;
   localPath: string;
   createdAt: string;
+  isFavorite: boolean;
   _count: { files: number };
   files: { _count: { chunks: number } }[];
 }

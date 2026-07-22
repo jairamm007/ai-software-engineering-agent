@@ -15,7 +15,6 @@ export const getRepositoryAnalyticsController = async (
   }
 
   try {
-    // Verify ownership first
     const repo = await getRepositoryById(req.params.id, userId);
     if (!repo) {
       res.status(404).json(errorResponse("Repository not found"));
@@ -29,6 +28,7 @@ export const getRepositoryAnalyticsController = async (
       return;
     }
 
+    res.setHeader("Cache-Control", "private, max-age=60");
     res.status(200).json(
       successResponse(analytics, "Repository analytics fetched successfully")
     );

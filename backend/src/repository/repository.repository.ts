@@ -26,13 +26,36 @@ export const createRepository = async (
   });
 };
 
-export const getRepositories = async (userId: string) => {
-  return prisma.repository.findMany({
-    where: { userId },
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
+export const getRepositories = async (
+  userId: string,
+  options?: { search?: string; sortBy?: string }
+) => {
+  const where: any = { userId };
+
+  if (options?.search) {
+    where.name = { contains: options.search, mode: "insensitive" };
+  }
+
+  let orderBy: any = { createdAt: "desc" };
+
+  if (options?.sortBy === "name") {
+    orderBy = { name: "asc" };
+  } else if (options?.sortBy === "oldest") {
+    orderBy = { createdAt: "asc" };
+  }
+
+  const repositories = await prisma.repository.findMany({
+    where,
+    orderBy,
+    select: {
+      id: true,
+      name: true,
+      githubUrl: true,
+      localPath: true,
+      isFavorite: true,
+      createdAt: true,
+      updatedAt: true,
+      userId: true,
       _count: { select: { files: true } },
       files: {
         select: {
@@ -41,6 +64,12 @@ export const getRepositories = async (userId: string) => {
       },
     },
   });
+
+  if (options?.sortBy === "files") {
+    repositories.sort((a: any, b: any) => b._count.files - a._count.files);
+  }
+
+  return repositories;
 };
 
 export const getRepositoryByGithubUrl = async (
@@ -84,6 +113,74 @@ export const repositoryExists = async (
   });
 
   return repository !== null;
+};
+
+export const toggleFavorite = async (
+  repositoryId: string,
+  userId: string
+) => {
+  const repo = await prisma.repository.findFirst({
+    where: { id: repositoryId, userId },
+  });
+
+  if (!repo) {
+    throw new Error("Repository not found or access denied");
+  }
+
+  return prisma.repository.update({
+    where: { id: repositoryId },
+    data: { isFavorite: !repo.isFavorite },
+  });
+};
+
+export const clearRepositoryIndex = async (
+  repositoryId: string,
+  userId: string
+) => {
+  const repo = await prisma.repository.findFirst({
+    where: { id: repositoryId, userId },
+  });
+
+  if (!repo) {
+    throw new Error("Repository not found or access denied");
+  }
+
+  await prisma.$executeRaw`
+    DELETE FROM code_embeddings
+    WHERE chunk_id IN (
+      SELECT cc.id
+      FROM "CodeChunk" cc
+      JOIN "RepositoryFile" rf
+        ON cc."fileId" = rf.id
+      WHERE rf."repositoryId" = ${repositoryId}
+    )
+  `.catch(() => {});
+
+  await prisma.$transaction(async (tx) => {
+    await tx.codeSymbol.deleteMany({
+      where: {
+        file: {
+          repositoryId,
+        },
+      },
+    });
+
+    await tx.codeChunk.deleteMany({
+      where: {
+        file: {
+          repositoryId,
+        },
+      },
+    });
+
+    await tx.repositoryFile.deleteMany({
+      where: {
+        repositoryId,
+      },
+    });
+  });
+
+  return repo;
 };
 
 export const deleteRepository = async (

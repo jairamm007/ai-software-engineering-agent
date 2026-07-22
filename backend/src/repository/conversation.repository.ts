@@ -14,10 +14,22 @@ export const getConversations = async (userId: string) => {
   return prisma.conversation.findMany({
     where: { userId },
     orderBy: { updatedAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      userId: true,
+      repositoryId: true,
+      createdAt: true,
+      updatedAt: true,
       messages: {
         take: 1,
         orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          role: true,
+          content: true,
+          createdAt: true,
+        },
       },
     },
   });
@@ -30,7 +42,15 @@ export const getConversationById = async (
   return prisma.conversation.findFirst({
     where: { id, userId },
     include: {
-      messages: { orderBy: { createdAt: "asc" } },
+      messages: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          role: true,
+          content: true,
+          createdAt: true,
+        },
+      },
     },
   });
 };

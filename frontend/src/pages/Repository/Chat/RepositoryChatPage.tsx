@@ -42,6 +42,7 @@ export default function RepositoryChatPage() {
   const [streaming, setStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [conversationId, setConversationId] = useState<string | undefined>();
+  const abortRef = useRef<AbortController | null>(null);
 
   const { data: repositories = [] } = useQuery({
     queryKey: ["repositories"],
@@ -68,12 +69,15 @@ export default function RepositoryChatPage() {
       setStreaming(true);
       setStreamingContent("");
 
+      const controller = new AbortController();
+      abortRef.current = controller;
       let fullContent = "";
 
       streamChat({
         question,
         repositoryId: id,
         conversationId,
+        signal: controller.signal,
         onToken: (token) => {
           fullContent += token;
           setStreamingContent(fullContent);
@@ -88,15 +92,29 @@ export default function RepositoryChatPage() {
           setMessages((prev) => [...prev, assistantMsg]);
           setStreamingContent("");
           setStreaming(false);
+          abortRef.current = null;
           if (data.conversationId) setConversationId(data.conversationId);
         },
         onError: (message) => {
+          if (controller.signal.aborted) {
+            if (fullContent) {
+              setMessages((prev) => [
+                ...prev,
+                { id: crypto.randomUUID(), role: "assistant", content: fullContent },
+              ]);
+            }
+            setStreamingContent("");
+            setStreaming(false);
+            abortRef.current = null;
+            return;
+          }
           setMessages((prev) => [
             ...prev,
             { id: crypto.randomUUID(), role: "assistant", content: message || "Failed to generate response." },
           ]);
           setStreamingContent("");
           setStreaming(false);
+          abortRef.current = null;
         },
       });
     },
@@ -248,7 +266,7 @@ export default function RepositoryChatPage() {
               className={`flex-1 resize-none rounded-xl border-0 bg-transparent px-3 py-2 text-sm outline-none font-[Inter] ${isDark ? "text-white placeholder:text-slate-500" : "text-slate-800 placeholder:text-slate-400"}`}
             />
             {streaming ? (
-              <button type="button" onClick={() => { setStreaming(false); setStreamingContent(""); }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30" title="Stop">
+              <button type="button" onClick={() => { abortRef.current?.abort(); }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30" title="Stop">
                 <Square size={14} />
               </button>
             ) : (

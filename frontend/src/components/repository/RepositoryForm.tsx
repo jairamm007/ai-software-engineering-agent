@@ -2,55 +2,77 @@ import { useState } from "react";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useTheme } from "@/context/ThemeContext";
 
 interface Props {
   onSubmit: (url: string) => Promise<void>;
 }
 
+const GITHUB_URL_PATTERN = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+\/?$/;
+
 export default function RepositoryForm({
   onSubmit,
 }: Props) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const [url, setUrl] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
-
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!url.trim()) return;
+    if (!url.trim()) {
+      setError("URL is required.");
+      return;
+    }
 
+    if (!GITHUB_URL_PATTERN.test(url.trim())) {
+      setError("Please enter a valid GitHub repository URL.");
+      return;
+    }
+
+    setError("");
     setLoading(true);
 
     try {
       await onSubmit(url);
-
       setUrl("");
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Analysis failed. Check that git is installed and the URL is valid.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mb-6 flex gap-4"
-    >
-      <Input
-        value={url}
-        placeholder="https://github.com/facebook/react"
-        onChange={(e) =>
-          setUrl(e.target.value)
-        }
-      />
+    <div className="mb-6">
+      <form onSubmit={handleSubmit} className="flex gap-4 items-end">
+        <div className="flex-1">
+          <Input
+            value={url}
+            placeholder="https://github.com/facebook/react"
+            onChange={(e) => {
+              setUrl(e.target.value);
+              if (error) setError("");
+            }}
+          />
+        </div>
 
-      <Button disabled={loading}>
-        {loading
-          ? "Analyzing..."
-          : "Analyze Repository"}
-      </Button>
-    </form>
+        <Button disabled={loading || !url.trim()}>
+          {loading ? "Analyzing..." : "Analyze Repository"}
+        </Button>
+      </form>
+      {error && (
+        <p className="mt-2 text-sm text-red-500">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

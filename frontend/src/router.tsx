@@ -32,6 +32,11 @@ const RepositoryReviewPage = lazy(() => import("@/pages/Repository/Review/Reposi
 const RepositoryArchitecturePage = lazy(() => import("@/pages/Repository/Architecture/RepositoryArchitecturePage"));
 const RepositoryDocumentationPage = lazy(() => import("@/pages/Repository/Documentation/RepositoryDocumentationPage"));
 const DependencyGraphPage = lazy(() => import("@/pages/Repository/DependencyGraph/DependencyGraphPage"));
+const RepositoryIntelligencePage = lazy(() => import("@/pages/Repository/Intelligence/RepositoryIntelligencePage"));
+const RepositoryDocGeneratorPage = lazy(() => import("@/pages/Repository/DocumentationGenerator/RepositoryDocumentationGeneratorPage"));
+const RepositorySemanticSearchPage = lazy(() => import("@/pages/Repository/SemanticSearch/RepositorySemanticSearchPage"));
+const MultiAgentPage = lazy(() => import("@/pages/Repository/MultiAgent/MultiAgentPage"));
+const RepositorySettingsPage = lazy(() => import("@/pages/Repository/RepositorySettingsPage"));
 
 const DocsPage = lazy(() => import("@/pages/Info/DocsPage"));
 const BlogPage = lazy(() => import("@/pages/Info/BlogPage"));
@@ -120,6 +125,11 @@ export const router = createBrowserRouter([
   { path: "/repositories/:id/architecture", element: <LazyPage><ProtectedRoute><RepositoryArchitecturePage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/documentation", element: <LazyPage><ProtectedRoute><RepositoryDocumentationPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/dependency-graph", element: <LazyPage><ProtectedRoute><DependencyGraphPage /></ProtectedRoute></LazyPage> },
+  { path: "/repositories/:id/intelligence", element: <LazyPage><ProtectedRoute><RepositoryIntelligencePage /></ProtectedRoute></LazyPage> },
+  { path: "/repositories/:id/doc-generator", element: <LazyPage><ProtectedRoute><RepositoryDocGeneratorPage /></ProtectedRoute></LazyPage> },
+  { path: "/repositories/:id/semantic-search", element: <LazyPage><ProtectedRoute><RepositorySemanticSearchPage /></ProtectedRoute></LazyPage> },
+  { path: "/repositories/:id/multi-agent", element: <LazyPage><ProtectedRoute><MultiAgentPage /></ProtectedRoute></LazyPage> },
+  { path: "/repositories/:id/settings", element: <LazyPage><ProtectedRoute><RepositorySettingsPage /></ProtectedRoute></LazyPage> },
 
   { path: "*", element: <NotFoundPage /> },
 ]);

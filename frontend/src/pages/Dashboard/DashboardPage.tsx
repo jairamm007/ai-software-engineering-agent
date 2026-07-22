@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -13,14 +14,75 @@ import {
   MessageSquare,
   BookOpen,
   Shield,
+  Check,
+  X,
+  Clock,
+  GitPullRequest,
+  Brain,
+  ChevronRight,
 } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import StatCard from "@/components/cards/StatCard";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 
 import { getRepositories } from "@/services/repository";
+import { getAIProviders } from "@/services/aiProviders";
+import { getConversations } from "@/services/chat";
 import type { RepositoryListItem } from "@/types/repository";
+import type { Conversation } from "@/types/chat";
+
+interface Activity {
+  action: string;
+  target: string;
+  repo: string;
+  timestamp: number;
+  type: "ai" | "chat" | "review" | "repo" | "docs";
+}
+
+const TYPE_CONFIG: Record<
+  Activity["type"],
+  { icon: typeof Brain; bgClass: string; textClass: string }
+> = {
+  ai: { icon: Brain, bgClass: "accent-bg-light", textClass: "accent-text-base" },
+  chat: { icon: MessageSquare, bgClass: "accent-bg-light", textClass: "accent-text-base" },
+  review: { icon: GitPullRequest, bgClass: "bg-emerald-500/10", textClass: "text-emerald-500" },
+  repo: { icon: FolderGit2, bgClass: "bg-cyan-500/10", textClass: "text-cyan-500" },
+  docs: { icon: FileCode2, bgClass: "bg-amber-500/10", textClass: "text-amber-500" },
+};
+
+const ACTIVITY_STORAGE_KEY = "activity-log";
+const ACTIVITY_EVENT_NAME = "asea-activity";
+
+function loadDashboardActivity(): Activity[] {
+  try {
+    const raw = localStorage.getItem(ACTIVITY_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function timeAgo(ts: number): string {
+  const seconds = Math.floor((Date.now() - ts) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days}d ago`;
+  return `${Math.floor(days / 7)}w ago`;
+}
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
 
 const capabilities = [
   { icon: GitBranch, label: "Code Review & Analysis", color: "accent-text-base" },
@@ -43,10 +105,31 @@ const itemVariants = {
 export default function DashboardPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { user } = useAuth();
+
+  const [activities, setActivities] = useState<Activity[]>(loadDashboardActivity);
+
+  useEffect(() => {
+    const handler = (e: CustomEvent<Activity>) => {
+      setActivities((prev) => [e.detail, ...prev].slice(0, 50));
+    };
+    window.addEventListener(ACTIVITY_EVENT_NAME, handler as EventListener);
+    return () => window.removeEventListener(ACTIVITY_EVENT_NAME, handler as EventListener);
+  }, []);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["repositories"],
     queryFn: getRepositories,
+  });
+
+  const { data: aiProvidersData } = useQuery({
+    queryKey: ["ai-providers"],
+    queryFn: getAIProviders,
+  });
+
+  const { data: conversations = [] } = useQuery({
+    queryKey: ["conversations"],
+    queryFn: getConversations,
   });
 
   const totalRepositories = data.length;
@@ -62,6 +145,9 @@ export default function DashboardPage() {
       ),
     0
   );
+
+  const providerCount = aiProvidersData?.count ?? 0;
+  const providers = aiProvidersData?.providers ?? [];
 
   const recentRepos = [...data]
     .sort((a: RepositoryListItem, b: RepositoryListItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -82,7 +168,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <h1 className={`text-2xl font-bold sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
-              Dashboard
+              {user ? `${getGreeting()}, ${user.name.split(" ")[0]}` : getGreeting()}
             </h1>
             <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               Overview of your AI-powered software engineering workspace
@@ -99,16 +185,112 @@ export default function DashboardPage() {
         className="mb-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4"
       >
         <motion.div variants={itemVariants}>
-          <StatCard title="Repositories" value={totalRepositories} icon={<FolderGit2 size={20} />} gradient="accent-gradient" index={0} />
+          <StatCard
+            title="Repositories"
+            value={totalRepositories}
+            icon={<FolderGit2 size={20} />}
+            gradient="accent-gradient"
+            index={0}
+            infoContent={
+              <div>
+                <p className="mb-2 font-semibold">Repository Analysis</p>
+                <p className="mb-2 text-xs opacity-80">
+                  Total GitHub repositories cloned and indexed for AI-powered analysis.
+                </p>
+                {data.length > 0 ? (
+                  <ul className="space-y-1">
+                    {data.slice(0, 5).map((repo: RepositoryListItem) => (
+                      <li key={repo.id} className="flex items-center gap-1 text-xs">
+                        <FolderGit2 size={12} className="shrink-0 opacity-50" />
+                        <span className="truncate">{repo.name}</span>
+                      </li>
+                    ))}
+                    {data.length > 5 && (
+                      <li className="text-xs opacity-60">+{data.length - 5} more</li>
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-xs opacity-60">No repositories indexed yet.</p>
+                )}
+              </div>
+            }
+          />
         </motion.div>
         <motion.div variants={itemVariants}>
-          <StatCard title="Files Indexed" value={totalFiles} icon={<FileCode2 size={20} />} gradient="accent-gradient" index={1} />
+          <StatCard
+            title="Files Indexed"
+            value={totalFiles}
+            icon={<FileCode2 size={20} />}
+            gradient="accent-gradient"
+            index={1}
+            infoContent={
+              <div>
+                <p className="mb-2 font-semibold">Indexed Source Files</p>
+                <p className="mb-2 text-xs opacity-80">
+                  Individual source files extracted from repositories and parsed for code understanding.
+                </p>
+                <p className="text-xs opacity-80">
+                  Files are split into semantic chunks for precise retrieval during AI analysis and chat.
+                </p>
+              </div>
+            }
+          />
         </motion.div>
         <motion.div variants={itemVariants}>
-          <StatCard title="Code Chunks" value={totalChunks} icon={<Layers size={20} />} gradient="from-cyan-500 to-blue-600" index={2} />
+          <StatCard
+            title="Code Chunks"
+            value={totalChunks}
+            icon={<Layers size={20} />}
+            gradient="from-cyan-500 to-blue-600"
+            index={2}
+            infoContent={
+              <div>
+                <p className="mb-2 font-semibold">Code Chunks</p>
+                <p className="mb-2 text-xs opacity-80">
+                  Semantic code segments used for vector embedding and retrieval-augmented generation (RAG).
+                </p>
+                <p className="text-xs opacity-80">
+                  Each chunk is embedded and indexed to enable accurate AI-powered code search and context.
+                </p>
+              </div>
+            }
+          />
         </motion.div>
         <motion.div variants={itemVariants}>
-          <StatCard title="AI Providers" value={4} icon={<Cpu size={20} />} gradient="from-emerald-500 to-teal-600" index={3} />
+          <StatCard
+            title="AI Providers"
+            value={providerCount}
+            icon={<Cpu size={20} />}
+            gradient="from-emerald-500 to-teal-600"
+            index={3}
+            infoContent={
+              <div>
+                <p className="mb-2 font-semibold">Configured AI Providers</p>
+                <p className="mb-2 text-xs opacity-80">
+                  LLM providers with API keys configured for code analysis, chat, and embeddings.
+                </p>
+                {providers.length > 0 ? (
+                  <ul className="space-y-1.5">
+                    {providers.map((p) => (
+                      <li key={p.key} className="flex items-center gap-2 text-xs">
+                        {p.configured ? (
+                          <Check size={12} className="shrink-0 text-emerald-500" />
+                        ) : (
+                          <X size={12} className="shrink-0 text-red-400" />
+                        )}
+                        <span className={p.configured ? "" : "opacity-50"}>{p.name}</span>
+                        <span className="ml-auto opacity-50">
+                          {p.configured ? "Active" : "Not configured"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs opacity-60">Loading provider status...</p>
+                )}
+              </div>
+            }
+          />
         </motion.div>
       </motion.div>
 
@@ -274,6 +456,146 @@ export default function DashboardPage() {
                 Start AI Chat
               </Link>
             </div>
+          </div>
+
+          {/* User Profile Card */}
+          {user && (
+            <Link
+              to="/profile"
+              className={`block rounded-2xl border p-6 shadow-sm transition-all hover:shadow-md ${
+                isDark ? "border-slate-700 bg-slate-800/80" : "border-slate-200 bg-white"
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full accent-gradient text-white text-lg font-bold shadow-sm">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`truncate font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
+                    {user.name}
+                  </p>
+                  <p className={`truncate text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    {user.email}
+                  </p>
+                  {user.role && (
+                    <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                      isDark ? "bg-slate-700 text-slate-300" : "bg-slate-100 text-slate-600"
+                    }`}>
+                      {user.role}
+                    </span>
+                  )}
+                </div>
+                <ChevronRight size={16} className={isDark ? "text-slate-500" : "text-slate-400"} />
+              </div>
+            </Link>
+          )}
+
+          {/* Recent AI Chats */}
+          <div className={`rounded-2xl border p-6 shadow-sm ${
+            isDark ? "border-slate-700 bg-slate-800/80" : "border-slate-200 bg-white"
+          }`}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`text-sm font-semibold uppercase tracking-wider ${
+                isDark ? "text-slate-400" : "text-slate-500"
+              }`}>
+                Recent AI Chats
+              </h3>
+              {conversations.length > 0 && (
+                <Link to="/chat" className={`flex items-center gap-1 text-xs font-medium accent-text-base hover:opacity-80`}>
+                  View all <ArrowRight size={12} />
+                </Link>
+              )}
+            </div>
+            {conversations.length === 0 ? (
+              <div className={`rounded-xl border border-dashed p-4 text-center ${
+                isDark ? "border-slate-600 bg-slate-800/50" : "border-slate-200 bg-slate-50"
+              }`}>
+                <MessageSquare size={20} className={`mx-auto mb-2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+                <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  No conversations yet
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {conversations.slice(0, 5).map((conv: Conversation) => (
+                  <Link
+                    key={conv.id}
+                    to="/chat"
+                    className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${
+                      isDark ? "hover:bg-slate-700/50" : "hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg accent-bg-light`}>
+                      <MessageSquare size={14} className="accent-text-base" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className={`truncate text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+                        {conv.title}
+                      </p>
+                      <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                        {timeAgo(new Date(conv.updatedAt).getTime())}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Activity */}
+          <div className={`rounded-2xl border p-6 shadow-sm ${
+            isDark ? "border-slate-700 bg-slate-800/80" : "border-slate-200 bg-white"
+          }`}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`text-sm font-semibold uppercase tracking-wider ${
+                isDark ? "text-slate-400" : "text-slate-500"
+              }`}>
+                Recent Activity
+              </h3>
+              <Link to="/history" className={`flex items-center gap-1 text-xs font-medium accent-text-base hover:opacity-80`}>
+                View all <ArrowRight size={12} />
+              </Link>
+            </div>
+            {activities.length === 0 ? (
+              <div className={`rounded-xl border border-dashed p-4 text-center ${
+                isDark ? "border-slate-600 bg-slate-800/50" : "border-slate-200 bg-slate-50"
+              }`}>
+                <Clock size={20} className={`mx-auto mb-2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+                <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  No activity yet
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {activities.slice(0, 5).map((item, i) => {
+                  const cfg = TYPE_CONFIG[item.type];
+                  const Icon = cfg.icon;
+                  return (
+                    <div
+                      key={`${item.timestamp}-${i}`}
+                      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${
+                        isDark ? "hover:bg-slate-700/30" : "hover:bg-slate-50"
+                      }`}
+                    >
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${cfg.bgClass}`}>
+                        <Icon size={14} className={cfg.textClass} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className={`truncate text-sm ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                          {item.action}{" "}
+                          <span className={`font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
+                            {item.target}
+                          </span>
+                        </p>
+                      </div>
+                      <span className={`shrink-0 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                        {timeAgo(item.timestamp)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* AI Capabilities */}

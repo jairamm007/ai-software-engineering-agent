@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../database/prisma.js";
 import { hashPassword, verifyPassword } from "better-auth/crypto";
 import type { AuthRequest } from "../auth/auth.middleware.js";
@@ -164,19 +165,23 @@ export async function exportDataController(req: AuthRequest, res: Response) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
-        repositories: {
-          include: {
-            files: {
-              include: {
-                chunks: true,
-                symbols: true,
-              },
-            },
-          },
-        },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
         accounts: {
           select: { providerId: true, createdAt: true },
+        },
+        repositories: {
+          select: {
+            id: true,
+            name: true,
+            githubUrl: true,
+            localPath: true,
+            createdAt: true,
+            _count: { select: { files: true } },
+          },
         },
       },
     });
@@ -184,6 +189,23 @@ export async function exportDataController(req: AuthRequest, res: Response) {
     if (!user) {
       res.status(404).json({ success: false, error: "User not found" });
       return;
+    }
+
+    const repoIds = user.repositories.map((r) => r.id);
+
+    const chunkCounts = repoIds.length > 0
+      ? await prisma.$queryRaw<{ repositoryId: string; count: bigint }[]>`
+          SELECT rf."repositoryId", COUNT(cc.id) as count
+          FROM "RepositoryFile" rf
+          JOIN "CodeChunk" cc ON cc."fileId" = rf.id
+          WHERE rf."repositoryId" IN (${Prisma.join(repoIds.map((id) => Prisma.sql`${id}`))})
+          GROUP BY rf."repositoryId"
+        `
+      : [];
+
+    const chunkCountMap = new Map<string, number>();
+    for (const row of chunkCounts) {
+      chunkCountMap.set(row.repositoryId, Number(row.count));
     }
 
     const exportData = {
@@ -200,8 +222,8 @@ export async function exportDataController(req: AuthRequest, res: Response) {
         githubUrl: repo.githubUrl,
         localPath: repo.localPath,
         createdAt: repo.createdAt,
-        filesCount: repo.files.length,
-        chunksCount: repo.files.reduce((s, f) => s + f.chunks.length, 0),
+        filesCount: repo._count.files,
+        chunksCount: chunkCountMap.get(repo.id) ?? 0,
       })),
       connectedAccounts: user.accounts,
     };

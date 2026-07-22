@@ -31,6 +31,7 @@ export const getDependencyGraphController = async (
 
     const graph = buildDependencyGraph(repository.localPath);
 
+    res.setHeader("Cache-Control", "public, max-age=300");
     res.status(200).json(
       successResponse(graph, "Dependency graph fetched successfully")
     );
@@ -177,8 +178,17 @@ export const dependencyGraphSummaryController = async (
     }
 
     const graph = buildDependencyGraph(repository.localPath);
+
+    const compactGraph = {
+      nodes: graph.nodes.length,
+      edges: graph.edges.length,
+      circular: graph.analytics.circularDependencies,
+      disconnected: graph.analytics.disconnectedFiles,
+      avgDeps: graph.analytics.averageDependencies,
+    };
+
     const result = await executeAgent(
-      `Analyze this repository dependency graph. Describe architecture, coupling, cohesion, circular dependencies, and highly connected modules. Graph: ${JSON.stringify(graph)}`
+      `Analyze this repository dependency graph. Describe architecture, coupling, cohesion, circular dependencies, and highly connected modules. Graph summary: ${JSON.stringify(compactGraph)}`
     );
 
     res.status(200).json(successResponse(result, "Dependency graph summary generated successfully"));
