@@ -295,13 +295,13 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 overflow-hidden lg:grid-cols-3">
         {/* Recent Repositories */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="lg:col-span-2"
+          className="min-w-0 lg:col-span-2"
         >
           <div className="mb-4 flex items-center justify-between">
             <h2 className={`text-lg font-semibold ${isDark ? "text-white" : "text-slate-800"}`}>

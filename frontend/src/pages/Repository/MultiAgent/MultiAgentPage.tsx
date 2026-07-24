@@ -124,7 +124,7 @@ export default function MultiAgentPage() {
         {result && (
           <div className="space-y-6">
             {/* Stats Bar */}
-            <div className={`flex flex-wrap gap-4 rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+            <div className={`flex flex-wrap gap-4 overflow-hidden rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
               <div className="flex items-center gap-2">
                 <Zap size={16} className="text-yellow-400" />
                 <span className={`text-sm ${isDark ? "text-slate-300" : "text-slate-600"}`}>

@@ -52,7 +52,7 @@ export default function RepositoryForm({
 
   return (
     <div className="mb-6">
-      <form onSubmit={handleSubmit} className="flex gap-4 items-end">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
           <Input
             value={url}

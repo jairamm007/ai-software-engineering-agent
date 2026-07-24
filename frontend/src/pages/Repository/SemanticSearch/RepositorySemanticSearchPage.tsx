@@ -74,7 +74,7 @@ export default function RepositorySemanticSearchPage() {
           <SearchFilters filters={filters} onFiltersChange={handleFilterChange} />
         </div>
 
-        <div className={`flex flex-wrap gap-2 rounded-xl border p-2 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+        <div className={`flex flex-wrap gap-2 overflow-hidden rounded-xl border p-2 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
           {TABS.map((tab) => (
             <button
               key={tab.key}

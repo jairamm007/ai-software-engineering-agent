@@ -42,11 +42,11 @@ export default function RepositoryFilesPage() {
           <p className={`mt-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Browse the indexed source files in this repository.</p>
         </div>
         <RepositoryTabs repositoryId={id} />
-        <div className="grid gap-6 lg:grid-cols-12">
-          <aside className="lg:col-span-4">
+        <div className="grid min-w-0 gap-6 overflow-hidden lg:grid-cols-12">
+          <aside className="min-w-0 lg:col-span-4">
             <FileExplorer files={repositoryQuery.data.files} selectedFileId={selectedFile?.id} onSelect={setSelectedFile} />
           </aside>
-          <section className="lg:col-span-8">
+          <section className="min-w-0 overflow-hidden lg:col-span-8">
             <FileViewer filePath={selectedFile?.path} content={selectedFile?.chunks.map((chunk) => chunk.content).join("\n")} />
           </section>
         </div>

@@ -304,9 +304,10 @@ RULES:
 
 TEST STRATEGY:
 1. Happy Path — Normal valid behavior
-2. Edge Cases — Boundaries, empty, max
-3. Error Cases — Invalid inputs, failures
-4. Integration — Dependency interactions
+2. Edge Cases — Boundaries, empty, max, undefined, null
+3. Error Cases — Invalid inputs, failures, exceptions
+4. Integration — Dependency interactions, mocked externals
+5. Regression — Tests for known bug patterns
 
 PRINCIPLES:
 - Arrange → Act → Assert (AAA)
@@ -314,10 +315,11 @@ PRINCIPLES:
 - Names: \`should_<expected>_when_<condition>\`
 - Isolated — no shared state
 - Fast — mock externals
+- Deterministic — no flaky tests
 
 RESPONSE FORMAT:
 ## Test Strategy
-(What's tested and why)
+(What's tested and why — reference specific functions/classes)
 
 ## Tests
 \`\`\`typescript
@@ -333,8 +335,9 @@ describe('FunctionName', () => {
   });
 
   describe('edge cases', () => {
-    it('should handle empty', () => {});
-    it('should handle null', () => {});
+    it('should handle empty input', () => {});
+    it('should handle null input', () => {});
+    it('should handle boundary values', () => {});
   });
 
   describe('errors', () => {
@@ -343,19 +346,24 @@ describe('FunctionName', () => {
 });
 \`\`\`
 
-## Coverage
+## Mock Setup
+(What to mock and why — external deps, databases, APIs)
+
+## Coverage Targets
 - Statements: >90%
 - Branches: >85%
-
-## Mocks
-(What to mock and why)
+- Functions: >90%
+- Lines: >90%
 
 RULES:
 - COMPLETE, runnable files
 - Include ALL imports
-- Mock external deps
-- Test success AND failure
+- Mock external deps (APIs, DB, filesystem)
+- Test success AND failure paths
 - Realistic test data
+- Use vi.mock() for module mocking
+- Use vi.fn() for function mocking
+- Test async code with proper await handling
 - Max 1500 words`,
   },
 

@@ -183,8 +183,8 @@ export default function AnalyticsPage() {
                   transition={{ delay: 0.25 + i * 0.04 }}
                   className="flex items-center gap-3"
                 >
-                  <span className={`w-12 text-xs font-mono font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}>.{ext}</span>
-                  <div className="flex-1 h-5 rounded-full overflow-hidden bg-white/[0.04]">
+                  <span className={`w-12 shrink-0 text-xs font-mono font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}>.{ext}</span>
+                  <div className="h-5 min-w-0 flex-1 overflow-hidden rounded-full bg-white/[0.04]">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${(count / maxLang) * 100}%` }}
@@ -253,10 +253,10 @@ export default function AnalyticsPage() {
           {stats.languages.length === 0 ? (
             <p className={muted}>No data to display.</p>
           ) : (
-            <div className="flex items-end gap-3 h-44">
+            <div className="flex items-end gap-2 overflow-hidden sm:gap-3 h-44">
               {stats.languages.map(([ext, count], i) => (
                 <div key={ext} className="flex flex-1 flex-col items-center gap-2">
-                  <span className={`text-[10px] font-[Inter] tabular-nums ${isDark ? "text-slate-400" : "text-slate-500"}`}>{count}</span>
+                  <span className={`shrink-0 text-[10px] font-[Inter] tabular-nums ${isDark ? "text-slate-400" : "text-slate-500"}`}>{count}</span>
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${(count / maxLang) * 100}%` }}
@@ -264,7 +264,7 @@ export default function AnalyticsPage() {
                     className="w-full rounded-t-lg"
                     style={{ backgroundColor: EXT_COLORS[ext] || "#64748b" }}
                   />
-                  <span className={`text-[10px] font-mono font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>.{ext}</span>
+                  <span className={`shrink-0 text-[10px] font-mono font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>.{ext}</span>
                 </div>
               ))}
             </div>

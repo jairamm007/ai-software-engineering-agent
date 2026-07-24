@@ -15,9 +15,13 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { AuthProvider } from "@/context/AuthContext";
 
+import { setupGlobalErrorHandlers } from "@/lib/error-tracking";
+
 import "./index.css";
 
 import { router } from "./router";
+
+setupGlobalErrorHandlers();
 
 const client = new QueryClient({
   defaultOptions: {

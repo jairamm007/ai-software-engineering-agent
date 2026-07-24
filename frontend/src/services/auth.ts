@@ -10,6 +10,7 @@ function mapUser(data: Record<string, unknown>): User {
     name: data.name as string,
     email: data.email as string,
     image: data.image as string | undefined,
+    bannerUrl: data.bannerUrl as string | undefined,
     role: data.role as string | undefined,
     bio: data.bio as string | undefined,
     linkedinUrl: data.linkedinUrl as string | undefined,
@@ -210,7 +211,7 @@ export async function apiClearCache(): Promise<void> {
   }
 }
 
-export async function apiUpdateProfile(updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>): Promise<User> {
+export async function apiUpdateProfile(updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "bannerUrl" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>): Promise<User> {
   const res = await fetch(`${BACKEND_URL}/api/user/profile`, {
     method: "PUT",
     credentials: "include",
@@ -225,4 +226,33 @@ export async function apiUpdateProfile(updates: Partial<Pick<User, "name" | "ema
 
   const json = await res.json();
   return mapUser(json.user as Record<string, unknown>);
+}
+
+export async function apiUploadBanner(bannerUrl: string): Promise<string> {
+  const res = await fetch(`${BACKEND_URL}/api/user/banner`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ bannerUrl }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error || "Failed to upload banner");
+  }
+
+  const json = await res.json();
+  return json.bannerUrl;
+}
+
+export async function apiRemoveBanner(): Promise<void> {
+  const res = await fetch(`${BACKEND_URL}/api/user/banner`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error || "Failed to remove banner");
+  }
 }

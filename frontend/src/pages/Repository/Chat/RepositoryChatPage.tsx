@@ -180,16 +180,16 @@ export default function RepositoryChatPage() {
     <DashboardLayout>
       <div className="flex h-[calc(100vh-3.5rem)] flex-col overflow-hidden -m-4 sm:-m-6 md:-m-8">
         {/* Header */}
-        <div className={`flex items-center gap-3 border-b px-4 py-3 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
+        <div className={`flex min-w-0 items-center gap-3 border-b px-4 py-3 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
           <Link
             to={`/repositories/${id}`}
-            className={`rounded-lg p-1.5 transition-colors ${isDark ? "text-slate-400 hover:bg-white/5 hover:text-white" : "text-slate-500 hover:bg-slate-100"}`}
+            className={`shrink-0 rounded-lg p-1.5 transition-colors ${isDark ? "text-slate-400 hover:bg-white/5 hover:text-white" : "text-slate-500 hover:bg-slate-100"}`}
           >
             <ArrowLeft size={16} />
           </Link>
-          <div className="flex items-center gap-2">
-            <MessageSquare size={16} className="text-[var(--accent)]" />
-            <span className={`text-sm font-semibold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>
+          <div className="flex min-w-0 items-center gap-2">
+            <MessageSquare size={16} className="shrink-0 text-[var(--accent)]" />
+            <span className={`truncate text-sm font-semibold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>
               {selectedRepo?.name ?? "Repository"} — AI Chat
             </span>
           </div>
@@ -295,11 +295,11 @@ function MessageBubble({
 
   return (
     <div className={`mb-6 flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""} w-full max-w-full`}>
+      <div className={`flex min-w-0 gap-3 ${isUser ? "flex-row-reverse" : ""} w-full max-w-full`}>
         <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white font-[Inter] ${isUser ? "bg-blue-600" : "accent-gradient"}`}>
           {isUser ? "U" : "AI"}
         </div>
-        <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} min-w-0 flex-1`}>
+        <div className={`flex min-w-0 flex-1 flex-col ${isUser ? "items-end" : "items-start"}`}>
           <div className={`rounded-2xl px-5 py-3 ${isUser ? "bg-blue-600 text-white" : isDark ? "border border-white/10 bg-white/5" : "border border-slate-200 bg-slate-50"}`}>
             {isUser ? (
               <p className="whitespace-pre-wrap text-sm leading-relaxed font-[Inter]">{message.content}</p>

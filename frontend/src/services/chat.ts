@@ -70,15 +70,12 @@ export const streamChat = async ({
   onError,
   signal,
 }: StreamChatInput): Promise<void> => {
-  const token = localStorage.getItem("better-auth.session_token") || "";
-
   let response: Response;
   try {
     response = await fetch("/api/chat/stream", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
       body: JSON.stringify({ question, repositoryId, filePath, conversationId }),

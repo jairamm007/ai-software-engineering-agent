@@ -114,7 +114,7 @@ export default function FavoritesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid gap-4 sm:grid-cols-2"
+            className="grid gap-4 overflow-hidden sm:grid-cols-2"
           >
             <AnimatePresence mode="popLayout">
               {favorites.map((repo, i) => (

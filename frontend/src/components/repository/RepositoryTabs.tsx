@@ -24,14 +24,14 @@ export default function RepositoryTabs({ repositoryId }: Props) {
   const isDark = theme === "dark";
 
   return (
-    <div className={`mb-8 flex gap-6 border-b ${isDark ? "border-white/10" : "border-slate-200"}`}>
+    <div className={`mb-8 flex gap-4 overflow-x-auto border-b scrollbar-thin sm:gap-6 ${isDark ? "border-white/10" : "border-slate-200"}`}>
       {tabs.map((tab) => (
         <NavLink
           key={tab.label}
           to={`/repositories/${repositoryId}/${tab.path}`}
           end
           className={({ isActive }) =>
-            `pb-3 transition-colors ${
+            `shrink-0 pb-3 text-sm transition-colors ${
               isActive
                 ? "border-b-2 border-[var(--accent)] font-semibold text-[var(--accent)]"
                 : isDark

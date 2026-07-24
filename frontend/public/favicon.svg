@@ -1,20 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#8b5cf6"/>
-      <stop offset="50%" stop-color="#a855f7"/>
-      <stop offset="100%" stop-color="#d946ef"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="1.5" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="48" height="48" rx="12" fill="url(#bg)"/>
-  <g filter="url(#glow)" font-family="monospace" font-size="20" font-weight="bold" fill="white" text-anchor="middle">
-    <text x="24" y="30" letter-spacing="-1">&gt;_^</text>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#7c3aed"/>
+  <path d="M8 16l4-4 4 4-4 4-4-4z" fill="white" opacity="0.9"/>
+  <path d="M16 12l4 4-4 4-4-4 4-4z" fill="white" opacity="0.7"/>
+  <path d="M20 16l4-4" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
 </svg>

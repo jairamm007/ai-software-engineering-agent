@@ -94,7 +94,7 @@ export default function RepositoryOverviewPage() {
           variants={container}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-2 gap-4 sm:grid-cols-4"
+          className="grid grid-cols-2 gap-3 overflow-hidden sm:grid-cols-4 sm:gap-4"
         >
           {[
             { icon: FolderGit2, label: "Files", value: data.files.length, color: "from-[var(--accent)] to-purple-600" },
@@ -163,7 +163,7 @@ export default function RepositoryOverviewPage() {
               </div>
             </div>
 
-            <div style={{ maxHeight: `${Math.max(140, Math.min(filteredFiles.length * 40 + 20, 520))}px` }} className="overflow-y-auto">
+            <div style={{ maxHeight: `${Math.max(140, Math.min(filteredFiles.length * 40 + 20, 520))}px` }} className="overflow-hidden overflow-y-auto">
               {filteredFiles.length === 0 && (
                 <p className={`py-8 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>No files found.</p>
               )}

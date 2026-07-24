@@ -459,18 +459,18 @@ export default function RepositoryDetailsPage() {
       <div className="space-y-4">
         <BackButton />
 
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <h1 className={`text-4xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h1 className={`text-2xl font-bold sm:text-3xl lg:text-4xl ${isDark ? "text-white" : "text-slate-900"}`}>
               {data.name}
             </h1>
 
-            <p className={`mt-2 break-all ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+            <p className={`mt-2 min-w-0 truncate text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`} title={data.githubUrl}>
               {data.githubUrl}
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <button
               type="button"
               onClick={() => navigate(`/repositories/${id}/settings`)}

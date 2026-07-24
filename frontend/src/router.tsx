@@ -37,6 +37,7 @@ const RepositoryDocGeneratorPage = lazy(() => import("@/pages/Repository/Documen
 const RepositorySemanticSearchPage = lazy(() => import("@/pages/Repository/SemanticSearch/RepositorySemanticSearchPage"));
 const MultiAgentPage = lazy(() => import("@/pages/Repository/MultiAgent/MultiAgentPage"));
 const RepositorySettingsPage = lazy(() => import("@/pages/Repository/RepositorySettingsPage"));
+const GitHubIntegrationPage = lazy(() => import("@/pages/GitHub/GitHubIntegrationPage"));
 
 const DocsPage = lazy(() => import("@/pages/Info/DocsPage"));
 const BlogPage = lazy(() => import("@/pages/Info/BlogPage"));
@@ -116,6 +117,7 @@ export const router = createBrowserRouter([
   { path: "/history", element: <LazyPage><ProtectedRoute><HistoryPage /></ProtectedRoute></LazyPage> },
   { path: "/settings", element: <LazyPage><ProtectedRoute><SettingsPage /></ProtectedRoute></LazyPage> },
   { path: "/profile", element: <LazyPage><ProtectedRoute><ProfilePage /></ProtectedRoute></LazyPage> },
+  { path: "/github", element: <LazyPage><ProtectedRoute><GitHubIntegrationPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories", element: <LazyPage><ProtectedRoute><RepositoryPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id", element: <LazyPage><ProtectedRoute><RepositoryDetailsPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/chat", element: <LazyPage><ProtectedRoute><RepositoryChatPage /></ProtectedRoute></LazyPage> },

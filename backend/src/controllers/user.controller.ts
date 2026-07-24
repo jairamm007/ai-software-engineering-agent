@@ -13,7 +13,7 @@ export async function updateProfileController(req: AuthRequest, res: Response) {
       return;
     }
 
-    const { name, email, bio, role, image, linkedinUrl, githubUrl, portfolioUrl } = req.body;
+    const { name, email, bio, role, image, bannerUrl, linkedinUrl, githubUrl, portfolioUrl } = req.body;
 
     const data: Record<string, string | null> = {};
     if (name !== undefined) data.name = name;
@@ -21,6 +21,7 @@ export async function updateProfileController(req: AuthRequest, res: Response) {
     if (bio !== undefined) data.bio = bio || null;
     if (role !== undefined) data.role = role || null;
     if (image !== undefined) data.image = image || null;
+    if (bannerUrl !== undefined) data.bannerUrl = bannerUrl || null;
     if (linkedinUrl !== undefined) data.linkedinUrl = linkedinUrl || null;
     if (githubUrl !== undefined) data.githubUrl = githubUrl || null;
     if (portfolioUrl !== undefined) data.portfolioUrl = portfolioUrl || null;
@@ -49,6 +50,7 @@ export async function updateProfileController(req: AuthRequest, res: Response) {
         name: true,
         email: true,
         image: true,
+        bannerUrl: true,
         bio: true,
         role: true,
         linkedinUrl: true,
@@ -75,14 +77,14 @@ export async function deleteAccountController(req: AuthRequest, res: Response) {
       return;
     }
 
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+
+    if (!user) {
+      res.status(404).json({ success: false, error: "User not found" });
+      return;
+    }
+
     await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({ where: { id: userId }, select: { email: true } });
-
-      if (!user) {
-        res.status(404).json({ success: false, error: "User not found" });
-        return;
-      }
-
       await tx.verification.deleteMany({ where: { identifier: user.email } });
       await tx.user.delete({ where: { id: userId } });
     });
@@ -254,5 +256,79 @@ export async function clearCacheController(req: AuthRequest, res: Response) {
   } catch (error) {
     console.error("[USER] Clear cache error:", error);
     res.status(500).json({ success: false, error: "Failed to clear cache" });
+  }
+}
+
+const MAX_BANNER_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+export async function uploadBannerController(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({ success: false, error: "Unauthorized" });
+      return;
+    }
+
+    const { bannerUrl } = req.body;
+
+    if (!bannerUrl || typeof bannerUrl !== "string") {
+      res.status(400).json({ success: false, error: "Banner image data is required" });
+      return;
+    }
+
+    // Validate data URL format
+    const dataUrlMatch = bannerUrl.match(/^data:(image\/[a-z]+);base64,(.+)$/);
+    if (!dataUrlMatch) {
+      res.status(400).json({ success: false, error: "Invalid image format. Use a data URL (data:image/...;base64,...)" });
+      return;
+    }
+
+    const mimeType = dataUrlMatch[1];
+    if (!ALLOWED_IMAGE_TYPES.includes(mimeType)) {
+      res.status(400).json({ success: false, error: "Only JPG, PNG, and WebP images are allowed" });
+      return;
+    }
+
+    // Validate file size (base64 is ~33% larger than raw)
+    const base64Data = dataUrlMatch[2];
+    const sizeInBytes = Math.ceil((base64Data.length * 3) / 4);
+    if (sizeInBytes > MAX_BANNER_SIZE) {
+      res.status(400).json({ success: false, error: "Banner image must be under 5MB" });
+      return;
+    }
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { bannerUrl },
+      select: { id: true, bannerUrl: true },
+    });
+
+    res.json({ success: true, bannerUrl: user.bannerUrl });
+  } catch (error) {
+    console.error("[USER] Upload banner error:", error);
+    res.status(500).json({ success: false, error: "Failed to upload banner" });
+  }
+}
+
+export async function removeBannerController(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({ success: false, error: "Unauthorized" });
+      return;
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { bannerUrl: null },
+    });
+
+    res.json({ success: true, message: "Banner removed" });
+  } catch (error) {
+    console.error("[USER] Remove banner error:", error);
+    res.status(500).json({ success: false, error: "Failed to remove banner" });
   }
 }

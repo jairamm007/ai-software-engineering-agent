@@ -271,7 +271,7 @@ export default function RepositoryDocumentationPage() {
                   />
                 </div>
 
-                <div style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }} className="overflow-y-auto px-1 py-1">
+                <div style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }} className="overflow-hidden overflow-y-auto px-1 py-1">
                   {scope === "multiple" && files.length > 0 && (
                     <button
                       type="button"
@@ -365,7 +365,7 @@ export default function RepositoryDocumentationPage() {
             )}
 
             {/* Generate Button */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => void runDocs()}
@@ -402,7 +402,7 @@ export default function RepositoryDocumentationPage() {
                   Generated Documentation
                 </h3>
                 {result && !loading && (
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     <button
                       type="button"
                       onClick={handleCopy}

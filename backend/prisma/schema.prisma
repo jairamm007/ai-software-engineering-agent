@@ -14,6 +14,7 @@ model user {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
+  bannerUrl     String?
   bio           String?
   role          String?
   linkedinUrl   String?
@@ -27,6 +28,11 @@ model user {
   repositories Repository[]
   conversations Conversation[]
   preferences UserPreference?
+  ownedTeams Team[]
+  teamMemberships TeamMember[]
+  activities TeamActivity[]
+  comments Comment[]
+  githubIntegrations GitHubIntegration[]
 }
 
 model session {
@@ -83,6 +89,7 @@ model Repository {
 
   user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
   files  RepositoryFile[]
+  teamShares TeamRepository[]
 
   @@unique([githubUrl, userId])
   @@index([userId])
@@ -178,4 +185,152 @@ model UserPreference {
   accentColor   String  @default("violet")
 
   user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Team Collaboration ───────────────────────────────────────────
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  slug        String   @unique
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       user            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invitations TeamInvitation[]
+  repositories TeamRepository[]
+  activities  TeamActivity[]
+  comments    Comment[]
+
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      String   @default("member") // owner | admin | member | viewer
+  joinedAt  DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+}
+
+model TeamInvitation {
+  id        String   @id @default(cuid())
+  teamId    String
+  email     String
+  role      String   @default("member")
+  invitedBy String
+  status    String   @default("pending") // pending | accepted | rejected | expired
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([email])
+  @@unique([teamId, email])
+}
+
+model TeamRepository {
+  id           String   @id @default(cuid())
+  teamId       String
+  repositoryId String
+  sharedBy     String
+  permission   String   @default("read") // read | write | admin
+  sharedAt     DateTime @default(now())
+
+  team       Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, repositoryId])
+  @@index([teamId])
+  @@index([repositoryId])
+}
+
+model TeamActivity {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  action    String   // invite_sent | member_joined | member_removed | repo_shared | comment_posted | role_changed
+  details   String?
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([teamId, createdAt(sort: Desc)])
+}
+
+model Comment {
+  id             String   @id @default(cuid())
+  teamId         String
+  userId         String
+  repositoryId   String?
+  parentCommentId String?
+  content        String
+  mentions       String[] // array of userIds mentioned
+  resolved       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([repositoryId])
+  @@index([userId])
+  @@index([teamId, createdAt(sort: Desc)])
+}
+
+// ─── GitHub Integration ───────────────────────────────────────────
+
+model GitHubIntegration {
+  id           String   @id @default(cuid())
+  userId       String
+  githubUrl    String
+  token        String   // encrypted GitHub PAT
+  isActive     Boolean  @default(true)
+  lastSyncAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repos        GitHubIntegrationRepository[]
+
+  @@unique([userId, githubUrl])
+  @@index([userId])
+}
+
+model GitHubIntegrationRepository {
+  id              String   @id @default(cuid())
+  integrationId   String
+  owner           String
+  name            String
+  fullName        String
+  description     String?
+  defaultBranch   String   @default("main")
+  isPrivate       Boolean  @default(false)
+  language        String?
+  starsCount      Int      @default(0)
+  forksCount      Int      @default(0)
+  openIssuesCount Int      @default(0)
+  lastSyncAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  integration GitHubIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([integrationId, owner, name])
+  @@index([integrationId])
 }

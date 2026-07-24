@@ -22,6 +22,7 @@ const AgentState = Annotation.Root({
   question: Annotation<string>(),
   repositoryId: Annotation<string | undefined>(),
   filePath: Annotation<string | undefined>(),
+  useLLMPlanning: Annotation<boolean>(),
   plan: Annotation<any>(),
   chunks: Annotation<any[]>(),
   reasoning: Annotation<any>(),
@@ -35,102 +36,109 @@ const AgentState = Annotation.Root({
   pullRequest: Annotation<string>(),
   testResult: Annotation<string>(),
   securityResult: Annotation<string>(),
+
+  executionTrace: Annotation<string[]>(),
+  agentTimings: Annotation<Record<string, number>>(),
 });
+
+const timedNode = <T extends Record<string, unknown>>(
+  name: string,
+  fn: (state: any) => Promise<T>
+): ((state: any) => Promise<T & { executionTrace: string[]; agentTimings: Record<string, number> }>) => {
+  return async (state) => {
+    const start = Date.now();
+    const result = await fn(state);
+    const duration = Date.now() - start;
+    return {
+      ...result,
+      executionTrace: [...(state.executionTrace ?? []), `${name}:${duration}ms`],
+      agentTimings: { ...(state.agentTimings ?? {}), [name]: duration },
+    };
+  };
+};
 
 const graph = new StateGraph(AgentState)
 
-  // Planner
-  .addNode("planner", async (state) => ({
+  .addNode("planner", timedNode("planner", async (state) => ({
     plan: await plannerAgent({
       question: state.question,
       repositoryId: state.repositoryId,
       filePath: state.filePath,
+      useLLM: state.useLLMPlanning,
     }),
+  })))
+
+  .addNode("retriever", timedNode("retriever", async (state) => {
+    const retrievalResult = await retrieverAgent(state.plan);
+    return { chunks: retrievalResult.chunks };
   }))
 
-  // Retriever
-  .addNode("retriever", async (state) => ({
-    chunks: await retrieverAgent(state.plan),
-  }))
-
-  // Reasoner
-  .addNode("reasoner", async (state) => ({
+  .addNode("reasoner", timedNode("reasoner", async (state) => ({
     reasoning: await reasonerAgent(state.chunks),
-  }))
+  })))
 
-  // Code Review
-  .addNode("codeReview", async (state) => ({
+  .addNode("codeReview", timedNode("codeReview", async (state) => ({
     reviewResult: await codeReviewAgent(
       state.plan,
       state.reasoning
     ),
-  }))
+  })))
 
-  // Suggested Fix
-  .addNode("fixAgent", async (state) => ({
+  .addNode("fixAgent", timedNode("fixAgent", async (state) => ({
     fixResult: await fixAgent(
       state.plan,
       state.reasoning
     ),
-  }))
+  })))
 
-  // Commit Message
-  .addNode("commitMessageAgent", async (state) => ({
+  .addNode("commitMessageAgent", timedNode("commitMessageAgent", async (state) => ({
     commitResult: await commitMessageAgent(
       state.plan,
       state.reasoning
     ),
-  }))
+  })))
 
-  // Architecture
-  .addNode("architectureAgent", async (state) => ({
+  .addNode("architectureAgent", timedNode("architectureAgent", async (state) => ({
     architecture: await architectureAgent(
       state.plan,
       state.reasoning.context
     ),
-  }))
+  })))
 
-  // Documentation
-  .addNode("documentationAgent", async (state) => ({
+  .addNode("documentationAgent", timedNode("documentationAgent", async (state) => ({
     documentation: await documentationAgent(
       state.plan,
       state.reasoning.context
     ),
-  }))
+  })))
 
-  // Pull Request
-  .addNode("pullRequestAgent", async (state) => ({
+  .addNode("pullRequestAgent", timedNode("pullRequestAgent", async (state) => ({
     pullRequest: await pullRequestAgent(
       state.plan,
       state.reasoning
     ),
-  }))
+  })))
 
-  // Test Generator
-  .addNode("testGeneratorAgent", async (state) => ({
+  .addNode("testGeneratorAgent", timedNode("testGeneratorAgent", async (state) => ({
     testResult: await testGeneratorAgent(
       state.plan,
       state.reasoning
     ),
-  }))
+  })))
 
-  // Security Scanner
-  .addNode("securityAgent", async (state) => ({
+  .addNode("securityAgent", timedNode("securityAgent", async (state) => ({
     securityResult: await securityAgent(
       state.plan,
       state.reasoning
     ),
-  }))
+  })))
 
-  // Normal QA
-  .addNode("answerAgent", async (state) => ({
+  .addNode("answerAgent", timedNode("answerAgent", async (state) => ({
     answer: await answerAgent(
       state.plan,
       state.reasoning
     ),
-  }))
-
-  // Graph
+  })))
 
   .addEdge(START, "planner")
 

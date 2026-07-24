@@ -14,6 +14,8 @@ import {
   apiDeleteAccount,
   apiChangePassword,
   apiUpdateProfile,
+  apiUploadBanner,
+  apiRemoveBanner,
 } from "@/services/auth";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -48,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await apiRegister(data);
     setUser(result.user);
     setToken(result.token);
+    return result.user;
   }, []);
 
   const logout = useCallback(async () => {
@@ -80,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(result.token);
   }, []);
 
-  const updateProfile = useCallback(async (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>) => {
+  const updateProfile = useCallback(async (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "bannerUrl" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>) => {
     // Optimistic update
     setUser((prev) => (prev ? { ...prev, ...updates } : null));
 
@@ -92,6 +95,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const session = await apiGetSession();
       if (session) setUser(session.user);
     }
+  }, []);
+
+  const uploadBanner = useCallback(async (bannerDataUrl: string) => {
+    const url = await apiUploadBanner(bannerDataUrl);
+    setUser((prev) => (prev ? { ...prev, bannerUrl: url } : null));
+  }, []);
+
+  const removeBanner = useCallback(async () => {
+    await apiRemoveBanner();
+    setUser((prev) => (prev ? { ...prev, bannerUrl: undefined } : null));
   }, []);
 
   const deleteAccount = useCallback(async () => {
@@ -121,6 +134,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginWithGoogle,
         loginWithGithub,
         updateProfile,
+        uploadBanner,
+        removeBanner,
         deleteAccount,
         changePassword,
       }}

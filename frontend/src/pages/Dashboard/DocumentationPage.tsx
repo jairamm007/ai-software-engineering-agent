@@ -374,7 +374,7 @@ export default function DocumentationPage() {
                       </div>
                     </div>
 
-                    <div style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }} className="overflow-y-auto px-3 py-2">
+                    <div className="overflow-hidden overflow-y-auto px-3 py-2" style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }}>
                       {scope === "multiple" && files.length > 0 && (
                         <button
                           type="button"
@@ -538,7 +538,7 @@ export default function DocumentationPage() {
                   Generated Documentation
                 </h3>
                 {result && !loading && (
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     <button
                       type="button"
                       onClick={handleCopy}

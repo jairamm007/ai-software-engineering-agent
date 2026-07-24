@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Delete2, RefreshCw, Settings, ExternalLink } from "lucide-react";
+import { Trash2, RefreshCw, Settings, ExternalLink } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import BackButton from "@/components/common/BackButton";
@@ -116,11 +116,11 @@ export default function RepositorySettingsPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className={`flex items-center justify-between px-5 py-3.5 ${
+                className={`flex min-w-0 items-center justify-between gap-4 px-5 py-3.5 ${
                   isDark ? "hover:bg-white/[0.02]" : "hover:bg-slate-50/80"
                 }`}
               >
-                <span className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                <span className={`shrink-0 text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   {item.label}
                 </span>
                 {item.link ? (
@@ -128,14 +128,14 @@ export default function RepositorySettingsPage() {
                     href={item.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+                    className="flex min-w-0 items-center gap-1.5 text-sm font-medium transition-colors"
                     style={{ color: "var(--accent)" }}
                   >
-                    {item.value}
-                    <ExternalLink size={12} />
+                    <span className="truncate">{item.value}</span>
+                    <ExternalLink size={12} className="shrink-0" />
                   </a>
                 ) : (
-                  <span className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+                  <span className={`min-w-0 truncate text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}>
                     {item.value}
                   </span>
                 )}
@@ -158,13 +158,13 @@ export default function RepositorySettingsPage() {
           </div>
           <div className="space-y-3 p-5">
             <div
-              className={`flex items-center justify-between rounded-xl border p-4 ${
+              className={`flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
                 isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-100 bg-slate-50/80"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <RefreshCw size={16} className="text-amber-500" />
-                <div>
+              <div className="flex min-w-0 items-center gap-3">
+                <RefreshCw size={16} className="shrink-0 text-amber-500" />
+                <div className="min-w-0">
                   <p className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}>
                     Re-index Repository
                   </p>
@@ -194,9 +194,9 @@ export default function RepositorySettingsPage() {
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Delete2 size={16} className="text-red-500" />
-                  <div>
+                <div className="flex min-w-0 items-center gap-3">
+                  <Trash2 size={16} className="shrink-0 text-red-500" />
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-red-600">Delete Repository</p>
                     <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                       Permanently remove this repository and all its data
@@ -210,9 +210,9 @@ export default function RepositorySettingsPage() {
                   className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/20 dark:text-red-400 dark:hover:bg-red-500/10 disabled:opacity-50"
                 >
                   {deleteMutation.isPending ? (
-                    <Delete2 size={12} className="animate-spin" />
+                    <Trash2 size={12} className="animate-spin" />
                   ) : (
-                    <Delete2 size={12} />
+                    <Trash2 size={12} />
                   )}
                   {deleteMutation.isPending ? "Deleting..." : "Delete"}
                 </button>

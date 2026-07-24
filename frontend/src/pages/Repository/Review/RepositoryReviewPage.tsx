@@ -122,7 +122,7 @@ export default function RepositoryReviewPage() {
             </div>
           </div>
 
-          <div style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 520))}px` }} className="overflow-y-auto px-3 py-2">
+          <div style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 520))}px` }} className="overflow-hidden overflow-y-auto px-3 py-2">
             {files.length === 0 && (
               <p className={`py-4 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>No files found.</p>
             )}
@@ -163,7 +163,7 @@ export default function RepositoryReviewPage() {
           </div>
 
           <div className={`border-t px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => void runReview()}
@@ -183,7 +183,7 @@ export default function RepositoryReviewPage() {
                 )}
               </button>
               {selectedFile && (
-                <span className={`self-center text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                <span className={`min-w-0 truncate text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`} title={selectedFile}>
                   {selectedFile}
                 </span>
               )}

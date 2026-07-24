@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -24,6 +25,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import api from "@/lib/axios";
 
@@ -289,6 +291,8 @@ export default function SettingsPage() {
   const { theme, toggleTheme, accent, setAccent } = useTheme();
   const isDark = theme === "dark";
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const [defaultModel, setDefaultModel] = useState("gemini-2.5-flash");
   const [temperature, setTemperature] = useState(0.3);
@@ -393,7 +397,8 @@ export default function SettingsPage() {
     setDeleting(true);
     try {
       await api.delete("/user/account");
-      window.location.href = "/login";
+      await logout();
+      navigate("/login", { replace: true });
     } catch {
       setDeleting(false);
     }

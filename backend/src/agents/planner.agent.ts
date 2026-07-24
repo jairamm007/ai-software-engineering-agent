@@ -1,3 +1,5 @@
+import { generateText } from "../ai/providers/llm.service.js";
+
 export type PlannerTask =
   | "answer"
   | "review"
@@ -18,6 +20,10 @@ export interface PlanResult {
   repositoryId?: string;
   filePath?: string;
   confidence: number;
+  reasoning: string;
+  subtasks: string[];
+  priority: "low" | "medium" | "high" | "critical";
+  estimatedComplexity: "simple" | "moderate" | "complex";
 }
 
 interface TaskRule {
@@ -74,16 +80,7 @@ const TASK_RULES: TaskRule[] = [
   },
 ];
 
-export const plannerAgent = async (
-  input: {
-    question: string;
-    repositoryId?: string;
-    filePath?: string;
-  }
-): Promise<PlanResult> => {
-  const { question, repositoryId, filePath } = input;
-
-  // Score each task type
+const regexPlan = (question: string): { task: PlannerTask; confidence: number; reasoning: string } => {
   const scores: Map<PlannerTask, number> = new Map();
 
   for (const rule of TASK_RULES) {
@@ -98,7 +95,6 @@ export const plannerAgent = async (
     }
   }
 
-  // Find the highest scoring task
   let bestTask: PlannerTask = "answer";
   let bestScore = 0;
   for (const [task, score] of scores) {
@@ -108,21 +104,137 @@ export const plannerAgent = async (
     }
   }
 
-  // Calculate confidence (0-1)
   const totalScore = Array.from(scores.values()).reduce((a, b) => a + b, 0);
   const confidence = totalScore > 0 ? Math.min(bestScore / totalScore, 1) : 0.5;
 
-  // If no strong match, default to answer/explain
   if (bestScore === 0) {
     bestTask = "answer";
   }
 
+  const matchedTasks = Array.from(scores.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([task, score]) => `${task}(${score})`)
+    .join(", ");
+
+  return {
+    task: bestTask,
+    confidence,
+    reasoning: `Regex analysis: matched tasks [${matchedTasks}]. Selected: ${bestTask} with confidence ${(confidence * 100).toFixed(0)}%`,
+  };
+};
+
+const LLM_PLAN_PROMPT = `You are a task planner for a software engineering AI assistant. Analyze the user's question and determine:
+1. The primary task type (one of: answer, review, fix, commit, architecture, documentation, pullRequest, test, security, explain, refactor)
+2. Whether repository code search is needed
+3. Key subtasks to accomplish
+4. Priority level (low, medium, high, critical)
+5. Complexity estimate (simple, moderate, complex)
+
+Respond in EXACTLY this JSON format:
+{
+  "task": "<task_type>",
+  "needsRepositorySearch": <true|false>,
+  "reasoning": "<brief reasoning>",
+  "subtasks": ["<subtask1>", "<subtask2>"],
+  "priority": "<low|medium|high|critical>",
+  "complexity": "<simple|moderate|complex>",
+  "confidence": <0.0-1.0>
+}
+
+Valid task types: answer, review, fix, commit, architecture, documentation, pullRequest, test, security, explain, refactor`;
+
+const llmPlan = async (question: string): Promise<{
+  task: PlannerTask;
+  confidence: number;
+  needsRepositorySearch: boolean;
+  reasoning: string;
+  subtasks: string[];
+  priority: PlanResult["priority"];
+  estimatedComplexity: PlanResult["estimatedComplexity"];
+} | null> => {
+  try {
+    const response = await generateText(
+      LLM_PLAN_PROMPT,
+      `Analyze this question and provide a task plan:\n\n${question}`
+    );
+
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    const validTasks: PlannerTask[] = [
+      "answer", "review", "fix", "commit", "architecture",
+      "documentation", "pullRequest", "test", "security", "explain", "refactor"
+    ];
+
+    if (!validTasks.includes(parsed.task)) return null;
+
+    return {
+      task: parsed.task,
+      confidence: typeof parsed.confidence === "number" ? Math.min(Math.max(parsed.confidence, 0), 1) : 0.7,
+      needsRepositorySearch: parsed.needsRepositorySearch !== false,
+      reasoning: parsed.reasoning || "LLM-based task planning",
+      subtasks: Array.isArray(parsed.subtasks) ? parsed.subtasks.slice(0, 5) : [],
+      priority: ["low", "medium", "high", "critical"].includes(parsed.priority) ? parsed.priority : "medium",
+      estimatedComplexity: ["simple", "moderate", "complex"].includes(parsed.complexity) ? parsed.complexity : "moderate",
+    };
+  } catch {
+    return null;
+  }
+};
+
+export const plannerAgent = async (
+  input: {
+    question: string;
+    repositoryId?: string;
+    filePath?: string;
+    useLLM?: boolean;
+  }
+): Promise<PlanResult> => {
+  const { question, repositoryId, filePath, useLLM = false } = input;
+
+  const regexResult = regexPlan(question);
+
+  let finalTask = regexResult.task;
+  let finalConfidence = regexResult.confidence;
+  let reasoning = regexResult.reasoning;
+  let needsRepositorySearch = true;
+  let subtasks: string[] = [];
+  let priority: PlanResult["priority"] = "medium";
+  let estimatedComplexity: PlanResult["estimatedComplexity"] = "moderate";
+
+  if (useLLM || finalConfidence < 0.5) {
+    const llmResult = await llmPlan(question);
+    if (llmResult) {
+      if (llmResult.confidence > finalConfidence) {
+        finalTask = llmResult.task;
+        finalConfidence = llmResult.confidence;
+        reasoning = `LLM override: ${llmResult.reasoning} (regex had: ${regexResult.task} at ${(regexResult.confidence * 100).toFixed(0)}%)`;
+      } else {
+        reasoning += ` | LLM suggests ${llmResult.task} at ${(llmResult.confidence * 100).toFixed(0)}% but regex confidence is higher`;
+      }
+      needsRepositorySearch = llmResult.needsRepositorySearch;
+      subtasks = llmResult.subtasks;
+      priority = llmResult.priority;
+      estimatedComplexity = llmResult.estimatedComplexity;
+    }
+  }
+
+  if (repositoryId || filePath) {
+    needsRepositorySearch = true;
+  }
+
   return {
     question,
-    task: bestTask,
-    needsRepositorySearch: true,
+    task: finalTask,
+    needsRepositorySearch,
     repositoryId,
     filePath,
-    confidence,
+    confidence: finalConfidence,
+    reasoning,
+    subtasks,
+    priority,
+    estimatedComplexity,
   };
 };

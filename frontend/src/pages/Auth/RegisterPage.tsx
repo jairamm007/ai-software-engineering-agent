@@ -60,7 +60,7 @@ export default function RegisterPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const navigate = useNavigate();
-  const { register, loginWithGoogle, loginWithGithub, user } = useAuth();
+  const { register, loginWithGoogle, loginWithGithub } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -112,8 +112,8 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await register({ name, email, password, confirmPassword });
-      if (!user?.emailVerified) {
+      const registeredUser = await register({ name, email, password, confirmPassword });
+      if (!registeredUser.emailVerified) {
         setNeedsVerification(true);
       } else {
         navigate("/dashboard", { replace: true });

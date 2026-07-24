@@ -27,6 +27,20 @@ export interface AgentExecutionStep {
   input?: string;
   output?: string;
   error?: string;
+  confidence?: number;
+}
+
+export interface AgentMemoryInsight {
+  agent: string;
+  type: string;
+  content: string;
+  severity: string;
+}
+
+export interface AgentPerformanceMetric {
+  durationMs: number;
+  confidence: number;
+  quality: string;
 }
 
 export interface MultiAgentResult {
@@ -37,11 +51,39 @@ export interface MultiAgentResult {
   finalOutput: string;
   totalDurationMs: number;
   agentsExecuted: number;
+  memoryInsights: AgentMemoryInsight[];
+  executionTrace: string[];
+  performanceMetrics: Record<string, AgentPerformanceMetric>;
 }
 
 export interface AgentDefinition {
   id: AgentName;
   label: string;
+}
+
+export interface AgentMetadata {
+  type: AgentName;
+  displayName: string;
+  description: string;
+  capabilities: Array<{ name: string; description: string }>;
+  requiredContext: string[];
+  optionalContext: string[];
+  outputFormat: string;
+  maxInputTokens: number;
+  estimatedLatencyMs: number;
+  canParallelize: boolean;
+  dependencies: AgentName[];
+}
+
+export interface AgentTool {
+  name: string;
+  description: string;
+  parameters: Array<{
+    name: string;
+    type: string;
+    description: string;
+    required: boolean;
+  }>;
 }
 
 export const getAgentDefinitions = async (): Promise<AgentDefinition[]> => {
@@ -52,11 +94,12 @@ export const getAgentDefinitions = async (): Promise<AgentDefinition[]> => {
 export const orchestrateMultiAgent = async (
   question: string,
   repositoryId?: string,
-  filePath?: string
+  filePath?: string,
+  useLLMPlanning?: boolean
 ): Promise<MultiAgentResult> => {
   const response = await api.post<ApiResponse<MultiAgentResult>>(
     "/multi-agent/orchestrate",
-    { question, repositoryId, filePath }
+    { question, repositoryId, filePath, useLLMPlanning }
   );
   return response.data.data;
 };
@@ -70,5 +113,30 @@ export const executeSingleAgent = async (
     "/multi-agent/execute",
     { agentType, context, question }
   );
+  return response.data.data;
+};
+
+export const getAgentMetadataList = async (): Promise<AgentMetadata[]> => {
+  const response = await api.get<ApiResponse<AgentMetadata[]>>("/multi-agent/metadata");
+  return response.data.data;
+};
+
+export const getAgentMetadata = async (type: string): Promise<AgentMetadata> => {
+  const response = await api.get<ApiResponse<AgentMetadata>>(`/multi-agent/metadata/${type}`);
+  return response.data.data;
+};
+
+export const getAgentTools = async (): Promise<AgentTool[]> => {
+  const response = await api.get<ApiResponse<AgentTool[]>>("/multi-agent/tools");
+  return response.data.data;
+};
+
+export const getToolsForAgent = async (type: string): Promise<AgentTool[]> => {
+  const response = await api.get<ApiResponse<AgentTool[]>>(`/multi-agent/tools/${type}`);
+  return response.data.data;
+};
+
+export const getAgentMemory = async (sessionId: string): Promise<string> => {
+  const response = await api.get<ApiResponse<string>>(`/multi-agent/memory/${sessionId}`);
   return response.data.data;
 };

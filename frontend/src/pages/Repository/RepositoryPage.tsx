@@ -47,9 +47,20 @@ export default function RepositoryPage() {
 
   return (
     <DashboardLayout>
-      <h1 className={`mb-6 text-3xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
-        Repository Management
-      </h1>
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl accent-gradient shadow-lg accent-shadow">
+            <FolderGit2 size={20} className="text-white" />
+          </div>
+          <div>
+            <h1 className={`text-2xl font-bold sm:text-3xl ${isDark ? "text-white" : "text-slate-900"}`}>
+              Repositories
+            </h1>
+            <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              Manage and analyze your GitHub repositories
+            </p>
+          </div>
+        </div>
       <RepositoryForm
         onSubmit={(url) => mutation.mutateAsync(url)}
       />
@@ -68,8 +79,8 @@ export default function RepositoryPage() {
           </div>
         </div>
       )}
-      <div className="mb-4 flex gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1">
           <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
           <input
             type="text"
@@ -83,12 +94,12 @@ export default function RepositoryPage() {
             }`}
           />
         </div>
-        <div className="relative">
+        <div className="relative shrink-0">
           <ArrowUpDown size={14} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? "text-slate-500" : "text-slate-400"}`} />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className={`appearance-none rounded-lg border py-2 pl-8 pr-8 text-sm outline-none cursor-pointer transition-colors ${
+            className={`w-full appearance-none rounded-lg border py-2 pl-8 pr-8 text-sm outline-none cursor-pointer transition-colors sm:w-auto ${
               isDark
                 ? "border-white/20 bg-white/5 text-white focus:border-violet-500"
                 : "border-slate-300 bg-white text-slate-900 focus:border-violet-500"
@@ -107,6 +118,7 @@ export default function RepositoryPage() {
       ) : (
         <RepositoryTable repositories={data} />
       )}
+      </div>
     </DashboardLayout>
   );
 }
