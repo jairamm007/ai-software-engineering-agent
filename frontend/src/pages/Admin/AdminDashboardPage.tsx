@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  PieChart, Pie, Cell,
+} from "recharts";
+import {
   Users,
   UserCog,
   FolderGit2,
@@ -17,7 +21,8 @@ import {
   ArrowUpRight,
   LayoutDashboard,
   HardDrive,
-  CalendarClock,
+  BarChart3,
+  LineChart,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { getAdminStats, getSystemHealth, type AdminStats, type SystemHealth } from "@/services/admin";
@@ -40,6 +45,7 @@ export default function AdminDashboardPage() {
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [chartType, setChartType] = useState<"bar" | "line">("bar");
 
   useEffect(() => {
     Promise.all([getAdminStats(), getSystemHealth()])
@@ -62,8 +68,18 @@ export default function AdminDashboardPage() {
     { icon: Ban, label: "Suspended", value: stats?.suspendedUsers ?? 0, sub: "Blocked accounts", gradient: "from-red-500 to-orange-600" },
   ];
 
-  const chartData = data?.charts.usersByDay?.slice(-7) ?? [];
-  const maxCount = Math.max(...chartData.map((d) => d.count), 1);
+  const chartData = data?.charts.usersByDay ?? [];
+  const repoChartData = data?.charts.reposByDay ?? [];
+
+  function pieData(s: NonNullable<AdminStats["stats"]>) {
+    return [
+      { name: "Users", value: s.totalUsers, color: "#f43f5e" },
+      { name: "Repos", value: s.totalRepos, color: "#06b6d4" },
+      { name: "Files", value: s.totalFiles, color: "#10b981" },
+      { name: "Conversations", value: s.totalConversations, color: "#f59e0b" },
+      { name: "Chunks", value: Math.min(s.totalChunks, 9999), color: "#8b5cf6" },
+    ];
+  }
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -194,7 +210,7 @@ export default function AdminDashboardPage() {
 
       {/* Charts + Activity */}
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        {/* Growth Chart */}
+        {/* Users Growth Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -203,43 +219,219 @@ export default function AdminDashboardPage() {
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div>
-              <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Growth Overview</h3>
-              <p className={`mt-0.5 text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>New users over the last 7 days</p>
+              <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>User Growth</h3>
+              <p className={`mt-0.5 text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>New users over the last 30 days</p>
             </div>
-            <div className={`flex h-8 items-center rounded-lg px-3 text-xs font-medium ${
-              isDark ? "bg-white/[0.04] text-slate-400" : "bg-slate-50 text-slate-500"
-            }`}>
-              <TrendingUp size={13} className="mr-1.5" />
-              7 days
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setChartType("bar")}
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                  chartType === "bar"
+                    ? "bg-gradient-to-br from-rose-500/20 to-orange-500/20 text-rose-500"
+                    : isDark ? "text-slate-500 hover:bg-white/5 hover:text-slate-300" : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                }`}
+              >
+                <BarChart3 size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setChartType("line")}
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                  chartType === "line"
+                    ? "bg-gradient-to-br from-rose-500/20 to-orange-500/20 text-rose-500"
+                    : isDark ? "text-slate-500 hover:bg-white/5 hover:text-slate-300" : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                }`}
+              >
+                <LineChart size={14} />
+              </button>
             </div>
           </div>
           <div className="p-6">
             {chartData.length > 0 ? (
-              <div className="space-y-3">
-                {chartData.map((d) => {
-                  const pct = Math.max(4, (d.count / maxCount) * 100);
-                  return (
-                    <div key={d.date} className="flex items-center gap-3">
-                      <span className={`w-16 text-right text-[13px] tabular-nums ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                        {new Date(d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      </span>
-                      <div className={`flex-1 h-8 rounded-xl overflow-hidden ${isDark ? "bg-white/[0.03]" : "bg-slate-100"}`}>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${pct}%` }}
-                          transition={{ duration: 0.7, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                          className={`h-full rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 opacity-80`}
-                        />
-                      </div>
-                      <span className={`w-8 text-right text-[13px] font-semibold tabular-nums ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                        {d.count}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+              <ResponsiveContainer width="100%" height={260}>
+                {chartType === "bar" ? (
+                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDark ? "#1a1a2e" : "#ffffff",
+                        border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e2e8f0",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                      }}
+                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)" }}
+                    />
+                    <Bar
+                      dataKey="count"
+                      name="Users"
+                      fill="url(#barGradient)"
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={40}
+                    />
+                    <defs>
+                      <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f43f5e" />
+                        <stop offset="100%" stopColor="#f97316" />
+                      </linearGradient>
+                    </defs>
+                  </BarChart>
+                ) : (
+                  <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDark ? "#1a1a2e" : "#ffffff",
+                        border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e2e8f0",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                      }}
+                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      cursor={{ stroke: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", strokeWidth: 1 }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="count"
+                      name="Users"
+                      stroke="#f43f5e"
+                      strokeWidth={2.5}
+                      fill="url(#lineGradient)"
+                      dot={{ r: 3, fill: "#f43f5e", strokeWidth: 0 }}
+                      activeDot={{ r: 5, fill: "#f43f5e", stroke: isDark ? "#111118" : "#fff", strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                )}
+              </ResponsiveContainer>
             ) : (
-              <div className={`flex h-48 items-center justify-center rounded-xl border border-dashed ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+              <div className={`flex h-64 items-center justify-center rounded-xl border border-dashed ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+                <p className={`text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                  {loading ? "Loading chart data..." : "No data yet"}
+                </p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Repository Growth Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.45 }}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+        >
+          <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
+            <div>
+              <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Repository Growth</h3>
+              <p className={`mt-0.5 text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Repos created over the last 30 days</p>
+            </div>
+            <div className={`flex h-8 items-center rounded-lg px-3 text-xs font-medium ${
+              isDark ? "bg-white/[0.04] text-slate-400" : "bg-slate-50 text-slate-500"
+            }`}>
+              <FolderGit2 size={13} className="mr-1.5" />
+              {chartType === "bar" ? "Bar" : "Line"}
+            </div>
+          </div>
+          <div className="p-6">
+            {repoChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={260}>
+                {chartType === "bar" ? (
+                  <BarChart data={repoChartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDark ? "#1a1a2e" : "#ffffff",
+                        border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e2e8f0",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                      }}
+                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)" }}
+                    />
+                    <Bar dataKey="count" name="Repos" fill="url(#repoBarGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                    <defs>
+                      <linearGradient id="repoBarGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#06b6d4" />
+                        <stop offset="100%" stopColor="#3b82f6" />
+                      </linearGradient>
+                    </defs>
+                  </BarChart>
+                ) : (
+                  <AreaChart data={repoChartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="repoLineGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: isDark ? "#64748b" : "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDark ? "#1a1a2e" : "#ffffff",
+                        border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e2e8f0",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                      }}
+                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      cursor={{ stroke: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", strokeWidth: 1 }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="count"
+                      name="Repos"
+                      stroke="#06b6d4"
+                      strokeWidth={2.5}
+                      fill="url(#repoLineGradient)"
+                      dot={{ r: 3, fill: "#06b6d4", strokeWidth: 0 }}
+                      activeDot={{ r: 5, fill: "#06b6d4", stroke: isDark ? "#111118" : "#fff", strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                )}
+              </ResponsiveContainer>
+            ) : (
+              <div className={`flex h-64 items-center justify-center rounded-xl border border-dashed ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
                 <p className={`text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                   {loading ? "Loading chart data..." : "No data yet"}
                 </p>
@@ -307,12 +499,72 @@ export default function AdminDashboardPage() {
             )}
           </div>
         </motion.div>
+      </div>
+
+      {/* Second row: Repositories, Activity Pie, Recent Repos */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        {/* Activity Distribution (Pie) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.45 }}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+        >
+          <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
+            <div>
+              <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Platform Activity</h3>
+              <p className={`mt-0.5 text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Content distribution overview</p>
+            </div>
+          </div>
+          <div className="p-6">
+            {stats ? (
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie
+                    data={pieData(stats)}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={95}
+                    paddingAngle={3}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {pieData(stats).map((entry, index) => (
+                      <Cell key={index} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: isDark ? "#1a1a2e" : "#ffffff",
+                      border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e2e8f0",
+                      borderRadius: "12px",
+                      fontSize: "12px",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                    }}
+                  />
+                  <Legend
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ fontSize: "12px" }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className={`flex h-64 items-center justify-center rounded-xl border border-dashed ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+                <p className={`text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                  {loading ? "Loading..." : "No data yet"}
+                </p>
+              </div>
+            )}
+          </div>
+        </motion.div>
 
         {/* Recent Repositories */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.45 }}
+          transition={{ delay: 0.5, duration: 0.45 }}
           className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
@@ -361,6 +613,48 @@ export default function AdminDashboardPage() {
                 {loading ? "Loading..." : "No repositories yet"}
               </p>
             )}
+          </div>
+        </motion.div>
+
+        {/* Quick Stats Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55, duration: 0.45 }}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+        >
+          <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
+            <div>
+              <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Growth Summary</h3>
+              <p className={`mt-0.5 text-[13px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Key metrics at a glance</p>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            {[
+              { label: "Users (7d)", value: stats?.newUsers7Days ?? 0, total: stats?.totalUsers ?? 0, color: "from-rose-500 to-orange-500" },
+              { label: "Repos (7d)", value: stats?.reposLast7Days ?? 0, total: stats?.totalRepos ?? 0, color: "from-cyan-500 to-blue-500" },
+              { label: "Conversations (today)", value: stats?.conversationsToday ?? 0, total: stats?.totalConversations ?? 0, color: "from-amber-500 to-orange-500" },
+            ].map((m) => {
+              const pct = m.total > 0 ? Math.min(100, Math.max(2, (m.value / Math.max(m.total, 1)) * 100)) : 0;
+              return (
+                <div key={m.label}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-[13px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{m.label}</span>
+                    <span className={`text-[13px] font-semibold tabular-nums ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+                      {m.value.toLocaleString()} / {m.total.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, delay: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className={`h-full rounded-full bg-gradient-to-r ${m.color}`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       </div>
