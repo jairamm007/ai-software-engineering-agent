@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, FileCode2, FolderGit2, Bot, ArrowRight, Loader2, Code2, Layers } from "lucide-react";
+import { Search, FileCode2, Bot, ArrowRight, Loader2, Code2, Layers } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { askRepository } from "@/services/chat";
@@ -19,20 +19,18 @@ export default function SearchPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [query, setQuery] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [results, setResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const { data: repos } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const handleSearch = async () => {
     const trimmed = query.trim();
     if (!trimmed || loading) return;
-    setSearchTerm(trimmed);
     setLoading(true);
     setResults(null);
     try {

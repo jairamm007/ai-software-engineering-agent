@@ -1,6 +1,7 @@
 import {
   useEffect,
   useState,
+  useRef,
 } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -51,6 +52,11 @@ export default function RepositoryDetailsPage() {
   const [, setSecurityReport] = useState<string | null>(null);
   const [selectedCode, setSelectedCode] = useState("");
   const [openCommandPalette, setOpenCommandPalette] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const {
     data,
@@ -90,7 +96,10 @@ export default function RepositoryDetailsPage() {
 
   useEffect(() => {
     if (!id) return;
-    localStorage.setItem(`workspace:${id}`, JSON.stringify({ selectedFileId: selectedFile?.id, conversation }));
+    const timeout = setTimeout(() => {
+      localStorage.setItem(`workspace:${id}`, JSON.stringify({ selectedFileId: selectedFile?.id, conversation }));
+    }, 500);
+    return () => clearTimeout(timeout);
   }, [conversation, id, selectedFile?.id]);
 
   const formatAnswer = (answer: unknown) =>
@@ -141,12 +150,15 @@ export default function RepositoryDetailsPage() {
     }
 
     setLoading(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const response = await askRepository({
         question,
         repositoryId: data.id,
         filePath: selectedFile.path,
+        signal: controller.signal,
       });
       const answer = formatAnswer(response.answer);
 
@@ -154,9 +166,11 @@ export default function RepositoryDetailsPage() {
       addAiResult(title, answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
+      if (controller.signal.aborted) return;
       addMessage("assistant", failureMessage);
       addAiResult(title, failureMessage);
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };
@@ -210,11 +224,14 @@ export default function RepositoryDetailsPage() {
     }
 
     setLoading(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const response = await askRepository({
         question,
         repositoryId: data.id,
+        signal: controller.signal,
       });
       const answer = formatAnswer(response.answer);
 
@@ -222,10 +239,12 @@ export default function RepositoryDetailsPage() {
       addAiResult("Generate Commit", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
+      if (controller.signal.aborted) return;
       const failureMessage = "Failed to generate a commit message.";
       addMessage("assistant", failureMessage);
       addAiResult("Generate Commit", failureMessage);
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };
@@ -247,11 +266,14 @@ export default function RepositoryDetailsPage() {
     }
 
     setLoading(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const response = await askRepository({
         question,
         repositoryId: data.id,
+        signal: controller.signal,
       });
       const answer = formatAnswer(response.answer);
 
@@ -260,12 +282,14 @@ export default function RepositoryDetailsPage() {
       addAiResult("Pull Request", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
+      if (controller.signal.aborted) return;
       const failureMessage = "Failed to generate a pull request.";
 
       setPullRequest(failureMessage);
       addMessage("assistant", failureMessage);
       addAiResult("Pull Request", failureMessage);
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };
@@ -287,12 +311,15 @@ export default function RepositoryDetailsPage() {
     }
 
     setLoading(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const response = await askRepository({
         question,
         repositoryId: data?.id,
         filePath: selectedFile.path,
+        signal: controller.signal,
       });
       const answer = formatAnswer(response.answer);
 
@@ -301,12 +328,14 @@ export default function RepositoryDetailsPage() {
       addAiResult("Generate Tests", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
+      if (controller.signal.aborted) return;
       const failureMessage = "Failed to generate tests.";
 
       setTests(failureMessage);
       addMessage("assistant", failureMessage);
       addAiResult("Generate Tests", failureMessage);
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };
@@ -328,12 +357,15 @@ export default function RepositoryDetailsPage() {
     }
 
     setLoading(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const response = await askRepository({
         question,
         repositoryId: data?.id,
         filePath: selectedFile.path,
+        signal: controller.signal,
       });
       const answer = formatAnswer(response.answer);
 
@@ -342,12 +374,14 @@ export default function RepositoryDetailsPage() {
       addAiResult("Security Scan", answer);
       setCache((prev) => ({ ...prev, [cacheKey]: answer }));
     } catch {
+      if (controller.signal.aborted) return;
       const failureMessage = "Failed to complete the security scan.";
 
       setSecurityReport(failureMessage);
       addMessage("assistant", failureMessage);
       addAiResult("Security Scan", failureMessage);
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };
@@ -394,6 +428,9 @@ export default function RepositoryDetailsPage() {
     void actions[action]();
   };
 
+  const actionsRef = useRef({ runSelectionAction, reviewFile, generateTests, securityScan });
+  actionsRef.current = { runSelectionAction, reviewFile, generateTests, securityScan };
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key.toLowerCase() === "k") {
@@ -402,14 +439,15 @@ export default function RepositoryDetailsPage() {
       }
       if (event.key === "Escape") setOpenCommandPalette(false);
       if (!event.ctrlKey) return;
-      if (event.key === "/") { event.preventDefault(); void runSelectionAction("Explain"); }
-      if (event.shiftKey && event.key.toLowerCase() === "r") { event.preventDefault(); void reviewFile(); }
-      if (event.shiftKey && event.key.toLowerCase() === "t") { event.preventDefault(); void generateTests(); }
-      if (event.shiftKey && event.key.toLowerCase() === "s") { event.preventDefault(); void securityScan(); }
+      const { runSelectionAction: run, reviewFile: review, generateTests: tests, securityScan: scan } = actionsRef.current;
+      if (event.key === "/") { event.preventDefault(); void run("Explain"); }
+      if (event.shiftKey && event.key.toLowerCase() === "r") { event.preventDefault(); void review(); }
+      if (event.shiftKey && event.key.toLowerCase() === "t") { event.preventDefault(); void tests(); }
+      if (event.shiftKey && event.key.toLowerCase() === "s") { event.preventDefault(); void scan(); }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  });
+  }, []);
 
   const handleDeleteRepository = async () => {
     if (!id) return;

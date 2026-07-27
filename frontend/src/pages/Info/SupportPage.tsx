@@ -10,12 +10,12 @@ const pageVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const badgeVariants = {
   hidden: { opacity: 0, scale: 0.7 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
 };
 
 export default function SupportPage() {
@@ -101,12 +101,12 @@ export default function SupportPage() {
                 rel={ch.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 variants={itemVariants}
                 whileHover={{ y: -6, scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                transition={{ type: "spring" as const, stiffness: 300, damping: 22 }}
                 className={`group rounded-2xl border p-6 text-center transition-shadow duration-300 hover:shadow-xl ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:shadow-amber-500/5" : "border-slate-200 bg-white hover:shadow-slate-200/60"}`}
               >
                 <motion.div
                   whileHover={{ rotate: 12, scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 400 }}
+                  transition={{ type: "spring" as const, stiffness: 400 }}
                   className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${ch.color} text-white shadow-md`}
                 >
                   <Icon size={20} />
@@ -124,11 +124,11 @@ export default function SupportPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -2 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
           className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-slate-50"}`}
         >
           <div className="flex items-start gap-3">
-            <motion.div whileHover={{ rotate: 15 }} transition={{ type: "spring", stiffness: 400 }}>
+            <motion.div whileHover={{ rotate: 15 }} transition={{ type: "spring" as const, stiffness: 400 }}>
               <FileQuestion size={20} className="mt-0.5 shrink-0 text-violet-500" />
             </motion.div>
             <div>

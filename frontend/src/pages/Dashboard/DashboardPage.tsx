@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -119,7 +119,7 @@ export default function DashboardPage() {
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const { data: aiProvidersData } = useQuery({
@@ -133,25 +133,32 @@ export default function DashboardPage() {
   });
 
   const totalRepositories = data.length;
-  const totalFiles = data.reduce(
-    (sum: number, repo: RepositoryListItem) => sum + repo._count.files,
-    0
+
+  const totalFiles = useMemo(
+    () => data.reduce((sum: number, repo: RepositoryListItem) => sum + repo._count.files, 0),
+    [data]
   );
-  const totalChunks = data.reduce(
-    (sum: number, repo: RepositoryListItem) =>
-      sum + repo.files.reduce(
-        (chunkSum: number, file: { _count: { chunks: number } }) => chunkSum + file._count.chunks,
-        0
-      ),
-    0
+
+  const totalChunks = useMemo(
+    () => data.reduce(
+      (sum: number, repo: RepositoryListItem) =>
+        sum + repo.files.reduce(
+          (chunkSum: number, file: { _count: { chunks: number } }) => chunkSum + file._count.chunks,
+          0
+        ),
+      0
+    ),
+    [data]
   );
 
   const providerCount = aiProvidersData?.count ?? 0;
   const providers = aiProvidersData?.providers ?? [];
 
-  const recentRepos = [...data]
+  const recentRepos = useMemo(() => [...data]
     .sort((a: RepositoryListItem, b: RepositoryListItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 5);
+    .slice(0, 5),
+    [data]
+  );
 
   return (
     <DashboardLayout>

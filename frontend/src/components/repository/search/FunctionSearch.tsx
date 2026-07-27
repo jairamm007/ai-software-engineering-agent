@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { FunctionSquare, Export, Lock } from "lucide-react";
+import { FunctionSquare, Share, Lock } from "lucide-react";
 import type { FunctionSearchResult } from "@/services/semanticSearch";
 
 interface Props {
@@ -65,7 +65,7 @@ export default function FunctionSearch({ results }: Props) {
                 </td>
                 <td className="px-4 py-2.5 text-center">
                   {fn.exported ? (
-                    <Export size={14} className="mx-auto text-emerald-400" />
+                    <Share size={14} className="mx-auto text-emerald-400" />
                   ) : (
                     <Lock size={14} className={`mx-auto ${isDark ? "text-slate-600" : "text-slate-300"}`} />
                   )}

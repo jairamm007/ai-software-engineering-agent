@@ -18,17 +18,37 @@ const registry: Record<string, () => LLMProvider> = {
   mistral: () => new MistralProvider(),
 };
 
+const MODEL_TO_PROVIDER: Record<string, string> = {
+  "gemini-2.5-flash": "gemini",
+  "llama-3.3-70b-versatile": "groq",
+  "meta-llama/llama-3.3-70b-instruct": "openrouter",
+  "gpt-4.1-mini": "openai",
+  "llama-3.3-70b": "cerebras",
+  "meta-llama/Llama-3-70b-chat-hf": "together",
+  "mistral-large-latest": "mistral",
+};
+
 // Default order: fastest providers first
-const DEFAULT_ORDER = "groq,cerebras,together,gemini,openai,openrouter,mistral";
+const DEFAULT_ORDER = "groq,cerebras,gemini,openai,together,openrouter,mistral";
 
 export class ProviderFactory {
-  static getProviders(): LLMProvider[] {
+  static getProviders(preferredModel?: string): LLMProvider[] {
     const order = process.env.LLM_PROVIDER_ORDER ?? DEFAULT_ORDER;
 
-    return order
+    const providers = order
       .split(",")
       .map((provider) => provider.trim().toLowerCase())
-      .filter((provider) => registry[provider])
-      .map((provider) => registry[provider]());
+      .filter((provider) => registry[provider]);
+
+    // If user has a preferred model, move its provider to the front
+    if (preferredModel) {
+      const preferredProvider = MODEL_TO_PROVIDER[preferredModel];
+      if (preferredProvider && providers.includes(preferredProvider)) {
+        providers.splice(providers.indexOf(preferredProvider), 1);
+        providers.unshift(preferredProvider);
+      }
+    }
+
+    return providers.map((provider) => registry[provider]());
   }
 }

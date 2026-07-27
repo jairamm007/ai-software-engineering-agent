@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { useState, useCallback, useRef } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { Info } from "lucide-react";
 
@@ -23,42 +22,31 @@ export default function StatCard({
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [showInfo, setShowInfo] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["6deg", "-6deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-6deg", "6deg"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const xPct = (e.clientX - rect.left) / rect.width - 0.5;
     const yPct = (e.clientY - rect.top) / rect.height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
+    setTilt({ x: yPct * -12, y: xPct * 12 });
+  }, []);
 
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
+  const handleMouseLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 });
+  }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, rotateX: -10 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
+    <div
+      ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
+        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: "transform 0.15s ease-out",
+        animationDelay: `${index * 0.1}s`,
       }}
-      className="cursor-default"
+      className="opacity-0 animate-fadeInUp cursor-default"
     >
       <div className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg ${
         isDark
@@ -73,12 +61,12 @@ export default function StatCard({
             <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               {title}
             </p>
-            <motion.p
+            <p
               className={`mt-2 text-3xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}
               style={{ transform: "translateZ(20px)" }}
             >
               {value}
-            </motion.p>
+            </p>
           </div>
           <div className="flex items-center gap-1">
             {infoContent && (
@@ -110,25 +98,15 @@ export default function StatCard({
         </div>
       </div>
 
-      <AnimatePresence>
-        {showInfo && infoContent && (
-          <motion.div
-            initial={{ opacity: 0, height: 0, marginTop: 0 }}
-            animate={{ opacity: 1, height: "auto", marginTop: 8 }}
-            exit={{ opacity: 0, height: 0, marginTop: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className={`rounded-xl border p-4 text-sm shadow-sm ${
-              isDark
-                ? "border-slate-700 bg-slate-800/90 text-slate-300"
-                : "border-slate-200 bg-white text-slate-600"
-            }`}>
-              {infoContent}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      {showInfo && infoContent && (
+        <div className={`mt-2 overflow-hidden rounded-xl border p-4 text-sm shadow-sm animate-fadeIn ${
+          isDark
+            ? "border-slate-700 bg-slate-800/90 text-slate-300"
+            : "border-slate-200 bg-white text-slate-600"
+        }`}>
+          {infoContent}
+        </div>
+      )}
+    </div>
   );
 }

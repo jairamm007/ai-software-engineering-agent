@@ -1,6 +1,7 @@
 import { generateTextStream } from "../ai/providers/llm.service.js";
 import { agentGraph } from "../agents/graph.state.js";
 import { AGENTS } from "../agents/prompts.js";
+import { getPreferences } from "../repository/user-preference.repository.js";
 import type { AgentType } from "../agents/agent.types.js";
 
 const MAX_CONTEXT_CHARS = 100_000;
@@ -26,6 +27,8 @@ export interface StreamChatInput {
   repositoryId?: string;
   filePath?: string;
   history?: { role: string; content: string }[];
+  userId?: string;
+  signal?: AbortSignal;
 }
 
 /**
@@ -77,8 +80,19 @@ export async function* streamRepositoryChat(input: StreamChatInput) {
 
   const userPrompt = `Repository Context:\n\n${truncatedContext}${historyBlock}\n\nQuestion: ${input.question}`;
 
-  // Step 4: Stream the response
-  const stream = generateTextStream(agent.systemPrompt, userPrompt);
+  // Step 4: Look up user's preferred model
+  let preferredModel: string | undefined;
+  if (input.userId) {
+    try {
+      const prefs = await getPreferences(input.userId);
+      preferredModel = prefs.defaultModel;
+    } catch {
+      // Ignore preference lookup errors, use default provider order
+    }
+  }
+
+  // Step 5: Stream the response
+  const stream = generateTextStream(agent.systemPrompt, userPrompt, preferredModel, input.signal);
 
   for await (const token of stream) {
     yield { token, type: agentType, source };

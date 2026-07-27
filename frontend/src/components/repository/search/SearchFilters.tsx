@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { Search, Filter, X } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import type { SearchFilters } from "@/services/semanticSearch";
 
 interface Props {

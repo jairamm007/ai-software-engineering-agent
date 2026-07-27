@@ -44,7 +44,7 @@ export async function getHealthStatus(): Promise<HealthStatus> {
 
 async function checkDatabase(): Promise<{ status: string; latencyMs: number }> {
   const start = Date.now();
-  await prisma.$queryRaw`SELECT 1`;
+  await prisma.$queryRawUnsafe("SELECT 1");
   return { status: "ok", latencyMs: Date.now() - start };
 }
 

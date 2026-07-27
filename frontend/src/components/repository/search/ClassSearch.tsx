@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { Box, Export, Lock } from "lucide-react";
+import { Box, Share, Lock } from "lucide-react";
 import type { ClassSearchResult } from "@/services/semanticSearch";
 
 interface Props {
@@ -65,7 +65,7 @@ export default function ClassSearch({ results }: Props) {
                 </td>
                 <td className="px-4 py-2.5 text-center">
                   {cls.exported ? (
-                    <Export size={14} className="mx-auto text-emerald-400" />
+                    <Share size={14} className="mx-auto text-emerald-400" />
                   ) : (
                     <Lock size={14} className={`mx-auto ${isDark ? "text-slate-600" : "text-slate-300"}`} />
                   )}

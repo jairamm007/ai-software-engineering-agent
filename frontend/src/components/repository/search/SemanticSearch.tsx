@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { Brain, ExternalLink } from "lucide-react";
+import { Brain } from "lucide-react";
 import type { SemanticChunk } from "@/services/semanticSearch";
 
 interface Props {

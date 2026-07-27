@@ -2,8 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Github,
-  Link2,
+  GitBranch,
   Unlink,
   Loader2,
   Search,
@@ -14,15 +13,12 @@ import {
   GitCommit,
   AlertCircle,
   CheckCircle,
-  Clock,
   Star,
   GitFork,
   Eye,
   Code2,
   FolderGit2,
   ChevronRight,
-  X,
-  Check,
   ArrowUpDown,
   Filter,
 } from "lucide-react";
@@ -57,7 +53,7 @@ import type {
 
 type Tab = "repos" | "pulls" | "issues" | "commits" | "analysis";
 
-const TABS: { key: Tab; label: string; icon: typeof Github }[] = [
+const TABS: { key: Tab; label: string; icon: typeof GitBranch }[] = [
   { key: "repos", label: "Repositories", icon: FolderGit2 },
   { key: "pulls", label: "Pull Requests", icon: GitPullRequest },
   { key: "issues", label: "Issues", icon: AlertCircle },
@@ -213,7 +209,7 @@ export default function GitHubIntegrationPage() {
           </h1>
           <div className={`rounded-2xl border p-12 text-center ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
             <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl ${isDark ? "bg-white/5" : "bg-slate-100"}`}>
-              <Github size={40} className={isDark ? "text-slate-400" : "text-slate-500"} />
+              <GitBranch size={40} className={isDark ? "text-slate-400" : "text-slate-500"} />
             </div>
             <h2 className={`mb-2 text-xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
               Connect your GitHub account
@@ -230,7 +226,7 @@ export default function GitHubIntegrationPage() {
               {connectMutation.isPending ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
-                <Github size={16} />
+                <GitBranch size={16} />
               )}
               {connectMutation.isPending ? "Connecting..." : "Connect with GitHub"}
             </button>
@@ -410,7 +406,6 @@ function ReposTab({
   isDark: boolean;
   timeAgo: (d: string | Date) => string;
 }) {
-  const queryClient = useQueryClient();
   const { data: localRepos } = useQuery({
     queryKey: ["repositories"],
     queryFn: () => import("@/services/repository").then((m) => m.getRepositories()),
@@ -465,7 +460,7 @@ function ReposTab({
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
                 >
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isDark ? "bg-white/5" : "bg-slate-100"}`}>
-                    <Github size={18} className={isDark ? "text-slate-400" : "text-slate-500"} />
+                    <GitBranch size={18} className={isDark ? "text-slate-400" : "text-slate-500"} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">

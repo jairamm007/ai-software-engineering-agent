@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Search, Play, RotateCcw, Network } from "lucide-react";
+import { Search, Play, Square, Network } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import BackButton from "@/components/common/BackButton";
 import RepositoryTabs from "@/components/repository/RepositoryTabs";
 import AIResult from "@/components/repository/AIResult";
 import { getRepository } from "@/services/repository";
-import { askRepository } from "@/services/chat";
+import { streamChat } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, getFileExtension, formatFileSize } from "@/utils/fileIcons";
 
@@ -22,6 +22,11 @@ export default function RepositoryArchitecturePage() {
   const [search, setSearch] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["repository", id],
@@ -38,18 +43,42 @@ export default function RepositoryArchitecturePage() {
     if (!selectedFile || !data) return;
     setLoading(true);
     setResult("");
+    const controller = new AbortController();
+    abortRef.current = controller;
+    let fullContent = "";
+
     try {
-      const response = await askRepository({
+      await streamChat({
         question: `Analyze the architecture of this file: purpose, components, data flow, dependencies, design patterns, and architectural recommendations: ${selectedFile}`,
         repositoryId: data.id,
         filePath: selectedFile,
+        signal: controller.signal,
+        onToken: (token) => {
+          fullContent += token;
+          setResult(fullContent);
+        },
+        onDone: () => {
+          setLoading(false);
+          abortRef.current = null;
+        },
+        onError: (message) => {
+          if (controller.signal.aborted) return;
+          setResult(message || "Failed to analyze architecture. Please try again.");
+          setLoading(false);
+          abortRef.current = null;
+        },
       });
-      setResult(response.answer ?? JSON.stringify(response));
     } catch {
+      if (controller.signal.aborted) return;
       setResult("Failed to analyze architecture. Please try again.");
-    } finally {
       setLoading(false);
+      abortRef.current = null;
     }
+  };
+
+  const handleStop = () => {
+    abortRef.current?.abort();
+    setLoading(false);
   };
 
   if (isLoading) {
@@ -171,24 +200,26 @@ export default function RepositoryArchitecturePage() {
 
           <div className={`border-t px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => void runArchitecture()}
-                disabled={!selectedFile || loading}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:shadow-none"
-              >
-                {loading ? (
-                  <>
-                    <RotateCcw size={14} className="animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Play size={14} />
-                    Analyze Architecture
-                  </>
-                )}
-              </button>
+              {loading ? (
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  className="flex items-center gap-2 rounded-xl bg-red-500/20 px-5 py-2.5 text-sm font-medium text-red-400 transition-all hover:bg-red-500/30"
+                >
+                  <Square size={14} />
+                  Stop Analysis
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void runArchitecture()}
+                  disabled={!selectedFile}
+                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:shadow-none"
+                >
+                  <Play size={14} />
+                  Analyze Architecture
+                </button>
+              )}
               {selectedFile && (
                 <span className={`min-w-0 truncate text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`} title={selectedFile}>
                   {selectedFile}

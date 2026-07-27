@@ -104,6 +104,11 @@ export default function DependencyGraph({ repositoryId }: Props) {
   const [flow, setFlow] = useState<ReactFlowInstance | null>(null);
   const [aiResult, setAiResult] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const graphQuery = useQuery({
     queryKey: ["dependency-graph", repositoryId],
@@ -206,12 +211,16 @@ export default function DependencyGraph({ repositoryId }: Props) {
   const summarizeGraph = async () => {
     setAiLoading(true);
     setAiResult(null);
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      const result = await summarizeDependencyGraph(repositoryId);
+      const result = await summarizeDependencyGraph(repositoryId, controller.signal);
       setAiResult(typeof result === "string" ? result : JSON.stringify(result, null, 2));
     } catch {
+      if (controller.signal.aborted) return;
       setAiResult("The dependency graph summary could not be completed. Please try again.");
     } finally {
+      abortRef.current = null;
       setAiLoading(false);
     }
   };
@@ -220,16 +229,21 @@ export default function DependencyGraph({ repositoryId }: Props) {
     const subject = node?.id ?? "the dependency graph";
     setAiLoading(true);
     setAiResult(null);
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       const response = await askRepository({
         repositoryId,
         filePath: repositoryQuery.data?.files.find((file) => file.path.replaceAll("\\", "/").endsWith(subject))?.path,
         question: `${action} ${subject} in this repository.`,
+        signal: controller.signal,
       });
       setAiResult(typeof response.answer === "string" ? response.answer : JSON.stringify(response.answer, null, 2));
     } catch {
+      if (controller.signal.aborted) return;
       setAiResult("The AI action could not be completed. Please try again.");
     } finally {
+      abortRef.current = null;
       setAiLoading(false);
     }
   };

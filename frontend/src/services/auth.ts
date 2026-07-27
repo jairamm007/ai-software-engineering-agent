@@ -63,10 +63,10 @@ export async function apiRegister(data: RegisterData): Promise<{ user: User; tok
   };
 }
 
-export async function apiLoginWithGoogle(): Promise<{ user: User; token: string }> {
+export async function apiLoginWithGoogle(callbackURL?: string): Promise<{ user: User; token: string }> {
   const { data, error } = await authClient.signIn.social({
     provider: "google",
-    callbackURL: `${FRONTEND_URL}/dashboard`,
+    callbackURL: callbackURL || `${FRONTEND_URL}/dashboard`,
   });
 
   if (error) {
@@ -81,10 +81,10 @@ export async function apiLoginWithGoogle(): Promise<{ user: User; token: string 
   throw new Error("Google sign-in failed: no redirect URL received");
 }
 
-export async function apiLoginWithGithub(): Promise<{ user: User; token: string }> {
+export async function apiLoginWithGithub(callbackURL?: string): Promise<{ user: User; token: string }> {
   const { data, error } = await authClient.signIn.social({
     provider: "github",
-    callbackURL: `${FRONTEND_URL}/dashboard`,
+    callbackURL: callbackURL || `${FRONTEND_URL}/dashboard`,
   });
 
   if (error) {

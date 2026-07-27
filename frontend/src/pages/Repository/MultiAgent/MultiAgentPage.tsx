@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
 import { useMutation } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import AgentCard from "@/components/repository/multi-agent/AgentCard";
 import AgentPipeline from "@/components/repository/multi-agent/AgentPipeline";
 import AgentExecutionTimeline from "@/components/repository/multi-agent/AgentExecutionTimeline";
 import { orchestrateMultiAgent } from "@/services/multiAgent";
-import type { MultiAgentResult, AgentExecutionStep } from "@/services/multiAgent";
+import type { MultiAgentResult } from "@/services/multiAgent";
 import {
   Play, Loader2, Sparkles, Zap, Clock, CheckCircle, RotateCcw,
 } from "lucide-react";
@@ -29,13 +29,24 @@ export default function MultiAgentPage() {
   const isDark = theme === "dark";
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState<MultiAgentResult | null>(null);
-  const [activeStepIndex, setActiveStepIndex] = useState<number | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const orchestrateMutation = useMutation({
-    mutationFn: (q: string) => orchestrateMultiAgent(q, id),
+    mutationFn: (q: string) => {
+      const controller = new AbortController();
+      abortRef.current = controller;
+      return orchestrateMultiAgent(q, id, undefined, undefined, controller.signal);
+    },
     onSuccess: (data) => {
       setResult(data);
-      setActiveStepIndex(null);
+      abortRef.current = null;
+    },
+    onError: () => {
+      abortRef.current = null;
     },
   });
 

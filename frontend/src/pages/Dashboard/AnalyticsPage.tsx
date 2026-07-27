@@ -61,7 +61,7 @@ export default function AnalyticsPage() {
 
   const { data: repos, isLoading } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const repoQueries = useQueries({

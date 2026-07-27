@@ -17,6 +17,7 @@ model user {
   bannerUrl     String?
   bio           String?
   role          String?
+  suspended     Boolean   @default(false)
   linkedinUrl   String?
   githubUrl     String?
   portfolioUrl  String?
@@ -33,6 +34,10 @@ model user {
   activities TeamActivity[]
   comments Comment[]
   githubIntegrations GitHubIntegration[]
+  auditLogs AuditLog[]
+  codeReviews CodeReview[]
+  testReports TestReport[]
+  supportMessages SupportMessage[]
 }
 
 model session {
@@ -90,6 +95,9 @@ model Repository {
   user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
   files  RepositoryFile[]
   teamShares TeamRepository[]
+  docs Documentation[]
+  codeReviews CodeReview[]
+  testReports TestReport[]
 
   @@unique([githubUrl, userId])
   @@index([userId])
@@ -333,4 +341,146 @@ model GitHubIntegrationRepository {
 
   @@unique([integrationId, owner, name])
   @@index([integrationId])
+}
+
+// ─── Admin Models ─────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // user_login | user_logout | user_created | user_deleted | user_updated | repo_deleted | admin_action | settings_changed | password_reset | role_changed | session_revoked
+  details   String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user user? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   @default("info") // info | warning | announcement
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([createdAt(sort: Desc)])
+}
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+
+  @@index([key])
+}
+
+// ─── Documentation Management ─────────────────────────────────────
+
+model Documentation {
+  id             String   @id @default(cuid())
+  repositoryId   String
+  title          String
+  content        String?
+  format         String   @default("markdown") // markdown | pdf
+  status         String   @default("completed") // generating | completed | failed
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@index([repositoryId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Code Review Management ───────────────────────────────────────
+
+model CodeReview {
+  id             String   @id @default(cuid())
+  repositoryId   String
+  userId         String?
+  status         String   @default("completed") // pending | running | completed | failed
+  summary        String?
+  issuesFound    Int      @default(0)
+  criticalCount  Int      @default(0)
+  warningCount   Int      @default(0)
+  infoCount      Int      @default(0)
+  reportData     String?  // JSON string of detailed findings
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  user       user?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([repositoryId])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Testing Management ───────────────────────────────────────────
+
+model TestReport {
+  id             String   @id @default(cuid())
+  repositoryId   String
+  userId         String?
+  status         String   @default("completed") // pending | running | completed | failed
+  totalTests     Int      @default(0)
+  passedTests    Int      @default(0)
+  failedTests    Int      @default(0)
+  skippedTests   Int      @default(0)
+  coverage       Float?
+  reportData     String?  // JSON string of test details
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  user       user?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([repositoryId])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Support Center ───────────────────────────────────────────────
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  userId    String?
+  subject   String
+  message   String
+  category  String   @default("feedback") // feedback | bug | feature | other
+  status    String   @default("open")     // open | in_progress | resolved | closed
+  priority  String   @default("normal")   // low | normal | high | urgent
+  reply     String?
+  repliedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user user? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Backup & Recovery ────────────────────────────────────────────
+
+model BackupRecord {
+  id        String   @id @default(cuid())
+  filename  String
+  size      BigInt   @default(0)
+  status    String   @default("completed") // creating | completed | failed
+  type      String   @default("full")     // full | incremental
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
 }

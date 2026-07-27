@@ -26,6 +26,7 @@ import teamRoutes from "./routes/team.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
 import activityRoutes from "./routes/activity.routes.js";
 import githubIntegrationRoutes from "./routes/github-integration.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 
@@ -70,6 +71,13 @@ app.use("/api", teamRoutes);
 app.use("/api", commentRoutes);
 app.use("/api", activityRoutes);
 app.use("/api", githubIntegrationRoutes);
+app.use("/api", adminRoutes);
+
+// Catch Better Auth /error requests and redirect to frontend login
+app.get("/error", (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  res.redirect(`${frontendUrl}/login`);
+});
 
 app.use(errorHandler);
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "@/context/ThemeContext";
@@ -10,6 +10,21 @@ interface Props {
   onSelectionChange?: (selection: string) => void;
 }
 
+const LANG_MAP: Record<string, string> = {
+  ts: "typescript",
+  tsx: "tsx",
+  js: "javascript",
+  jsx: "jsx",
+  json: "json",
+  css: "css",
+  html: "html",
+  md: "markdown",
+  c: "c",
+  cpp: "cpp",
+  java: "java",
+  py: "python",
+};
+
 export default function FileViewer({ filePath, content, onSelectionChange }: Props) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -19,24 +34,10 @@ export default function FileViewer({ filePath, content, onSelectionChange }: Pro
   const displayName = filePath?.replace(/\\/g, "/").split("/").pop();
   const code = content ?? "";
 
-  const language = (() => {
+  const language = useMemo(() => {
     const ext = filePath?.split(".").pop()?.toLowerCase();
-    switch (ext) {
-      case "ts": return "typescript";
-      case "tsx": return "tsx";
-      case "js": return "javascript";
-      case "jsx": return "jsx";
-      case "json": return "json";
-      case "css": return "css";
-      case "html": return "html";
-      case "md": return "markdown";
-      case "c": return "c";
-      case "cpp": return "cpp";
-      case "java": return "java";
-      case "py": return "python";
-      default: return "text";
-    }
-  })();
+    return (ext && LANG_MAP[ext]) || "text";
+  }, [filePath]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code);

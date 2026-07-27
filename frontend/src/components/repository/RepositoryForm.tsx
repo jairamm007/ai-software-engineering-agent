@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { useTheme } from "@/context/ThemeContext";
 
 interface Props {
   onSubmit: (url: string) => Promise<void>;
@@ -13,9 +12,6 @@ const GITHUB_URL_PATTERN = /^https?:\/\/(www\.)?github\.com\/[\w.-]+\/[\w.-]+\/?
 export default function RepositoryForm({
   onSubmit,
 }: Props) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

@@ -27,9 +27,8 @@ import {
   Brain,
   Search,
   Code2,
+  Bot,
 } from "lucide-react";
-import { jsPDF } from "jspdf";
-import { Document, Packer, Paragraph, TextRun } from "docx";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import {
@@ -41,6 +40,7 @@ import {
 } from "@/services/chat";
 import { getRepositories } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import MarkdownMessage from "@/components/chat/MarkdownMessage";
 import type { ChatMessage } from "@/types/chat";
 import type { RepositoryListItem } from "@/types/repository";
@@ -98,6 +98,7 @@ function formatRelativeTime(dateStr: string): string {
 export default function AIChatPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -120,7 +121,7 @@ export default function AIChatPage() {
   // ── Queries ──
   const { data: repositories = [], isLoading: reposLoading } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const { data: conversations = [], isLoading: convosLoading } = useQuery({
@@ -168,6 +169,23 @@ export default function AIChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingContent]);
+
+  // ── Abort streaming on unmount ──
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
+
+  // ── Warn before leaving while streaming ──
+  useEffect(() => {
+    if (!streaming) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [streaming]);
 
   // ── Thinking stages ──
   useEffect(() => {
@@ -337,6 +355,7 @@ export default function AIChatPage() {
       const ext = format === "md" ? "md" : "txt";
       downloadBlob(new Blob([content], { type: "text/plain" }), `response.${ext}`);
     } else if (format === "pdf") {
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
       doc.setFont("Courier", "normal");
       doc.setFontSize(9);
@@ -349,6 +368,7 @@ export default function AIChatPage() {
       }
       doc.save("response.pdf");
     } else {
+      const { Document, Packer, Paragraph, TextRun } = await import("docx");
       const paragraphs = content.split("\n").map(
         (line) => new Paragraph({ children: [new TextRun({ text: line, font: "Courier New", size: 20 })] })
       );
@@ -641,6 +661,7 @@ export default function AIChatPage() {
                     key={msg.id}
                     message={msg}
                     isDark={isDark}
+                    user={user}
                     onCopy={handleCopy}
                     onDownload={handleDownload}
                     onRegenerate={msg.role === "assistant" ? handleRegenerate : undefined}
@@ -656,15 +677,18 @@ export default function AIChatPage() {
                   <MessageBubble
                     message={{ id: "streaming", role: "assistant", content: streamingContent }}
                     isDark={isDark}
+                    user={user}
                     onCopy={handleCopy}
                     onDownload={handleDownload}
                     streaming
+                    isHovered={hoveredMsgId === "streaming"}
+                    onHover={setHoveredMsgId}
                   />
                 )}
                 {streaming && !streamingContent && (
                   <div className="mb-6 flex gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full accent-gradient text-xs font-bold text-white font-[Inter]">
-                      AI
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full accent-gradient text-white font-[Inter]">
+                      <Bot size={16} />
                     </div>
                     <div className={`rounded-2xl border px-5 py-4 ${
                       isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
@@ -761,16 +785,18 @@ export default function AIChatPage() {
 function MessageBubble({
   message,
   isDark,
+  user,
   onCopy,
   onDownload,
   onRegenerate,
   streaming = false,
   isLastAssistant = false,
-  isHovered,
+  isHovered: _isHovered,
   onHover,
 }: {
   message: ChatMessage;
   isDark: boolean;
+  user?: { name?: string; image?: string } | null;
   onCopy: (content: string) => void;
   onDownload: (content: string, format: "txt" | "pdf" | "docx" | "md") => void;
   onRegenerate?: () => void;
@@ -796,11 +822,19 @@ function MessageBubble({
       onMouseLeave={() => onHover(null)}
     >
       <div className={`flex max-w-full gap-3 ${isUser ? "flex-row-reverse" : ""} w-full`}>
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white font-[Inter] ${
-          isUser ? "bg-blue-600" : "accent-gradient"
-        }`}>
-          {isUser ? "U" : "AI"}
-        </div>
+        {isUser ? (
+          user?.image ? (
+            <img src={user.image} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
+          ) : (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white font-[Inter]">
+              {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            </div>
+          )
+        ) : (
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full accent-gradient text-white font-[Inter]">
+            <Bot size={16} />
+          </div>
+        )}
 
         <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} min-w-0 flex-1`}>
           <div className={`w-full rounded-2xl px-5 py-3 ${

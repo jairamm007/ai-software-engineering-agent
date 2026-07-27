@@ -40,8 +40,8 @@ export interface AuthContextValue extends AuthState {
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, newPassword: string) => Promise<void>;
   verifyEmail: (token: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  loginWithGithub: () => Promise<void>;
+  loginWithGoogle: (callbackURL?: string) => Promise<void>;
+  loginWithGithub: (callbackURL?: string) => Promise<void>;
   updateProfile: (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "bannerUrl" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>) => Promise<void>;
   uploadBanner: (bannerDataUrl: string) => Promise<void>;
   removeBanner: () => Promise<void>;

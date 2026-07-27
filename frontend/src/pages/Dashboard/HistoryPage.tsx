@@ -90,7 +90,7 @@ export default function HistoryPage() {
 
   const { data: repos = [] } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const repoNames = useMemo(() => new Set(repos.map((r) => r.name)), [repos]);

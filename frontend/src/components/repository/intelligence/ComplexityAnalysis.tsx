@@ -118,7 +118,7 @@ function ComplexityTable({ data }: { data: ComplexityResult[] }) {
           </thead>
           <tbody>
             {sorted.slice(0, 100).map((row, i) => {
-              const { label, icon } = getComplexityLabel(row.complexity);
+              const { icon } = getComplexityLabel(row.complexity);
               return (
                 <tr key={i} className={`border-t ${isDark ? "border-white/5 hover:bg-white/5" : "border-slate-100 hover:bg-slate-50"}`}>
                   <td className={`px-3 py-2 font-mono text-xs truncate max-w-[300px] ${isDark ? "text-slate-200" : "text-slate-700"}`}>{row.file}</td>

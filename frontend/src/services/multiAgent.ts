@@ -95,11 +95,13 @@ export const orchestrateMultiAgent = async (
   question: string,
   repositoryId?: string,
   filePath?: string,
-  useLLMPlanning?: boolean
+  useLLMPlanning?: boolean,
+  signal?: AbortSignal
 ): Promise<MultiAgentResult> => {
   const response = await api.post<ApiResponse<MultiAgentResult>>(
     "/multi-agent/orchestrate",
-    { question, repositoryId, filePath, useLLMPlanning }
+    { question, repositoryId, filePath, useLLMPlanning },
+    { signal }
   );
   return response.data.data;
 };

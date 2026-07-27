@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute, { GuestRoute } from "@/components/auth/ProtectedRoute";
+import AdminRoute from "@/components/auth/AdminRoute";
+import AdminLayout from "@/layouts/AdminLayout";
 import PublicLayout from "@/layouts/PublicLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -38,6 +40,27 @@ const RepositorySemanticSearchPage = lazy(() => import("@/pages/Repository/Seman
 const MultiAgentPage = lazy(() => import("@/pages/Repository/MultiAgent/MultiAgentPage"));
 const RepositorySettingsPage = lazy(() => import("@/pages/Repository/RepositorySettingsPage"));
 const GitHubIntegrationPage = lazy(() => import("@/pages/GitHub/GitHubIntegrationPage"));
+
+const AdminLoginPage = lazy(() => import("@/pages/Admin/AdminLoginPage"));
+const AdminDashboardPage = lazy(() => import("@/pages/Admin/AdminDashboardPage"));
+const AdminUsersPage = lazy(() => import("@/pages/Admin/AdminUsersPage"));
+const AdminRepositoriesPage = lazy(() => import("@/pages/Admin/AdminRepositoriesPage"));
+const AdminAIServicesPage = lazy(() => import("@/pages/Admin/AdminAIServicesPage"));
+const AdminAnalyticsPage = lazy(() => import("@/pages/Admin/AdminAnalyticsPage"));
+const AdminSecurityPage = lazy(() => import("@/pages/Admin/AdminSecurityPage"));
+const AdminNotificationsPage = lazy(() => import("@/pages/Admin/AdminNotificationsPage"));
+const AdminReportsPage = lazy(() => import("@/pages/Admin/AdminReportsPage"));
+const AdminSettingsPage = lazy(() => import("@/pages/Admin/AdminSettingsPage"));
+const AdminAccessDeniedPage = lazy(() => import("@/pages/Admin/AdminAccessDeniedPage"));
+const AdminManagementPage = lazy(() => import("@/pages/Admin/AdminManagementPage"));
+const AdminDocumentationPage = lazy(() => import("@/pages/Admin/AdminDocumentationPage"));
+const AdminCodeReviewPage = lazy(() => import("@/pages/Admin/AdminCodeReviewPage"));
+const AdminTestingPage = lazy(() => import("@/pages/Admin/AdminTestingPage"));
+const AdminSearchPage = lazy(() => import("@/pages/Admin/AdminSearchPage"));
+const AdminActivityLogsPage = lazy(() => import("@/pages/Admin/AdminActivityLogsPage"));
+const AdminBackupPage = lazy(() => import("@/pages/Admin/AdminBackupPage"));
+const AdminSupportPage = lazy(() => import("@/pages/Admin/AdminSupportPage"));
+const AdminProfilePage = lazy(() => import("@/pages/Admin/AdminProfilePage"));
 
 const DocsPage = lazy(() => import("@/pages/Info/DocsPage"));
 const BlogPage = lazy(() => import("@/pages/Info/BlogPage"));
@@ -132,6 +155,27 @@ export const router = createBrowserRouter([
   { path: "/repositories/:id/semantic-search", element: <LazyPage><ProtectedRoute><RepositorySemanticSearchPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/multi-agent", element: <LazyPage><ProtectedRoute><MultiAgentPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/settings", element: <LazyPage><ProtectedRoute><RepositorySettingsPage /></ProtectedRoute></LazyPage> },
+
+  { path: "/admin/login", element: <LazyPage><AdminLoginPage /></LazyPage> },
+  { path: "/admin/access-denied", element: <LazyPage><AdminAccessDeniedPage /></LazyPage> },
+  { path: "/admin", element: <LazyPage><AdminRoute><AdminLayout><AdminDashboardPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/users", element: <LazyPage><AdminRoute><AdminLayout><AdminUsersPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/repositories", element: <LazyPage><AdminRoute><AdminLayout><AdminRepositoriesPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/ai", element: <LazyPage><AdminRoute><AdminLayout><AdminAIServicesPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/analytics", element: <LazyPage><AdminRoute><AdminLayout><AdminAnalyticsPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/security", element: <LazyPage><AdminRoute><AdminLayout><AdminSecurityPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/notifications", element: <LazyPage><AdminRoute><AdminLayout><AdminNotificationsPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/reports", element: <LazyPage><AdminRoute><AdminLayout><AdminReportsPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/settings", element: <LazyPage><AdminRoute><AdminLayout><AdminSettingsPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/admins", element: <LazyPage><AdminRoute><AdminLayout><AdminManagementPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/documentation", element: <LazyPage><AdminRoute><AdminLayout><AdminDocumentationPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/code-reviews", element: <LazyPage><AdminRoute><AdminLayout><AdminCodeReviewPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/testing", element: <LazyPage><AdminRoute><AdminLayout><AdminTestingPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/search", element: <LazyPage><AdminRoute><AdminLayout><AdminSearchPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/activity-logs", element: <LazyPage><AdminRoute><AdminLayout><AdminActivityLogsPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/backup", element: <LazyPage><AdminRoute><AdminLayout><AdminBackupPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/support", element: <LazyPage><AdminRoute><AdminLayout><AdminSupportPage /></AdminLayout></AdminRoute></LazyPage> },
+  { path: "/admin/profile", element: <LazyPage><AdminRoute><AdminLayout><AdminProfilePage /></AdminLayout></AdminRoute></LazyPage> },
 
   { path: "*", element: <NotFoundPage /> },
 ]);

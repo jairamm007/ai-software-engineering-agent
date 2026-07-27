@@ -11,6 +11,42 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "user",
+        input: false,
+      },
+      suspended: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+      bio: {
+        type: "string",
+        required: false,
+      },
+      bannerUrl: {
+        type: "string",
+        required: false,
+      },
+      linkedinUrl: {
+        type: "string",
+        required: false,
+      },
+      githubUrl: {
+        type: "string",
+        required: false,
+      },
+      portfolioUrl: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24,      // refresh every 24h
@@ -44,11 +80,21 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       redirectURI: `${process.env.BETTER_AUTH_URL || "http://localhost:3000"}/api/auth/callback/google`,
+      mapProfileToUser: (profile) => ({
+        name: profile.name,
+        email: profile.email,
+        image: profile.picture,
+      }),
     },
     github: {
       clientId: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
       redirectURI: `${process.env.BETTER_AUTH_URL || "http://localhost:3000"}/api/auth/callback/github`,
+      mapProfileToUser: (profile) => ({
+        name: profile.name || profile.login,
+        email: profile.email,
+        image: profile.avatar_url,
+      }),
     },
   },
   advanced: {

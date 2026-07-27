@@ -97,7 +97,7 @@ export default function ProfilePage() {
 
   const { data: repos } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const { data: integrations, isLoading: integrationsLoading } = useQuery({

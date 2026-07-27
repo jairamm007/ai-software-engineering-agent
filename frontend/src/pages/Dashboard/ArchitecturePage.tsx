@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -173,10 +173,15 @@ export default function ArchitecturePage() {
   const [treeFilter, setTreeFilter] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const { data: repos, isLoading: reposLoading } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const { data: repoData, isLoading: repoLoading } = useQuery({
@@ -215,15 +220,20 @@ export default function ArchitecturePage() {
     if (!repoData) return;
     setLoading(true);
     setResult("");
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       const res = await askRepository({
         question: "Provide a detailed architecture analysis of this repository including: 1) Overall structure and design patterns 2) Key modules and their responsibilities 3) Data flow between components 4) Strengths and potential improvements 5) Technology stack assessment",
         repositoryId: repoData.id,
+        signal: controller.signal,
       });
       setResult(res.answer ?? JSON.stringify(res));
     } catch {
+      if (controller.signal.aborted) return;
       setResult("Failed to generate architecture analysis. Please try again.");
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };

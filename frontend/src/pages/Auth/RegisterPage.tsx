@@ -7,7 +7,6 @@ import {
   Mail,
   Lock,
   User,
-  Sparkles,
   ArrowRight,
   ArrowLeft,
   Bot,
@@ -129,7 +128,7 @@ export default function RegisterPage() {
     setError("");
     setOauthLoading("google");
     try {
-      await loginWithGoogle();
+      await loginWithGoogle(`${window.location.origin}/dashboard`);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-up failed");
@@ -142,7 +141,7 @@ export default function RegisterPage() {
     setError("");
     setOauthLoading("github");
     try {
-      await loginWithGithub();
+      await loginWithGithub(`${window.location.origin}/dashboard`);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "GitHub sign-up failed");
@@ -156,7 +155,7 @@ export default function RegisterPage() {
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: 0.1 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+      transition: { delay: 0.1 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
     }),
   };
 
@@ -280,7 +279,7 @@ export default function RegisterPage() {
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as const }}
             style={{
               perspective: "1000px",
               transform: `rotateX(${-mousePos.y * 0.15}deg) rotateY(${mousePos.x * 0.15}deg)`,

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import type { User, AuthContextValue, LoginCredentials, RegisterData } from "@/types/auth";
 import {
@@ -71,14 +71,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await apiVerifyEmail(verifyToken);
   }, []);
 
-  const loginWithGoogle = useCallback(async () => {
-    const result = await apiLoginWithGoogle();
+  const loginWithGoogle = useCallback(async (callbackURL?: string) => {
+    const result = await apiLoginWithGoogle(callbackURL);
     setUser(result.user);
     setToken(result.token);
   }, []);
 
-  const loginWithGithub = useCallback(async () => {
-    const result = await apiLoginWithGithub();
+  const loginWithGithub = useCallback(async (callbackURL?: string) => {
+    const result = await apiLoginWithGithub(callbackURL);
     setUser(result.user);
     setToken(result.token);
   }, []);
@@ -118,28 +118,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await apiChangePassword(currentPassword, newPassword);
   }, []);
 
+  const value = useMemo(() => ({
+    user,
+    token,
+    isLoading,
+    isAuthenticated: !!user,
+    login,
+    register,
+    logout,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+    loginWithGoogle,
+    loginWithGithub,
+    updateProfile,
+    uploadBanner,
+    removeBanner,
+    deleteAccount,
+    changePassword,
+  }), [user, token, isLoading, login, register, logout, forgotPassword, resetPassword, verifyEmail, loginWithGoogle, loginWithGithub, updateProfile, uploadBanner, removeBanner, deleteAccount, changePassword]);
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isLoading,
-        isAuthenticated: !!user,
-        login,
-        register,
-        logout,
-        forgotPassword,
-        resetPassword,
-        verifyEmail,
-        loginWithGoogle,
-        loginWithGithub,
-        updateProfile,
-        uploadBanner,
-        removeBanner,
-        deleteAccount,
-        changePassword,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -37,6 +37,11 @@ export default function RepositoryDocumentationPage() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["repository", id],
@@ -76,6 +81,8 @@ export default function RepositoryDocumentationPage() {
     if (!data || !canGenerate) return;
     setLoading(true);
     setResult("");
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       let question = "";
       let filePath: string | undefined;
@@ -92,11 +99,13 @@ export default function RepositoryDocumentationPage() {
         filePath = undefined;
       }
 
-      const response = await askRepository({ question, repositoryId: data.id, filePath });
+      const response = await askRepository({ question, repositoryId: data.id, filePath, signal: controller.signal });
       setResult(response.answer ?? JSON.stringify(response));
     } catch {
+      if (controller.signal.aborted) return;
       setResult("Failed to generate documentation. Please try again.");
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };

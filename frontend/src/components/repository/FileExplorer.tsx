@@ -22,7 +22,7 @@ export default function FileExplorer({ files, selectedFileId, onSelect }: Props)
     return files.filter((file) => file.path.toLowerCase().includes(search.toLowerCase()));
   }, [files, search]);
 
-  const tree = buildFileTree(filteredFiles);
+  const tree = useMemo(() => buildFileTree(filteredFiles), [filteredFiles]);
 
   const totalChunks = files.reduce((sum, f) => sum + f.chunks.length, 0);
 

@@ -89,9 +89,11 @@ export const invalidateGraphCache = async (id: string): Promise<void> => {
   await api.post(`/repository/${id}/dependency-graph/invalidate`);
 };
 
-export const summarizeDependencyGraph = async (id: string) => {
+export const summarizeDependencyGraph = async (id: string, signal?: AbortSignal) => {
   const response = await api.post<ApiResponse<unknown>>(
-    `/repository/${id}/dependency-graph/summary`
+    `/repository/${id}/dependency-graph/summary`,
+    undefined,
+    { signal }
   );
 
   return response.data.data;

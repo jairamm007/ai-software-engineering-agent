@@ -13,8 +13,6 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
-  Eye,
-  EyeOff,
   Shield,
   Database,
   Zap,

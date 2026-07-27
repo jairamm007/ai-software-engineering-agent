@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
+import { motion, AnimatePresence } from "framer-motion";
 import BackButton from "@/components/common/BackButton";
 import RepositoryTabs from "@/components/repository/RepositoryTabs";
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -10,12 +11,12 @@ import ComplexityAnalysis from "@/components/repository/intelligence/ComplexityA
 import ImportGraph from "@/components/repository/intelligence/ImportGraph";
 import CallGraph from "@/components/repository/intelligence/CallGraph";
 import ArchitectureDiagram from "@/components/repository/intelligence/ArchitectureDiagram";
-import { FolderTree, BarChart3, Activity, GitBranch, Phone, LayoutGrid } from "lucide-react";
+import { FolderTree, BarChart3, Activity, GitBranch, Phone, LayoutGrid, Brain } from "lucide-react";
 
 type Tab = "overview" | "folders" | "languages" | "complexity" | "imports" | "calls" | "architecture";
 
 const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
-  { key: "overview", label: "Overview", icon: <LayoutGrid size={14} /> },
+  { key: "overview", label: "Overview", icon: <Brain size={14} /> },
   { key: "folders", label: "Folders", icon: <FolderTree size={14} /> },
   { key: "languages", label: "Languages", icon: <BarChart3 size={14} /> },
   { key: "complexity", label: "Complexity", icon: <Activity size={14} /> },
@@ -28,9 +29,115 @@ export default function RepositoryIntelligencePage() {
   const { id } = useParams();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const tab = searchParams.get("tab");
+    return (tab && TABS.some((t) => t.key === tab)) ? tab as Tab : "overview";
+  });
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   if (!id) return null;
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return (
+          <motion.div
+            key="overview"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-8"
+          >
+            <div>
+              <h2 className={`text-xl font-semibold mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>Language Distribution</h2>
+              <LanguageStatistics repositoryId={id} />
+            </div>
+            <div>
+              <h2 className={`text-xl font-semibold mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>Code Complexity</h2>
+              <ComplexityAnalysis repositoryId={id} />
+            </div>
+          </motion.div>
+        );
+      case "folders":
+        return (
+          <motion.div
+            key="folders"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <FolderVisualization repositoryId={id} />
+          </motion.div>
+        );
+      case "languages":
+        return (
+          <motion.div
+            key="languages"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <LanguageStatistics repositoryId={id} />
+          </motion.div>
+        );
+      case "complexity":
+        return (
+          <motion.div
+            key="complexity"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ComplexityAnalysis repositoryId={id} />
+          </motion.div>
+        );
+      case "imports":
+        return (
+          <motion.div
+            key="imports"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ImportGraph repositoryId={id} />
+          </motion.div>
+        );
+      case "calls":
+        return (
+          <motion.div
+            key="calls"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <CallGraph repositoryId={id} />
+          </motion.div>
+        );
+      case "architecture":
+        return (
+          <motion.div
+            key="architecture"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ArchitectureDiagram repositoryId={id} />
+          </motion.div>
+        );
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -50,10 +157,10 @@ export default function RepositoryIntelligencePage() {
           {TABS.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              onClick={() => handleTabChange(tab.key)}
+              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                 activeTab === tab.key
-                  ? "bg-[var(--accent)] text-white"
+                  ? "bg-[var(--accent)] text-white shadow-sm"
                   : isDark ? "text-slate-300 hover:bg-white/10" : "text-slate-600 hover:bg-slate-100"
               }`}
             >
@@ -63,24 +170,9 @@ export default function RepositoryIntelligencePage() {
           ))}
         </div>
 
-        {activeTab === "overview" && (
-          <div className="space-y-8">
-            <div>
-              <h2 className={`text-xl font-semibold mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>Language Distribution</h2>
-              <LanguageStatistics repositoryId={id} />
-            </div>
-            <div>
-              <h2 className={`text-xl font-semibold mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>Code Complexity</h2>
-              <ComplexityAnalysis repositoryId={id} />
-            </div>
-          </div>
-        )}
-        {activeTab === "folders" && <FolderVisualization repositoryId={id} />}
-        {activeTab === "languages" && <LanguageStatistics repositoryId={id} />}
-        {activeTab === "complexity" && <ComplexityAnalysis repositoryId={id} />}
-        {activeTab === "imports" && <ImportGraph repositoryId={id} />}
-        {activeTab === "calls" && <CallGraph repositoryId={id} />}
-        {activeTab === "architecture" && <ArchitectureDiagram repositoryId={id} />}
+        <AnimatePresence mode="wait">
+          {renderContent()}
+        </AnimatePresence>
       </div>
     </DashboardLayout>
   );

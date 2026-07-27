@@ -10,12 +10,12 @@ const pageVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const badgeVariants = {
   hidden: { opacity: 0, scale: 0.7 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
 };
 
 const posts = [
@@ -122,7 +122,7 @@ export default function BlogPage() {
               key={post.title}
               variants={itemVariants}
               whileHover={{ y: -4, scale: 1.005 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
               className={`group rounded-2xl border p-6 sm:p-8 transition-shadow duration-300 ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:shadow-xl hover:shadow-fuchsia-500/5" : "border-slate-200 bg-white hover:shadow-xl hover:shadow-slate-200/60"}`}
             >
               <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -151,7 +151,7 @@ export default function BlogPage() {
               </motion.div>
               <motion.div
                 whileHover={{ x: 6 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                transition={{ type: "spring" as const, stiffness: 400, damping: 20 }}
                 className="mt-4 flex items-center gap-1 text-sm font-medium text-violet-500 hover:text-violet-400 transition-colors cursor-pointer"
               >
                 Read full post <ArrowRight size={14} />

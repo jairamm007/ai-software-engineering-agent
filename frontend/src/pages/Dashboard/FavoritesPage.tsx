@@ -37,7 +37,7 @@ export default function FavoritesPage() {
 
   const { data: repos = [] } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   useEffect(() => {

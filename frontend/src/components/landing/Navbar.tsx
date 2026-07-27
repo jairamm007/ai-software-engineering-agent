@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X, Shield } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
@@ -11,6 +11,8 @@ const navigationLinks = [
   { href: "#how-it-works", label: "How It Works" },
   { href: "#use-cases", label: "Who It's For" },
 ];
+
+const adminLink = { to: "/admin/login", label: "Admin" };
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -56,6 +58,15 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
+          <Link
+            to={adminLink.to}
+            className={`flex items-center gap-1.5 text-sm font-medium transition-colors font-[Inter] ${
+              isDark ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-700"
+            }`}
+          >
+            <Shield size={13} />
+            {adminLink.label}
+          </Link>
         </nav>
 
         {/* Right side */}
@@ -131,6 +142,16 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <Link
+                to={adminLink.to}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] ${
+                  isDark ? "text-red-400 hover:bg-red-500/10" : "text-red-600 hover:bg-red-50"
+                }`}
+              >
+                <Shield size={13} />
+                {adminLink.label}
+              </Link>
               <div className={`my-2 border-t ${isDark ? "border-white/5" : "border-slate-200"}`} />
               <Link
                 to={isAuthenticated ? "/dashboard" : "/login"}

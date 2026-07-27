@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
-import { ArrowLeft, History, Tag, Plus, Bug, Sparkles, Wrench, Shield } from "lucide-react";
+import { ArrowLeft, History, Tag, Plus, Sparkles, Wrench, Shield } from "lucide-react";
 
 const pageVariants = {
   hidden: { opacity: 0 },
@@ -10,17 +10,17 @@ const pageVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, x: -20, y: 20 },
-  visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const badgeVariants = {
   hidden: { opacity: 0, scale: 0.7 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
 };
 
 const dotVariants = {
   hidden: { scale: 0 },
-  visible: { scale: 1, transition: { type: "spring", stiffness: 400, damping: 15 } },
+  visible: { scale: 1, transition: { type: "spring" as const, stiffness: 400, damping: 15 } },
 };
 
 const releases = [
@@ -123,7 +123,7 @@ export default function ChangelogPage() {
           <motion.div
             initial={{ scaleY: 0 }}
             animate={{ scaleY: 1 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] as const }}
             className={`absolute left-5 top-0 bottom-0 w-px origin-top ${isDark ? "bg-white/[0.06]" : "bg-slate-200"}`}
           />
 
@@ -159,7 +159,7 @@ export default function ChangelogPage() {
                       <motion.li
                         key={change}
                         whileHover={{ x: 4 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
                         className={`flex items-start gap-2.5 text-sm ${isDark ? "text-slate-300" : "text-slate-600"}`}
                       >
                         <Tag size={12} className="mt-1 shrink-0 text-violet-400" />

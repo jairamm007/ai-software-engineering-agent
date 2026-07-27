@@ -9,6 +9,8 @@ import {
   Clock,
   ArrowUpRight,
   Search,
+  RefreshCw,
+  Filter,
 } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -34,6 +36,8 @@ export default function RepositoryOverviewPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [fileSearch, setFileSearch] = useState("");
+  const [extFilter, setExtFilter] = useState<string>("all");
+  const [reindexing, setReindexing] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["repository", id],
@@ -49,7 +53,9 @@ export default function RepositoryOverviewPage() {
 
   const filteredFiles =
     data?.files.filter(
-      (f) => !fileSearch || f.path.toLowerCase().includes(fileSearch.toLowerCase())
+      (f) =>
+        (!fileSearch || f.path.toLowerCase().includes(fileSearch.toLowerCase())) &&
+        (extFilter === "all" || f.extension === extFilter)
     ) ?? [];
 
   if (isLoading) {
@@ -143,22 +149,57 @@ export default function RepositoryOverviewPage() {
                     Repository Files
                   </h2>
                   <p className={`mt-0.5 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                    {data.files.length} indexed files · Click to open in workspace
+                    {filteredFiles.length} of {data.files.length} files · Click to open in workspace
                   </p>
                 </div>
-                <div className="relative">
-                  <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
-                  <input
-                    type="text"
-                    placeholder="Filter..."
-                    value={fileSearch}
-                    onChange={(e) => setFileSearch(e.target.value)}
-                    className={`w-44 rounded-lg border py-1.5 pl-8 pr-3 text-xs outline-none transition-colors ${
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Filter size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+                    <select
+                      value={extFilter}
+                      onChange={(e) => setExtFilter(e.target.value)}
+                      className={`appearance-none rounded-lg border py-1.5 pl-8 pr-6 text-xs outline-none transition-colors ${
+                        isDark
+                          ? "border-white/10 bg-white/5 text-white focus:border-[var(--accent)]"
+                          : "border-slate-200 bg-slate-50 text-slate-900 focus:border-[var(--accent)]"
+                      }`}
+                    >
+                      <option value="all">All Types</option>
+                      {extensions.sort().map((ext) => (
+                        <option key={ext} value={ext}>.{ext}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="relative">
+                    <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      value={fileSearch}
+                      onChange={(e) => setFileSearch(e.target.value)}
+                      className={`w-40 rounded-lg border py-1.5 pl-8 pr-3 text-xs outline-none transition-colors ${
+                        isDark
+                          ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-[var(--accent)]"
+                          : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)]"
+                      }`}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    disabled={reindexing}
+                    onClick={() => {
+                      setReindexing(true);
+                      window.location.reload();
+                    }}
+                    className={`flex h-7 w-7 items-center justify-center rounded-lg border transition-colors ${
                       isDark
-                        ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-[var(--accent)]"
-                        : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)]"
-                    }`}
-                  />
+                        ? "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
+                        : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                    } ${reindexing ? "animate-spin" : ""}`}
+                    title="Refresh repository"
+                  >
+                    <RefreshCw size={13} />
+                  </button>
                 </div>
               </div>
             </div>

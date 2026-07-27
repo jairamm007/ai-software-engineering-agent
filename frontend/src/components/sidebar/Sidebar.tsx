@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -99,9 +98,8 @@ export default function Sidebar() {
   };
 
   return (
-    <motion.aside
-      animate={{ width: collapsed ? 72 : 260 }}
-      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+    <aside
+      style={{ width: collapsed ? 72 : 260, transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)" }}
       className={`relative flex h-screen shrink-0 flex-col border-r ${
         isDark
           ? "border-white/[0.06] bg-[#0B0614]"
@@ -116,22 +114,19 @@ export default function Sidebar() {
         isDark ? "border-white/[0.06]" : "border-slate-100"
       }`}>
         <Logo size="md" />
-        <AnimatePresence mode="wait">
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden whitespace-nowrap"
-            >
-              <h2 className="font-[Outfit] text-sm font-bold leading-tight">Repo Verify</h2>
-              <p className={`text-[10px] font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                AI Software Agent
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div
+          className="overflow-hidden whitespace-nowrap"
+          style={{
+            opacity: collapsed ? 0 : 1,
+            width: collapsed ? 0 : "auto",
+            transition: "opacity 0.2s, width 0.2s",
+          }}
+        >
+          <h2 className="font-[Outfit] text-sm font-bold leading-tight">Repo Verify</h2>
+          <p className={`text-[10px] font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+            AI Software Agent
+          </p>
+        </div>
         <div className="ml-auto flex items-center gap-1">
           <button
             type="button"
@@ -150,31 +145,19 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
         {sections.map((section) => (
           <div key={section.label}>
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest font-[Inter] ${
-                    isDark ? "text-slate-600" : "text-slate-400"
-                  }`}
-                >
-                  {section.label}
-                </motion.p>
-              )}
-            </AnimatePresence>
+            {!collapsed && (
+              <p className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest font-[Inter] transition-opacity duration-200 ${
+                isDark ? "text-slate-600" : "text-slate-400"
+              }`}>
+                {section.label}
+              </p>
+            )}
             <ul className="space-y-0.5">
               {section.items.map((item) => {
                 const active = isActive(item.path);
                 const Icon = item.icon;
                 return (
-                  <motion.li
-                    key={item.path}
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
+                  <li key={item.path}>
                     <Link
                       to={item.path}
                       title={collapsed ? item.label : undefined}
@@ -189,11 +172,7 @@ export default function Sidebar() {
                       }`}
                     >
                       {active && (
-                        <motion.div
-                          layoutId="sidebar-active-glow"
-                          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full accent-gradient"
-                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                        />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full accent-gradient" />
                       )}
                       <Icon
                         size={17}
@@ -205,28 +184,17 @@ export default function Sidebar() {
                               : "text-slate-400 group-hover:text-slate-600"
                         }`}
                       />
-                      <AnimatePresence mode="wait">
-                        {!collapsed && (
-                          <motion.span
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -8 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden whitespace-nowrap"
-                          >
-                            {item.label}
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
+                      <span
+                        className="overflow-hidden whitespace-nowrap transition-opacity duration-200"
+                        style={{ opacity: collapsed ? 0 : 1, width: collapsed ? 0 : "auto" }}
+                      >
+                        {item.label}
+                      </span>
                       {active && !collapsed && (
-                        <motion.div
-                          layoutId="sidebar-active-dot"
-                          className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full accent-bg"
-                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                        />
+                        <div className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full accent-bg" />
                       )}
                     </Link>
-                  </motion.li>
+                  </li>
                 );
               })}
             </ul>
@@ -239,45 +207,32 @@ export default function Sidebar() {
         isDark ? "border-white/[0.06]" : "border-slate-100"
       }`}>
         {/* AI Status */}
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className={`overflow-hidden rounded-xl px-3 py-2.5 ${
-                isDark ? "bg-white/[0.02]" : "bg-slate-50"
-              }`}
-            >
-              <p className={`text-[11px] font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                AI Status
-              </p>
-              <div className="mt-1 flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                </span>
-                <span className={`text-[11px] font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  All systems operational
-                </span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {!collapsed && (
+          <div className={`rounded-xl px-3 py-2.5 transition-opacity duration-200 ${
+            isDark ? "bg-white/[0.02]" : "bg-slate-50"
+          }`}>
+            <p className={`text-[11px] font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              AI Status
+            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <span className={`text-[11px] font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                All systems operational
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* User card — clickable to profile */}
         {isAuthenticated && user && (
-          <AnimatePresence mode="wait">
+          <>
             {!collapsed ? (
-              <motion.button
-                key="user-expanded"
+              <button
                 type="button"
                 onClick={() => navigate("/profile")}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
                 className={`w-full overflow-hidden rounded-xl p-3 text-left transition-colors ${
                   isDark
                     ? "bg-[var(--accent)]/[0.06] hover:bg-[var(--accent)]/[0.10]"
@@ -297,24 +252,20 @@ export default function Sidebar() {
                     </p>
                   </div>
                 </div>
-              </motion.button>
+              </button>
             ) : (
-              <motion.button
-                key="user-collapsed"
+              <button
                 type="button"
                 onClick={() => navigate("/profile")}
                 title={user.name || "Profile"}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
                 className="flex w-full justify-center"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full accent-gradient text-xs font-bold text-white font-[Inter]">
                   {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
                 </div>
-              </motion.button>
+              </button>
             )}
-          </AnimatePresence>
+          </>
         )}
 
         {/* Sign out */}
@@ -330,22 +281,15 @@ export default function Sidebar() {
             }`}
           >
             <LogOut size={17} className="shrink-0" />
-            <AnimatePresence mode="wait">
-              {!collapsed && (
-                <motion.span
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden whitespace-nowrap"
-                >
-                  Sign Out
-                </motion.span>
-              )}
-            </AnimatePresence>
+            <span
+              className="overflow-hidden whitespace-nowrap transition-opacity duration-200"
+              style={{ opacity: collapsed ? 0 : 1, width: collapsed ? 0 : "auto" }}
+            >
+              Sign Out
+            </span>
           </button>
         )}
       </div>
-    </motion.aside>
+    </aside>
   );
 }

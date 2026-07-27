@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { FileText, Folder } from "lucide-react";
+import { FileText } from "lucide-react";
 import type { FileSearchResult } from "@/services/semanticSearch";
 
 interface Props {

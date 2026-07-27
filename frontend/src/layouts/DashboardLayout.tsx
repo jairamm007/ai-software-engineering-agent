@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { motion } from "framer-motion";
 
 import Sidebar from "@/components/sidebar/Sidebar";
 import TopBar from "@/components/layout/TopBar";
@@ -23,15 +22,8 @@ export default function DashboardLayout({ children }: Props) {
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="p-4 sm:p-6 md:p-8"
-          >
-            {children}
-          </motion.div>
+        <main className="flex-1 overflow-y-auto animate-fadeIn p-4 sm:p-6 md:p-8">
+          {children}
         </main>
       </div>
     </div>

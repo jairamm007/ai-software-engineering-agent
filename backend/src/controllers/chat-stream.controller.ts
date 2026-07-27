@@ -69,6 +69,10 @@ export const chatStreamController = async (
     let sourceInfo = null;
     let typeInfo = "answer";
 
+    // Abort LLM if client disconnects
+    const abortController = new AbortController();
+    req.on("close", () => abortController.abort());
+
     // Send conversation ID first
     res.write(`data: ${JSON.stringify({ type: "conversation_id", conversationId: convId })}\n\n`);
 
@@ -78,7 +82,10 @@ export const chatStreamController = async (
         repositoryId,
         filePath,
         history,
+        userId,
+        signal: abortController.signal,
       })) {
+        if (abortController.signal.aborted) break;
         fullResponse += chunk.token;
         sourceInfo = chunk.source;
         typeInfo = chunk.type;

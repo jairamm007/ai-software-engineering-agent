@@ -10,12 +10,12 @@ const pageVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const badgeVariants = {
   hidden: { opacity: 0, scale: 0.7 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
 };
 
 const stack = [
@@ -81,7 +81,7 @@ export default function AboutPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -3 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
           className={`rounded-2xl border p-8 mb-12 transition-shadow duration-300 ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:shadow-lg hover:shadow-violet-500/5" : "border-slate-200 bg-white hover:shadow-lg hover:shadow-slate-200/50"}`}
         >
           <p className={`text-lg leading-relaxed mb-4 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
@@ -100,10 +100,10 @@ export default function AboutPage() {
                 key={v.title}
                 variants={itemVariants}
                 whileHover={{ y: -6, scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                transition={{ type: "spring" as const, stiffness: 300, damping: 22 }}
                 className={`rounded-2xl border p-6 transition-shadow duration-300 ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:shadow-lg hover:shadow-violet-500/5" : "border-slate-200 bg-white hover:shadow-lg hover:shadow-slate-200/50"}`}
               >
-                <motion.div whileHover={{ rotate: 15, scale: 1.1 }} transition={{ type: "spring", stiffness: 400 }}>
+                <motion.div whileHover={{ rotate: 15, scale: 1.1 }} transition={{ type: "spring" as const, stiffness: 400 }}>
                   <Icon size={20} className="text-violet-500 mb-3" />
                 </motion.div>
                 <h3 className={`font-[Outfit] text-base font-bold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>{v.title}</h3>
@@ -116,7 +116,7 @@ export default function AboutPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -2 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
           className={`rounded-2xl border p-8 mb-12 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}
         >
           <h2 className={`font-[Outfit] text-xl font-bold mb-6 ${isDark ? "text-white" : "text-slate-900"}`}>Tech Stack</h2>
@@ -125,10 +125,10 @@ export default function AboutPage() {
               <motion.div
                 key={s.name}
                 whileHover={{ x: 4, scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
                 className={`flex items-center gap-3 rounded-xl border p-3 ${isDark ? "border-white/[0.04] bg-white/[0.02]" : "border-slate-100 bg-slate-50"}`}
               >
-                <motion.div whileHover={{ rotate: 90 }} transition={{ type: "spring", stiffness: 400 }}>
+                <motion.div whileHover={{ rotate: 90 }} transition={{ type: "spring" as const, stiffness: 400 }}>
                   <Sparkles size={14} className="shrink-0 text-violet-500" />
                 </motion.div>
                 <div>
@@ -143,7 +143,7 @@ export default function AboutPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -3, boxShadow: "0 20px 60px -12px rgba(139, 92, 246, 0.12)" }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
           className={`rounded-2xl border p-8 text-center ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-white"}`}
         >
           <h3 className="font-[Outfit] text-xl font-bold mb-2">Open Source at Heart</h3>

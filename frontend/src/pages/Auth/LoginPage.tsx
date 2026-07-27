@@ -6,7 +6,6 @@ import {
   EyeOff,
   Mail,
   Lock,
-  Sparkles,
   ArrowRight,
   ArrowLeft,
   Bot,
@@ -66,7 +65,7 @@ export default function LoginPage() {
     setError("");
     setOauthLoading("google");
     try {
-      await loginWithGoogle();
+      await loginWithGoogle(`${window.location.origin}/dashboard`);
       navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed");
@@ -79,7 +78,7 @@ export default function LoginPage() {
     setError("");
     setOauthLoading("github");
     try {
-      await loginWithGithub();
+      await loginWithGithub(`${window.location.origin}/dashboard`);
       navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "GitHub sign-in failed");

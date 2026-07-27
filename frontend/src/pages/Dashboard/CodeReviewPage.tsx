@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -47,10 +47,15 @@ export default function CodeReviewPage() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [reviewHistory] = useState<ReviewHistoryEntry[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const { data: repos, isLoading: reposLoading } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const { data: repoData, isLoading: repoLoading } = useQuery({
@@ -75,16 +80,21 @@ export default function CodeReviewPage() {
     if (!selectedFile || !repoData) return;
     setLoading(true);
     setResult("");
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       const response = await askRepository({
         question: `Perform a thorough code review of this file including security, performance, maintainability, and code quality: ${selectedFile}`,
         repositoryId: repoData.id,
         filePath: selectedFile,
+        signal: controller.signal,
       });
       setResult(response.answer ?? JSON.stringify(response));
     } catch {
+      if (controller.signal.aborted) return;
       setResult("Failed to perform code review. Please try again.");
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };

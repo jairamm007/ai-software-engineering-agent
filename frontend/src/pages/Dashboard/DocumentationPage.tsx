@@ -1,12 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   Search, Play, RotateCcw, BookOpen, FolderGit2, ArrowRight,
-  FileCode2, Download, Copy, Check, FileText, Code2, Layers,
+  Download, Copy, Check, FileText, Code2, Layers,
   Database, Route, Cpu, File, FolderOpen, CheckSquare, Square,
-  FileStack, ListChecks,
+  FileStack,
 } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -44,12 +44,17 @@ export default function DocumentationPage() {
   const [search, setSearch] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>("auto");
   const [copied, setCopied] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("auto");
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const { data: repos, isLoading: reposLoading } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const { data: repoData, isLoading: repoLoading } = useQuery({
@@ -99,6 +104,8 @@ export default function DocumentationPage() {
     if (!repoData || !canGenerate) return;
     setLoading(true);
     setResult("");
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       const cat = categories.find((c) => c.id === activeCategory) ?? categories[0];
       let question = "";
@@ -116,11 +123,13 @@ export default function DocumentationPage() {
         filePath = undefined;
       }
 
-      const response = await askRepository({ question, repositoryId: repoData.id, filePath });
+      const response = await askRepository({ question, repositoryId: repoData.id, filePath, signal: controller.signal });
       setResult(response.answer ?? JSON.stringify(response));
     } catch {
+      if (controller.signal.aborted) return;
       setResult("Failed to generate documentation. Please try again.");
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   };

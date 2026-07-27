@@ -10,12 +10,12 @@ const pageVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const badgeVariants = {
   hidden: { opacity: 0, scale: 0.7 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
 };
 
 const sections = [
@@ -136,20 +136,20 @@ export default function DocsPage() {
         </motion.div>
 
         <motion.div variants={pageVariants} className="space-y-10">
-          {sections.map((section, i) => {
+          {sections.map((section) => {
             const Icon = section.icon;
             return (
               <motion.div
                 key={section.title}
                 variants={itemVariants}
                 whileHover={{ y: -2 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
                 className={`rounded-2xl border p-6 sm:p-8 transition-shadow duration-300 ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:shadow-lg hover:shadow-violet-500/5" : "border-slate-200 bg-white hover:shadow-lg hover:shadow-slate-200/50"}`}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <motion.div
                     whileHover={{ rotate: 15, scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 400 }}
+                    transition={{ type: "spring" as const, stiffness: 400 }}
                     className={`flex h-9 w-9 items-center justify-center rounded-lg ${isDark ? "bg-violet-500/10" : "bg-violet-100"}`}
                   >
                     <Icon size={18} className="text-violet-500" />
@@ -164,7 +164,7 @@ export default function DocsPage() {
                       <motion.div
                         key={si}
                         whileHover={{ x: 4 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
                         className={`flex gap-4 rounded-xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-slate-50"}`}
                       >
                         <motion.div
@@ -215,7 +215,7 @@ export default function DocsPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -3, boxShadow: "0 20px 60px -12px rgba(139, 92, 246, 0.15)" }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
           className={`mt-16 rounded-2xl border p-8 text-center ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-white"}`}
         >
           <h3 className="font-[Outfit] text-xl font-bold mb-2">Ready to get started?</h3>

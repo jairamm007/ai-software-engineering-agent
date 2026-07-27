@@ -60,9 +60,10 @@ const withTimeout = <T>(
 
 export const generateText = async (
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  preferredModel?: string
 ): Promise<string> => {
-  const providers = ProviderFactory.getProviders();
+  const providers = ProviderFactory.getProviders(preferredModel);
 
   let lastError: unknown;
 
@@ -103,9 +104,11 @@ export const generateText = async (
 
 export const generateTextStream = async function* (
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  preferredModel?: string,
+  signal?: AbortSignal
 ): AsyncGenerator<string> {
-  const providers = ProviderFactory.getProviders();
+  const providers = ProviderFactory.getProviders(preferredModel);
 
   for (const provider of providers) {
     if (!provider.generateTextStream) continue;
@@ -119,6 +122,8 @@ export const generateTextStream = async function* (
         if (attempt > 0) {
           await sleep(500);
         }
+
+        if (signal?.aborted) return;
 
         console.log(`🤖 Streaming ${provider.name}...`);
         yield* provider.generateTextStream(systemPrompt, userPrompt);
@@ -135,6 +140,6 @@ export const generateTextStream = async function* (
   }
 
   console.log("⚠️ Falling back to non-streaming");
-  const text = await generateText(systemPrompt, userPrompt);
+  const text = await generateText(systemPrompt, userPrompt, preferredModel);
   yield text;
 };

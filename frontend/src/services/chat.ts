@@ -5,14 +5,16 @@ interface AskRepositoryInput {
   question: string;
   repositoryId?: string;
   filePath?: string;
+  signal?: AbortSignal;
 }
 
 export const askRepository = async ({
   question,
   repositoryId,
   filePath,
+  signal,
 }: AskRepositoryInput) => {
-  const response = await api.post("/chat", { question, repositoryId, filePath });
+  const response = await api.post("/chat", { question, repositoryId, filePath }, { signal });
   return response.data.data;
 };
 

@@ -30,7 +30,7 @@ export default function TestingPage() {
 
   const { data: repos, isLoading: reposLoading } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
   });
 
   const { data: repoData, isLoading: repoLoading } = useQuery({
