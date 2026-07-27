@@ -1,6 +1,17 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Bot, Cpu, MessageSquare, Activity, Users, Clock, TrendingUp, Zap } from "lucide-react";
+import { Bot, Cpu, MessageSquare, Activity, Users, Clock, TrendingUp, BarChart3 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  AreaChart,
+  Area,
+} from "recharts";
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { getAIStats, type AIStats } from "@/services/admin";
@@ -8,11 +19,36 @@ import { getAIStats, type AIStats } from "@/services/admin";
 const container = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
 const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] } } };
 
+function formatShortDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function ChartTooltip({ active, payload, label, isDark }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div
+      className={`rounded-xl border px-3.5 py-2.5 text-[12px] shadow-xl ${
+        isDark ? "border-white/[0.08] bg-[#1a1a24]" : "border-slate-200 bg-white"
+      }`}
+    >
+      <p className={`font-semibold mb-1 ${isDark ? "text-white" : "text-slate-900"}`}>
+        {formatShortDate(label)}
+      </p>
+      {payload.map((p: any, i: number) => (
+        <p key={i} style={{ color: p.color }} className="font-medium">
+          {p.name}: {p.value}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export default function AdminAIServicesPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [data, setData] = useState<AIStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [chartType, setChartType] = useState<"bar" | "area">("bar");
 
   useEffect(() => {
     getAIStats()
@@ -21,7 +57,14 @@ export default function AdminAIServicesPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const maxMsgCount = Math.max(...(data?.messagesByDay?.map((d) => d.count) ?? [1]), 1);
+  const gridColor = isDark ? "rgba(255,255,255,0.04)" : "#e2e8f0";
+  const tickFill = isDark ? "#475569" : "#64748b";
+  const barRadius: [number, number, number, number] = [4, 4, 0, 0];
+
+  const chartData = (data?.messagesByDay ?? []).map((d) => ({
+    date: d.date,
+    Messages: d.count,
+  }));
 
   const stats = [
     { icon: MessageSquare, label: "Total Conversations", value: data?.totalConversations ?? 0, gradient: "from-rose-500 to-orange-500", shadow: "shadow-rose-500/10" },
@@ -90,17 +133,40 @@ export default function AdminAIServicesPage() {
         transition={{ delay: 0.3, duration: 0.4 }}
         className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white shadow-sm"}`}
       >
-        <div className={`flex items-center gap-2.5 border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-orange-500">
-            <TrendingUp size={15} className="text-white" />
+        <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-orange-500">
+              <TrendingUp size={15} className="text-white" />
+            </div>
+            <div>
+              <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
+                AI Activity
+              </h3>
+              <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                Last 7 days
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
-              AI Activity
-            </h3>
-            <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-              Last 7 days
-            </p>
+          <div className={`flex rounded-lg border overflow-hidden text-[11px] font-medium ${
+            isDark ? "border-white/[0.06]" : "border-slate-200"
+          }`}>
+            {(["bar", "area"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setChartType(t)}
+                className={`px-3 py-1.5 transition-colors ${
+                  chartType === t
+                    ? isDark
+                      ? "bg-white/[0.08] text-white"
+                      : "bg-slate-100 text-slate-900"
+                    : isDark
+                      ? "text-slate-500 hover:text-slate-300"
+                      : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                {t === "bar" ? <BarChart3 size={12} /> : <TrendingUp size={12} />}
+              </button>
+            ))}
           </div>
         </div>
         <div className="p-6">
@@ -108,31 +174,38 @@ export default function AdminAIServicesPage() {
             <div className="flex h-48 items-center justify-center">
               <div className="h-7 w-7 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
             </div>
-          ) : data?.messagesByDay && data.messagesByDay.length > 0 ? (
-            <div className="space-y-3">
-              {data.messagesByDay.map((d, i) => (
-                <motion.div
-                  key={d.date}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 * i }}
-                  className="flex items-center gap-4"
-                >
-                  <span className={`w-20 text-right text-[11px] font-medium tabular-nums ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                    {new Date(d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                  <div className={`h-7 flex-1 overflow-hidden rounded-xl ${isDark ? "bg-white/[0.03]" : "bg-slate-50"}`}>
-                    <div
-                      className="h-full rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 transition-all duration-500"
-                      style={{ width: `${Math.max(4, (d.count / maxMsgCount) * 100)}%` }}
-                    />
-                  </div>
-                  <span className={`w-10 text-right text-[13px] font-semibold tabular-nums ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                    {d.count}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+          ) : chartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={280}>
+              {chartType === "bar" ? (
+                <BarChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="aiActivityGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f43f5e" stopOpacity={1} />
+                      <stop offset="100%" stopColor="#f97316" stopOpacity={0.5} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                  <XAxis dataKey="date" tickFormatter={formatShortDate} tick={{ fontSize: 11, fill: tickFill }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: tickFill }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<ChartTooltip isDark={isDark} />} cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)" }} />
+                  <Bar dataKey="Messages" fill="url(#aiActivityGrad)" radius={barRadius} maxBarSize={40} />
+                </BarChart>
+              ) : (
+                <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="aiActivityAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                  <XAxis dataKey="date" tickFormatter={formatShortDate} tick={{ fontSize: 11, fill: tickFill }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: tickFill }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<ChartTooltip isDark={isDark} />} />
+                  <Area type="monotone" dataKey="Messages" stroke="#f43f5e" strokeWidth={2.5} fill="url(#aiActivityAreaGrad)" dot={{ r: 3, fill: "#f43f5e", strokeWidth: 0 }} activeDot={{ r: 5, fill: "#f43f5e", stroke: isDark ? "#111118" : "#fff", strokeWidth: 2 }} />
+                </AreaChart>
+              )}
+            </ResponsiveContainer>
           ) : (
             <div className="flex flex-col items-center justify-center py-12">
               <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isDark ? "bg-white/[0.04]" : "bg-slate-50"}`}>
