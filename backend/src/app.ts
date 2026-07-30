@@ -25,8 +25,16 @@ import multiAgentRoutes from "./routes/multi-agent.routes.js";
 import teamRoutes from "./routes/team.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
 import activityRoutes from "./routes/activity.routes.js";
+import teamChatRoutes from "./routes/team-chat.routes.js";
+import teamNotificationRoutes from "./routes/team-notification.routes.js";
+import teamAnalyticsRoutes from "./routes/team-analytics.routes.js";
 import githubIntegrationRoutes from "./routes/github-integration.routes.js";
+import webhookRoutes from "./routes/webhook.routes.js";
+import aiPRRoutes from "./routes/ai-pr-assistant.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import codeGenerationRoutes from "./routes/code-generation.routes.js";
+import debugRoutes from "./routes/debug.routes.js";
+import securityRoutes from "./routes/security.routes.js";
 
 const app = express();
 
@@ -70,8 +78,16 @@ app.use("/api", multiAgentRoutes);
 app.use("/api", teamRoutes);
 app.use("/api", commentRoutes);
 app.use("/api", activityRoutes);
+app.use("/api", teamChatRoutes);
+app.use("/api", teamNotificationRoutes);
+app.use("/api", teamAnalyticsRoutes);
 app.use("/api", githubIntegrationRoutes);
+app.use("/api", webhookRoutes);
+app.use("/api", aiPRRoutes);
 app.use("/api", adminRoutes);
+app.use("/api/ai", codeGenerationRoutes);
+app.use("/api", debugRoutes);
+app.use("/api", securityRoutes);
 
 // Catch Better Auth /error requests and redirect to frontend login
 app.get("/error", (req, res) => {

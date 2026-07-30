@@ -3,6 +3,7 @@ export interface TeamUser {
   name: string;
   email: string;
   image?: string | null;
+  userCode?: string;
 }
 
 export type TeamRole = "owner" | "admin" | "member" | "viewer";
@@ -20,7 +21,10 @@ export interface Team {
   id: string;
   name: string;
   slug: string;
+  teamCode: string;
   description?: string | null;
+  logo?: string | null;
+  visibility: string;
   ownerId: string;
   createdAt: string;
   updatedAt: string;
@@ -79,4 +83,58 @@ export interface TeamActivity {
   details?: string | null;
   createdAt: string;
   user: TeamUser;
+}
+
+export interface SharedDocument {
+  id: string;
+  teamId: string;
+  authorId: string;
+  title: string;
+  content?: string | null;
+  format: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  author: TeamUser;
+}
+
+export interface TeamCodeReview {
+  id: string;
+  repositoryId: string;
+  teamId?: string | null;
+  userId?: string | null;
+  status: string;
+  summary?: string | null;
+  issuesFound: number;
+  criticalCount: number;
+  warningCount: number;
+  infoCount: number;
+  createdAt: string;
+  repository: { id: string; name: string };
+  user?: TeamUser | null;
+}
+
+export interface SearchedUser {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  bio?: string | null;
+  userCode: string;
+}
+
+export interface TeamTestReport {
+  id: string;
+  repositoryId: string;
+  teamId?: string | null;
+  userId?: string | null;
+  status: string;
+  totalTests: number;
+  passedTests: number;
+  failedTests: number;
+  skippedTests: number;
+  coverage?: number | null;
+  createdAt: string;
+  repository: { id: string; name: string };
+  user?: TeamUser | null;
 }

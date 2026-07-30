@@ -1,31 +1,72 @@
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
-import { Sparkles } from "lucide-react";
+import Logo from "@/components/common/Logo";
 
 const productLinks = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Who It's For", href: "#use-cases" },
-  { label: "Dashboard", href: "/dashboard" },
+  { label: "Dashboard", to: "/dashboard" },
 ];
 
 const resources = [
-  { label: "Documentation", href: "/docs" },
-  { label: "Blog", href: "/blog" },
-  { label: "Changelog", href: "/changelog" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Support", href: "/support" },
+  { label: "Documentation", to: "/docs" },
+  { label: "Blog", to: "/blog" },
+  { label: "Changelog", to: "/changelog" },
+  { label: "FAQ", to: "/faq" },
+  { label: "Support", to: "/support" },
 ];
 
 const company = [
-  { label: "About", href: "/about" },
-  { label: "Careers", href: "/careers" },
-  { label: "Privacy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
+  { label: "About", to: "/about" },
+  { label: "Careers", to: "/careers" },
+  { label: "Privacy", to: "/privacy" },
+  { label: "Terms", to: "/terms" },
 ];
+
+function NavLink({ href, to, label, isDark }: { href?: string; to?: string; label: string; isDark: boolean }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        onClick={(e) => {
+          e.preventDefault();
+          if (location.pathname !== "/") {
+            navigate("/");
+            setTimeout(() => {
+              document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+            }, 100);
+          } else {
+            document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
+        className={`text-sm transition-colors font-[Inter] cursor-pointer ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}
+      >
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        navigate(to!);
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }}
+      className={`text-sm transition-colors font-[Inter] text-left cursor-pointer ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}
+    >
+      {label}
+    </button>
+  );
+}
 
 export default function Footer() {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const isDark = theme === "dark";
 
   return (
@@ -34,14 +75,19 @@ export default function Footer() {
         <div className="grid gap-12 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600">
-                <Sparkles size={16} className="text-white" />
-              </div>
-              <h3 className="font-[Outfit] text-lg font-bold">Repo Verify</h3>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                navigate("/");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="flex items-center gap-2 mb-4 transition-opacity hover:opacity-80"
+              title="Go to top"
+            >
+              <Logo size="sm" showText />
+            </button>
             <p className={`text-sm leading-relaxed font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              AI-powered repository analysis, code review, and documentation generation for modern development teams.
+              AI-powered code generation, review, analysis, and documentation for modern development teams.
             </p>
           </div>
 
@@ -53,15 +99,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {productLinks.map((link) => (
                 <li key={link.label}>
-                  {link.href.startsWith("/") ? (
-                    <Link to={link.href} className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
-                      {link.label}
-                    </a>
-                  )}
+                  <NavLink {...link} isDark={isDark} />
                 </li>
               ))}
             </ul>
@@ -75,15 +113,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {resources.map((link) => (
                 <li key={link.label}>
-                  {link.href.startsWith("/") ? (
-                    <Link to={link.href} className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
-                      {link.label}
-                    </a>
-                  )}
+                  <NavLink {...link} isDark={isDark} />
                 </li>
               ))}
             </ul>
@@ -97,15 +127,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {company.map((link) => (
                 <li key={link.label}>
-                  {link.href.startsWith("/") ? (
-                    <Link to={link.href} className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
-                      {link.label}
-                    </a>
-                  )}
+                  <NavLink {...link} isDark={isDark} />
                 </li>
               ))}
             </ul>
@@ -117,9 +139,13 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Repo Verify. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link to="/dashboard" className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+            <button
+              type="button"
+              onClick={() => { navigate("/dashboard"); window.scrollTo({ top: 0 }); }}
+              className={`text-sm transition-colors font-[Inter] cursor-pointer ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}
+            >
               Dashboard
-            </Link>
+            </button>
             <a href="https://github.com/anomalyco/opencode" target="_blank" rel="noopener noreferrer" className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
               GitHub
             </a>

@@ -21,6 +21,7 @@ model user {
   linkedinUrl   String?
   githubUrl     String?
   portfolioUrl  String?
+  userCode      String    @unique @default(cuid())
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -33,11 +34,19 @@ model user {
   teamMemberships TeamMember[]
   activities TeamActivity[]
   comments Comment[]
+  teamMessages TeamMessage[]
+  teamNotifications TeamNotification[]
+  documents SharedDocument[]
   githubIntegrations GitHubIntegration[]
   auditLogs AuditLog[]
   codeReviews CodeReview[]
   testReports TestReport[]
   supportMessages SupportMessage[]
+  codeGenerations CodeGeneration[]
+  savedPrompts SavedPrompt[]
+  generationHistory GenerationHistory[]
+  debugSessions DebugSession[]
+  securityScans SecurityScan[]
 }
 
 model session {
@@ -98,6 +107,7 @@ model Repository {
   docs Documentation[]
   codeReviews CodeReview[]
   testReports TestReport[]
+  codeGenerations CodeGeneration[]
 
   @@unique([githubUrl, userId])
   @@index([userId])
@@ -197,11 +207,14 @@ model UserPreference {
 
 // ─── Team Collaboration ───────────────────────────────────────────
 
-model Team {
+model   Team {
   id          String   @id @default(cuid())
   name        String
   description String?
   slug        String   @unique
+  teamCode    String   @unique @default(cuid())
+  logo        String?
+  visibility  String   @default("private") // public | private
   ownerId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -212,9 +225,15 @@ model Team {
   repositories TeamRepository[]
   activities  TeamActivity[]
   comments    Comment[]
+  chats       TeamChat[]
+  notifications TeamNotification[]
+  documents   SharedDocument[]
+  codeReviews  CodeReview[]
+  testReports  TestReport[]
 
   @@index([ownerId])
   @@index([slug])
+  @@index([teamCode])
 }
 
 model TeamMember {
@@ -301,6 +320,79 @@ model Comment {
   @@index([teamId, createdAt(sort: Desc)])
 }
 
+// ─── Shared Documentation ─────────────────────────────────────────
+
+model SharedDocument {
+  id             String   @id @default(cuid())
+  teamId         String
+  authorId       String
+  title          String
+  content        String?
+  format         String   @default("markdown") // markdown | pdf
+  status         String   @default("draft") // draft | published | archived
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  author user @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([teamId, updatedAt(sort: Desc)])
+}
+
+// ─── Team AI Chat ───────────────────────────────────────────────
+
+model TeamChat {
+  id        String   @id @default(cuid())
+  teamId    String
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  team     Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  messages TeamMessage[]
+
+  @@index([teamId])
+  @@index([teamId, updatedAt(sort: Desc)])
+}
+
+model TeamMessage {
+  id        String   @id @default(cuid())
+  chatId    String
+  userId    String
+  role      String   // user | assistant | system
+  content   String
+  createdAt DateTime @default(now())
+
+  chat TeamChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user user    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@index([chatId, createdAt(sort: Desc)])
+}
+
+// ─── Team Notifications ─────────────────────────────────────────
+
+model TeamNotification {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  type      String   // member_joined | repo_shared | comment_posted | invitation | code_review | general
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  linkTo    String?
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([userId])
+  @@index([userId, read])
+  @@index([teamId, createdAt(sort: Desc)])
+}
+
 // ─── GitHub Integration ───────────────────────────────────────────
 
 model GitHubIntegration {
@@ -315,6 +407,7 @@ model GitHubIntegration {
 
   user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
   repos        GitHubIntegrationRepository[]
+  webhookEvents GitHubWebhookEvent[]
 
   @@unique([userId, githubUrl])
   @@index([userId])
@@ -341,6 +434,25 @@ model GitHubIntegrationRepository {
 
   @@unique([integrationId, owner, name])
   @@index([integrationId])
+}
+
+model GitHubWebhookEvent {
+  id              String   @id @default(cuid())
+  integrationId   String
+  eventType       String
+  action          String?
+  deliveryId      String?  @unique
+  repositoryOwner String?
+  repositoryName  String?
+  payload         Json
+  processedAt     DateTime?
+  createdAt       DateTime @default(now())
+
+  integration GitHubIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId])
+  @@index([eventType])
+  @@index([createdAt])
 }
 
 // ─── Admin Models ─────────────────────────────────────────────────
@@ -406,6 +518,7 @@ model Documentation {
 model CodeReview {
   id             String   @id @default(cuid())
   repositoryId   String
+  teamId         String?
   userId         String?
   status         String   @default("completed") // pending | running | completed | failed
   summary        String?
@@ -418,9 +531,11 @@ model CodeReview {
   updatedAt      DateTime @updatedAt
 
   repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  team       Team?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user       user?      @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([repositoryId])
+  @@index([teamId])
   @@index([userId])
   @@index([createdAt(sort: Desc)])
 }
@@ -430,6 +545,7 @@ model CodeReview {
 model TestReport {
   id             String   @id @default(cuid())
   repositoryId   String
+  teamId         String?
   userId         String?
   status         String   @default("completed") // pending | running | completed | failed
   totalTests     Int      @default(0)
@@ -442,10 +558,172 @@ model TestReport {
   updatedAt      DateTime @updatedAt
 
   repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  team       Team?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user       user?      @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([repositoryId])
+  @@index([teamId])
   @@index([userId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── AI Code Generation ──────────────────────────────────────────
+
+model CodeGeneration {
+  id             String   @id @default(cuid())
+  userId         String
+  repositoryId   String?
+  type           String   // generate | refactor | explain | translate | test | documentation
+  prompt         String
+  inputCode      String?
+  inputLanguage  String?
+  targetLanguage String?
+  generatedCode  String   @default("")
+  status         String   @default("pending") // pending | generating | completed | failed | accepted | rejected
+  filePath       String?
+  model          String?
+  tokensUsed     Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         user?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repository   Repository?   @relation(fields: [repositoryId], references: [id], onDelete: SetNull)
+  historyItems GenerationHistory[]
+
+  @@index([userId])
+  @@index([repositoryId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model SavedPrompt {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  icon      String   @default("Code2")
+  prompt    String
+  category  String   @default("general") // authentication | crud | react | api | database | testing | refactoring | documentation | general
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([category])
+}
+
+model GenerationHistory {
+  id             String   @id @default(cuid())
+  userId         String
+  generationId   String
+  action         String   // accepted | rejected | edited
+  editedCode     String?
+  createdAt      DateTime @default(now())
+
+  generation CodeGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  user       user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([generationId])
+  @@index([userId])
+}
+
+// ─── AI Debugging Assistant ───────────────────────────────────────
+
+model DebugSession {
+  id             String   @id @default(cuid())
+  userId         String
+  repositoryId   String?
+  filePath       String?
+  sessionType    String   // error_analyzer | stack_trace | bug_detection | fix_suggestion | log_analysis | dependency_check
+  errorMessage   String?
+  inputCode      String?
+  inputLog       String?
+  explanation    String?
+  suggestedFix   String?
+  fixedCode      String?
+  status         String   @default("open") // open | resolved | unresolved
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user user? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  historyItems DebugHistory[]
+
+  @@index([userId])
+  @@index([repositoryId])
+  @@index([sessionType])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model DebugHistory {
+  id        String   @id @default(cuid())
+  sessionId String
+  action    String   // fix_applied | fix_copied | ignored | reopened | resolved
+  createdAt DateTime @default(now())
+
+  session DebugSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Security Analysis ─────────────────────────────────────────────
+
+model SecurityScan {
+  id            String   @id @default(cuid())
+  userId        String
+  repositoryId  String?
+  securityScore Int      @default(0)
+  summary       String?
+  status        String   @default("completed") // pending | running | completed | failed
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user user? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  issues  SecurityIssue[]
+  reports SecurityReport[]
+
+  @@index([userId])
+  @@index([repositoryId])
+  @@index([createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model SecurityIssue {
+  id             String   @id @default(cuid())
+  scanId         String
+  filePath       String?
+  issueType      String   // secret | dependency | sql_injection | xss | input_validation | auth | file_upload | other
+  severity       String   // critical | high | medium | low
+  title          String
+  description    String?
+  recommendation String?
+  snippet        String?
+  status         String   @default("open") // open | resolved | ignored
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  scan SecurityScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([scanId])
+  @@index([severity])
+  @@index([status])
+  @@index([issueType])
+}
+
+model SecurityReport {
+  id         String   @id @default(cuid())
+  scanId     String
+  format     String   @default("markdown") // markdown | pdf
+  content    String?
+  filePath   String?
+  createdAt  DateTime @default(now())
+
+  scan SecurityScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([scanId])
   @@index([createdAt(sort: Desc)])
 }
 

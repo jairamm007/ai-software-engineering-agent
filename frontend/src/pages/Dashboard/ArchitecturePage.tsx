@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Layers, Boxes, GitBranch, Database, Globe,
   FolderOpen, FileCode2, ArrowRight, ChevronRight,
-  ChevronDown, Play, RotateCcw, Search,
+  ChevronDown, Play, RotateCcw, Search, FileStack,
 } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -22,6 +22,8 @@ interface TreeNode {
   children: TreeNode[];
   fileCount: number;
 }
+
+type ArchitectureScope = "single" | "multiple" | "repository";
 
 function buildTree(paths: string[]): TreeNode {
   const root: TreeNode = { name: "/", fullPath: "", isDir: true, children: [], fileCount: 0 };
@@ -171,6 +173,8 @@ export default function ArchitecturePage() {
   const [selectedRepoId, setSelectedRepoId] = useState("");
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
   const [treeFilter, setTreeFilter] = useState("");
+  const [scope, setScope] = useState<ArchitectureScope>("repository");
+  const [selectedPaths, setSelectedPaths] = useState<string[]>([]);
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -214,18 +218,24 @@ export default function ArchitecturePage() {
     setExpandedDirs(new Set());
     setResult("");
     setTreeFilter("");
+    setScope("repository");
+    setSelectedPaths([]);
   };
 
   const analyze = async () => {
-    if (!repoData) return;
+    if (!repoData || (scope !== "repository" && selectedPaths.length === 0)) return;
     setLoading(true);
     setResult("");
     const controller = new AbortController();
     abortRef.current = controller;
     try {
+      const selected = selectedPaths.join(", ");
       const res = await askRepository({
-        question: "Provide a detailed architecture analysis of this repository including: 1) Overall structure and design patterns 2) Key modules and their responsibilities 3) Data flow between components 4) Strengths and potential improvements 5) Technology stack assessment",
+        question: scope === "repository"
+          ? "Provide a detailed architecture analysis of this entire repository including: 1) Overall structure and design patterns 2) Key modules and responsibilities 3) Data flow 4) Strengths and improvements 5) Technology stack assessment"
+          : `Provide a detailed architecture analysis of the following ${scope === "single" ? "file" : "files"}: ${selected}. Include module responsibilities, dependencies, data flow, design patterns, and improvements.`,
         repositoryId: repoData.id,
+        filePath: scope === "single" ? selectedPaths[0] : undefined,
         signal: controller.signal,
       });
       setResult(res.answer ?? JSON.stringify(res));
@@ -432,8 +442,17 @@ export default function ArchitecturePage() {
 
               {/* Analyze Button + AI Result */}
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-4">
+                <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                  <p className={`mb-3 text-sm font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>Analysis Scope</p>
+                  <div className="grid gap-2 sm:grid-cols-3">{[
+                    ["single", "Single File", FileCode2],
+                    ["multiple", "Multiple Files", FileStack],
+                    ["repository", "Entire Repository", FolderOpen],
+                  ].map(([value, label, Icon]) => <button key={value as string} type="button" onClick={() => { setScope(value as ArchitectureScope); setSelectedPaths([]); }} className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium ${scope === value ? "accent-bg-light accent-text-base border-[var(--accent)]/30" : isDark ? "border-white/10 text-slate-400" : "border-slate-200 text-slate-600"}`}><Icon size={14} />{label as string}</button>)}</div>
+                  {scope !== "repository" && <select multiple={scope === "multiple"} value={selectedPaths} onChange={(event) => setSelectedPaths(Array.from(event.target.selectedOptions, (option) => option.value))} className={`mt-3 w-full rounded-lg border px-3 py-2 text-xs outline-none ${isDark ? "border-white/10 bg-white/5 text-white" : "border-slate-200 bg-slate-50 text-slate-800"}`} size={scope === "multiple" ? 6 : 1}><option value="" disabled>Select {scope === "single" ? "a file" : "files"}...</option>{filePaths.map((path) => <option key={path} value={path}>{path}</option>)}</select>}
+                </div>
                 <button
-                  type="button" onClick={() => void analyze()} disabled={loading || !repoData}
+                  type="button" onClick={() => void analyze()} disabled={loading || !repoData || (scope !== "repository" && selectedPaths.length === 0)}
                   className="flex items-center gap-2 rounded-xl accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg accent-shadow disabled:opacity-50 disabled:shadow-none font-[Inter]"
                 >
                   {loading ? (

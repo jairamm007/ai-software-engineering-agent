@@ -11,6 +11,7 @@ const routeLabels: Record<string, string> = {
   "/repositories": "Repositories",
   "/chat": "AI Chat",
   "/code-review": "Code Review",
+  "/code-generation": "Code Generation",
   "/architecture": "Architecture",
   "/documentation": "Documentation",
   "/testing": "Testing",

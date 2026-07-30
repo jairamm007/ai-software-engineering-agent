@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -13,6 +13,10 @@ import {
   RotateCcw,
   Search,
   FileCode2,
+  FileStack,
+  FolderOpen,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -37,12 +41,16 @@ interface ReviewHistoryEntry {
   time: string;
 }
 
+type ReviewScope = "single" | "multiple" | "repository";
+
 export default function CodeReviewPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
   const [selectedRepoId, setSelectedRepoId] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<string>("");
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [scope, setScope] = useState<ReviewScope>("single");
   const [search, setSearch] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -64,29 +72,41 @@ export default function CodeReviewPage() {
     enabled: !!selectedRepoId,
   });
 
-  const files =
-    repoData?.files.filter(
-      (f) => !search || f.path.toLowerCase().includes(search.toLowerCase())
-    ) ?? [];
+  const files = useMemo(() => repoData?.files.filter((file) => !search || file.path.toLowerCase().includes(search.toLowerCase())) ?? [], [repoData, search]);
 
   const handleRepoSelect = (repoId: string) => {
     setSelectedRepoId(repoId);
     setSelectedFile("");
+    setSelectedFiles(new Set());
+    setScope("single");
     setResult("");
     setSearch("");
   };
 
+  const toggleSelectedFile = (path: string) => {
+    setSelectedFiles((previous) => {
+      const next = new Set(previous);
+      next.has(path) ? next.delete(path) : next.add(path);
+      return next;
+    });
+  };
+
+  const canReview = !!repoData && (scope === "repository" || (scope === "single" ? !!selectedFile : selectedFiles.size > 0));
+
   const runReview = async () => {
-    if (!selectedFile || !repoData) return;
+    if (!repoData || !canReview) return;
     setLoading(true);
     setResult("");
     const controller = new AbortController();
     abortRef.current = controller;
     try {
+      const targets = scope === "single" ? selectedFile : Array.from(selectedFiles).join(", ");
       const response = await askRepository({
-        question: `Perform a thorough code review of this file including security, performance, maintainability, and code quality: ${selectedFile}`,
+        question: scope === "repository"
+          ? "Perform a thorough code review of this entire repository including security, performance, maintainability, code quality, and prioritized improvements."
+          : `Perform a thorough code review of the following ${scope === "multiple" ? "files" : "file"} including security, performance, maintainability, and code quality: ${targets}`,
         repositoryId: repoData.id,
-        filePath: selectedFile,
+        filePath: scope === "single" ? selectedFile : undefined,
         signal: controller.signal,
       });
       setResult(response.answer ?? JSON.stringify(response));
@@ -203,6 +223,14 @@ export default function CodeReviewPage() {
               </div>
             ) : (
               <>
+                <div className="grid gap-3 px-5 pt-5 sm:grid-cols-3">
+                  {[
+                    ["single", "Single File", FileCode2],
+                    ["multiple", "Multiple Files", FileStack],
+                    ["repository", "Entire Repository", FolderOpen],
+                  ].map(([value, label, Icon]) => <button key={value as string} type="button" onClick={() => { setScope(value as ReviewScope); setSelectedFile(""); setSelectedFiles(new Set()); }} className={`flex items-center gap-2 rounded-xl border p-3 text-left text-sm font-medium ${scope === value ? "accent-bg-light accent-text-base border-[var(--accent)]/30" : isDark ? "border-white/10 text-slate-400" : "border-slate-200 text-slate-600"}`}><Icon size={16} /><span>{label as string}</span></button>)}
+                </div>
+                {scope !== "repository" && <>
                 <div className="px-5 pt-4">
                   <div className="relative">
                     <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
@@ -221,6 +249,7 @@ export default function CodeReviewPage() {
                 </div>
 
                 <div className="overflow-hidden overflow-y-auto px-3 py-2" style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }}>
+                  {scope === "multiple" && files.length > 0 && <button type="button" onClick={() => setSelectedFiles(selectedFiles.size === files.length ? new Set() : new Set(files.map((file) => file.path)))} className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{selectedFiles.size === files.length ? <CheckSquare size={14} /> : <Square size={14} />}{selectedFiles.size === files.length ? "Deselect all" : `Select all (${files.length})`}</button>}
                   {files.length === 0 && (
                     <p className={`py-4 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>No files found.</p>
                   )}
@@ -228,9 +257,9 @@ export default function CodeReviewPage() {
                     const ext = getFileExtension(file.path);
                     const typeInfo = getFileTypeInfo(ext);
                     const Icon = typeInfo.icon;
-                    const isSelected = selectedFile === file.path;
+                    const isSelected = scope === "multiple" ? selectedFiles.has(file.path) : selectedFile === file.path;
                     return (
-                      <button key={file.id} type="button" onClick={() => setSelectedFile(file.path)} className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all font-[Inter] ${isSelected ? isDark ? "accent-bg-light text-white shadow-sm ring-1 ring-[var(--accent)]/20" : "accent-bg-light text-slate-700 shadow-sm ring-1 ring-[var(--accent)]/20" : isDark ? "text-slate-400 hover:bg-white/[0.03] hover:text-slate-200" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}>
+                      <button key={file.id} type="button" onClick={() => scope === "multiple" ? toggleSelectedFile(file.path) : setSelectedFile(file.path)} className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all font-[Inter] ${isSelected ? isDark ? "accent-bg-light text-white shadow-sm ring-1 ring-[var(--accent)]/20" : "accent-bg-light text-slate-700 shadow-sm ring-1 ring-[var(--accent)]/20" : isDark ? "text-slate-400 hover:bg-white/[0.03] hover:text-slate-200" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}>
                         <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${isSelected ? "accent-bg-light" : typeInfo.bg}`}>
                           <Icon size={13} className={isSelected ? "accent-text-base" : typeInfo.color} />
                         </div>
@@ -240,13 +269,14 @@ export default function CodeReviewPage() {
                     );
                   })}
                 </div>
+                </>}
 
                 <div className={`border-t px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => void runReview()}
-                      disabled={!selectedFile || loading}
+                      disabled={!canReview || loading}
                       className="flex items-center gap-2 rounded-xl accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg accent-shadow disabled:opacity-50 disabled:shadow-none font-[Inter]"
                     >
                       {loading ? (
@@ -257,15 +287,15 @@ export default function CodeReviewPage() {
                       ) : (
                         <>
                           <Play size={14} />
-                          Review Code
+                          Review {scope === "repository" ? "Repository" : scope === "multiple" ? "Files" : "Code"}
                         </>
                       )}
                     </button>
-                    {selectedFile && (
+                    {(selectedFile || selectedFiles.size > 0 || scope === "repository") && (
                       <div className="flex min-w-0 items-center gap-1.5">
                         <FileCode2 size={14} className={`shrink-0 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
                         <span className={`truncate text-xs font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                          {selectedFile}
+                          {scope === "repository" ? "Entire repository" : scope === "multiple" ? `${selectedFiles.size} files selected` : selectedFile}
                         </span>
                       </div>
                     )}

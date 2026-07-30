@@ -139,6 +139,7 @@ export default function Hero() {
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
               <Link
                 to="/dashboard"
+                onClick={() => window.scrollTo({ top: 0 })}
                 className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-shadow hover:shadow-xl hover:shadow-violet-500/40"
               >
                 Start Free

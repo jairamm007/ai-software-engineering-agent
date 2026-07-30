@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Sun, Moon, Menu, X, Shield } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
@@ -12,13 +12,33 @@ const navigationLinks = [
   { href: "#use-cases", label: "Who It's For" },
 ];
 
-const adminLink = { to: "/admin/login", label: "Admin" };
-
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleNavClick = (href: string) => {
+    setMobileOpen(false);
+    if (href.startsWith("#")) {
+      if (location.pathname !== "/") {
+        navigate("/");
+        setTimeout(() => {
+          document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      } else {
+        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  const handleRouteClick = (to: string) => {
+    setMobileOpen(false);
+    navigate(to);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  };
 
   return (
     <motion.header
@@ -32,18 +52,15 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-18 sm:px-6 md:px-8">
-        {/* Logo */}
-        <div className="flex items-center gap-2.5">
-          <Logo size="md" />
-          <div>
-            <h1 className={`font-[Outfit] text-base font-bold leading-tight sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>
-              Repo Verify
-            </h1>
-            <p className={`hidden text-[10px] font-[Inter] leading-none sm:block ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-              AI Software Engineering Agent
-            </p>
-          </div>
-        </div>
+        {/* Logo - click to scroll to top */}
+        <button
+          type="button"
+          onClick={() => handleRouteClick("/")}
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+          title="Go to top"
+        >
+          <Logo size="md" showText />
+        </button>
 
         {/* Desktop nav */}
         <nav className="hidden gap-8 md:flex">
@@ -51,22 +68,27 @@ export default function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors font-[Inter] ${
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick(link.href);
+              }}
+              className={`text-sm font-medium transition-colors font-[Inter] cursor-pointer ${
                 isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"
               }`}
             >
               {link.label}
             </a>
           ))}
-          <Link
-            to={adminLink.to}
-            className={`flex items-center gap-1.5 text-sm font-medium transition-colors font-[Inter] ${
+          <button
+            type="button"
+            onClick={() => handleRouteClick("/admin/login")}
+            className={`flex items-center gap-1.5 text-sm font-medium transition-colors font-[Inter] cursor-pointer ${
               isDark ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-700"
             }`}
           >
             <Shield size={13} />
-            {adminLink.label}
-          </Link>
+            Admin
+          </button>
         </nav>
 
         {/* Right side */}
@@ -84,23 +106,25 @@ export default function Navbar() {
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          <Link
-            to={isAuthenticated ? "/dashboard" : "/login"}
-            className={`hidden rounded-full border px-4 py-2 text-sm font-medium transition-all font-[Inter] sm:inline-block ${
+          <button
+            type="button"
+            onClick={() => handleRouteClick(isAuthenticated ? "/dashboard" : "/login")}
+            className={`hidden rounded-full border px-4 py-2 text-sm font-medium transition-all font-[Inter] sm:inline-block cursor-pointer ${
               isDark
                 ? "border-white/10 text-white hover:bg-white/5"
                 : "border-slate-200 text-slate-700 hover:bg-slate-100"
             }`}
           >
             {isAuthenticated ? "Dashboard" : "Sign In"}
-          </Link>
+          </button>
 
-          <Link
-            to={isAuthenticated ? "/dashboard" : "/register"}
-            className="rounded-full accent-gradient px-4 py-2 text-sm font-semibold text-white accent-shadow transition-all hover:scale-[1.03] font-[Inter]"
+          <button
+            type="button"
+            onClick={() => handleRouteClick(isAuthenticated ? "/dashboard" : "/register")}
+            className="rounded-full accent-gradient px-4 py-2 text-sm font-semibold text-white accent-shadow transition-all hover:scale-[1.03] font-[Inter] cursor-pointer"
           >
             {isAuthenticated ? "Dashboard" : "Get Started"}
-          </Link>
+          </button>
 
           {/* Mobile menu button */}
           <button
@@ -134,41 +158,44 @@ export default function Navbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] ${
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(link.href);
+                  }}
+                  className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] cursor-pointer ${
                     isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   {link.label}
                 </a>
               ))}
-              <Link
-                to={adminLink.to}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] ${
+              <button
+                type="button"
+                onClick={() => handleRouteClick("/admin/login")}
+                className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] cursor-pointer ${
                   isDark ? "text-red-400 hover:bg-red-500/10" : "text-red-600 hover:bg-red-50"
                 }`}
               >
                 <Shield size={13} />
-                {adminLink.label}
-              </Link>
+                Admin
+              </button>
               <div className={`my-2 border-t ${isDark ? "border-white/5" : "border-slate-200"}`} />
-              <Link
-                to={isAuthenticated ? "/dashboard" : "/login"}
-                onClick={() => setMobileOpen(false)}
-                className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] ${
+              <button
+                type="button"
+                onClick={() => handleRouteClick(isAuthenticated ? "/dashboard" : "/login")}
+                className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors font-[Inter] cursor-pointer ${
                   isDark ? "text-slate-300 hover:bg-white/5" : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 {isAuthenticated ? "Dashboard" : "Sign In"}
-              </Link>
-              <Link
-                to={isAuthenticated ? "/dashboard" : "/register"}
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg accent-gradient px-4 py-3 text-center text-sm font-semibold text-white accent-shadow-lg font-[Inter]"
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRouteClick(isAuthenticated ? "/dashboard" : "/register")}
+                className="rounded-lg accent-gradient px-4 py-3 text-center text-sm font-semibold text-white accent-shadow-lg font-[Inter] cursor-pointer"
               >
                 {isAuthenticated ? "Dashboard" : "Get Started"}
-              </Link>
+              </button>
             </nav>
           </motion.div>
         )}

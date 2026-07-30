@@ -1,4 +1,5 @@
 import { auth } from "./auth.config.js";
+import { prisma } from "../database/prisma.js";
 import type { Request, Response, NextFunction } from "express";
 
 export interface AuthRequest extends Request {
@@ -26,6 +27,13 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
 
     if (!session) {
       res.status(401).json({ success: false, error: "Unauthorized" });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true } });
+
+    if (!user) {
+      res.status(401).json({ success: false, error: "Session expired — please log out and log back in" });
       return;
     }
 

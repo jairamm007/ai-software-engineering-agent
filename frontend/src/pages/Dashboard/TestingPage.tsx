@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { FlaskConical, Play, RotateCcw, Search, FileCode2, FolderGit2, CheckCircle2, XCircle, TrendingUp } from "lucide-react";
+import { FlaskConical, Play, RotateCcw, Search, FileCode2, FolderGit2, CheckCircle2, XCircle, TrendingUp, FileStack, FolderOpen, CheckSquare, Square } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import AIResult from "@/components/repository/AIResult";
@@ -18,12 +18,16 @@ const stats = [
   { label: "Coverage", value: "87.3%", icon: TrendingUp, color: "cyan" },
 ];
 
+type TestScope = "single" | "multiple" | "repository";
+
 export default function TestingPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
   const [selectedRepoId, setSelectedRepoId] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [scope, setScope] = useState<TestScope>("single");
   const [search, setSearch] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,27 +43,36 @@ export default function TestingPage() {
     enabled: !!selectedRepoId,
   });
 
-  const files =
-    repoData?.files.filter(
-      (f) => !search || f.path.toLowerCase().includes(search.toLowerCase())
-    ) ?? [];
+  const files = useMemo(() => repoData?.files.filter((file) => !search || file.path.toLowerCase().includes(search.toLowerCase())) ?? [], [repoData, search]);
 
   const handleRepoSelect = (repoId: string) => {
     setSelectedRepoId(repoId);
     setSelectedFile("");
+    setSelectedFiles(new Set());
+    setScope("single");
     setResult("");
     setSearch("");
   };
 
+  const toggleSelectedFile = (path: string) => setSelectedFiles((previous) => {
+    const next = new Set(previous);
+    next.has(path) ? next.delete(path) : next.add(path);
+    return next;
+  });
+  const canGenerate = !!repoData && (scope === "repository" || (scope === "single" ? !!selectedFile : selectedFiles.size > 0));
+
   const runTestGen = async (type: "unit" | "integration") => {
-    if (!selectedFile || !repoData) return;
+    if (!repoData || !canGenerate) return;
     setLoading(true);
     setResult("");
     try {
+      const targets = scope === "single" ? selectedFile : Array.from(selectedFiles).join(", ");
       const response = await askRepository({
-        question: `Generate comprehensive ${type} tests for this file: ${selectedFile}`,
+        question: scope === "repository"
+          ? `Generate comprehensive ${type} tests for this entire repository, covering critical modules, integration boundaries, mocks, and edge cases.`
+          : `Generate comprehensive ${type} tests for the following ${scope === "multiple" ? "files" : "file"}: ${targets}`,
         repositoryId: repoData.id,
-        filePath: selectedFile,
+        filePath: scope === "single" ? selectedFile : undefined,
       });
       setResult(response.answer ?? JSON.stringify(response));
     } catch {
@@ -213,6 +226,14 @@ export default function TestingPage() {
               </div>
             ) : (
               <>
+                <div className="grid gap-3 px-5 pt-5 sm:grid-cols-3">
+                  {[
+                    ["single", "Single File", FileCode2],
+                    ["multiple", "Multiple Files", FileStack],
+                    ["repository", "Entire Repository", FolderOpen],
+                  ].map(([value, label, Icon]) => <button key={value as string} type="button" onClick={() => { setScope(value as TestScope); setSelectedFile(""); setSelectedFiles(new Set()); }} className={`flex items-center gap-2 rounded-xl border p-3 text-left text-sm font-medium ${scope === value ? "accent-bg-light accent-text-base border-[var(--accent)]/30" : isDark ? "border-white/10 text-slate-400" : "border-slate-200 text-slate-600"}`}><Icon size={16} /><span>{label as string}</span></button>)}
+                </div>
+                {scope !== "repository" && <>
                 <div className="px-5 pt-4">
                   <div className="relative">
                     <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
@@ -231,6 +252,7 @@ export default function TestingPage() {
                 </div>
 
                 <div className="overflow-hidden overflow-y-auto px-3 py-2" style={{ maxHeight: `${Math.max(140, Math.min(files.length * 40 + 20, 480))}px` }}>
+                  {scope === "multiple" && files.length > 0 && <button type="button" onClick={() => setSelectedFiles(selectedFiles.size === files.length ? new Set() : new Set(files.map((file) => file.path)))} className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{selectedFiles.size === files.length ? <CheckSquare size={14} /> : <Square size={14} />}{selectedFiles.size === files.length ? "Deselect all" : `Select all (${files.length})`}</button>}
                   {files.length === 0 && (
                     <p className={`py-4 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>No files found.</p>
                   )}
@@ -238,12 +260,12 @@ export default function TestingPage() {
                     const ext = getFileExtension(file.path);
                     const typeInfo = getFileTypeInfo(ext);
                     const Icon = typeInfo.icon;
-                    const isSelected = selectedFile === file.path;
+                    const isSelected = scope === "multiple" ? selectedFiles.has(file.path) : selectedFile === file.path;
                     return (
                       <button
                         key={file.id}
                         type="button"
-                        onClick={() => setSelectedFile(file.path)}
+                        onClick={() => scope === "multiple" ? toggleSelectedFile(file.path) : setSelectedFile(file.path)}
                         className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all font-[Inter] ${
                           isSelected
                             ? isDark
@@ -269,13 +291,14 @@ export default function TestingPage() {
                     );
                   })}
                 </div>
+                </>}
 
                 <div className={`border-t px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => void runTestGen("unit")}
-                      disabled={!selectedFile || loading}
+                      disabled={!canGenerate || loading}
                       className="flex items-center gap-2 rounded-xl accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:shadow-none font-[Inter]"
                     >
                       {loading ? (
@@ -293,7 +316,7 @@ export default function TestingPage() {
                     <button
                       type="button"
                       onClick={() => void runTestGen("integration")}
-                      disabled={!selectedFile || loading}
+                      disabled={!canGenerate || loading}
                       className="flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-all disabled:opacity-50 font-[Inter] border-[var(--accent)]/30 accent-text-base accent-bg-light"
                     >
                       {loading ? (
@@ -308,11 +331,11 @@ export default function TestingPage() {
                         </>
                       )}
                     </button>
-                    {selectedFile && (
+                    {(selectedFile || selectedFiles.size > 0 || scope === "repository") && (
                       <div className="flex items-center gap-2 ml-1">
                         <FileCode2 size={14} className={`shrink-0 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
                         <span className={`text-xs font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                          {selectedFile}
+                          {scope === "repository" ? "Entire repository" : scope === "multiple" ? `${selectedFiles.size} files selected` : selectedFile}
                         </span>
                       </div>
                     )}

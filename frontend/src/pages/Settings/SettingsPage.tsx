@@ -377,7 +377,7 @@ export default function SettingsPage() {
     setClearing(true);
     try {
       await api.post("/user/clear-cache");
-      const keysToKeep = ["theme", "accent", "sidebar-collapsed"];
+      const keysToKeep = ["theme", "accent", "sidebar-mode"];
       const allKeys = Object.keys(localStorage);
       for (const key of allKeys) {
         if (!keysToKeep.includes(key)) {

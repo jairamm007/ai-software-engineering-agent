@@ -4,6 +4,7 @@ import ProtectedRoute, { GuestRoute } from "@/components/auth/ProtectedRoute";
 import AdminRoute from "@/components/auth/AdminRoute";
 import AdminLayout from "@/layouts/AdminLayout";
 import PublicLayout from "@/layouts/PublicLayout";
+import TeamLayout from "@/layouts/TeamLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const LandingPage = lazy(() => import("@/pages/Landing/LandingPage"));
@@ -16,6 +17,9 @@ const VerifyEmailPage = lazy(() => import("@/pages/Auth/VerifyEmailPage"));
 const DashboardPage = lazy(() => import("@/pages/Dashboard/DashboardPage"));
 const SearchPage = lazy(() => import("@/pages/Dashboard/SearchPage"));
 const CodeReviewPage = lazy(() => import("@/pages/Dashboard/CodeReviewPage"));
+const CodeGenerationPage = lazy(() => import("@/pages/CodeGeneration/CodeGenerationPage"));
+const DebuggingPage = lazy(() => import("@/pages/Debugging/DebuggingPage"));
+const SecurityPage = lazy(() => import("@/pages/Security/SecurityPage"));
 const ArchitecturePage = lazy(() => import("@/pages/Dashboard/ArchitecturePage"));
 const DocumentationPage = lazy(() => import("@/pages/Dashboard/DocumentationPage"));
 const TestingPage = lazy(() => import("@/pages/Dashboard/TestingPage"));
@@ -40,6 +44,19 @@ const RepositorySemanticSearchPage = lazy(() => import("@/pages/Repository/Seman
 const MultiAgentPage = lazy(() => import("@/pages/Repository/MultiAgent/MultiAgentPage"));
 const RepositorySettingsPage = lazy(() => import("@/pages/Repository/RepositorySettingsPage"));
 const GitHubIntegrationPage = lazy(() => import("@/pages/GitHub/GitHubIntegrationPage"));
+const TeamsPage = lazy(() => import("@/pages/Teams/TeamsPage"));
+const TeamDashboardPage = lazy(() => import("@/pages/Teams/TeamDashboardPage"));
+const TeamMembersPage = lazy(() => import("@/pages/Teams/TeamMembersPage"));
+const TeamReposPage = lazy(() => import("@/pages/Teams/TeamReposPage"));
+const TeamChatPage = lazy(() => import("@/pages/Teams/TeamChatPage"));
+const TeamDiscussionsPage = lazy(() => import("@/pages/Teams/TeamDiscussionsPage"));
+const TeamDocumentationPage = lazy(() => import("@/pages/Teams/TeamDocumentationPage"));
+const TeamCodeReviewsPage = lazy(() => import("@/pages/Teams/TeamCodeReviewsPage"));
+const TeamTestingPage = lazy(() => import("@/pages/Teams/TeamTestingPage"));
+const TeamAnalyticsPage = lazy(() => import("@/pages/Teams/TeamAnalyticsPage"));
+const TeamActivityPage = lazy(() => import("@/pages/Teams/TeamActivityPage"));
+const TeamNotificationsPage = lazy(() => import("@/pages/Teams/TeamNotificationsPage"));
+const TeamSettingsPage = lazy(() => import("@/pages/Teams/TeamSettingsPage"));
 
 const AdminLoginPage = lazy(() => import("@/pages/Admin/AdminLoginPage"));
 const AdminDashboardPage = lazy(() => import("@/pages/Admin/AdminDashboardPage"));
@@ -132,6 +149,9 @@ export const router = createBrowserRouter([
   { path: "/search", element: <LazyPage><ProtectedRoute><SearchPage /></ProtectedRoute></LazyPage> },
   { path: "/chat", element: <LazyPage><ProtectedRoute><AIChatPage /></ProtectedRoute></LazyPage> },
   { path: "/code-review", element: <LazyPage><ProtectedRoute><CodeReviewPage /></ProtectedRoute></LazyPage> },
+  { path: "/code-generation", element: <LazyPage><ProtectedRoute><CodeGenerationPage /></ProtectedRoute></LazyPage> },
+  { path: "/debugging", element: <LazyPage><ProtectedRoute><DebuggingPage /></ProtectedRoute></LazyPage> },
+  { path: "/security", element: <LazyPage><ProtectedRoute><SecurityPage /></ProtectedRoute></LazyPage> },
   { path: "/architecture", element: <LazyPage><ProtectedRoute><ArchitecturePage /></ProtectedRoute></LazyPage> },
   { path: "/documentation", element: <LazyPage><ProtectedRoute><DocumentationPage /></ProtectedRoute></LazyPage> },
   { path: "/testing", element: <LazyPage><ProtectedRoute><TestingPage /></ProtectedRoute></LazyPage> },
@@ -141,6 +161,25 @@ export const router = createBrowserRouter([
   { path: "/settings", element: <LazyPage><ProtectedRoute><SettingsPage /></ProtectedRoute></LazyPage> },
   { path: "/profile", element: <LazyPage><ProtectedRoute><ProfilePage /></ProtectedRoute></LazyPage> },
   { path: "/github", element: <LazyPage><ProtectedRoute><GitHubIntegrationPage /></ProtectedRoute></LazyPage> },
+  { path: "/teams", element: <LazyPage><ProtectedRoute><TeamsPage /></ProtectedRoute></LazyPage> },
+  {
+    path: "/teams/:teamId",
+    element: <LazyPage><ProtectedRoute><TeamLayout /></ProtectedRoute></LazyPage>,
+    children: [
+      { index: true, element: <TeamDashboardPage /> },
+      { path: "members", element: <TeamMembersPage /> },
+      { path: "repositories", element: <TeamReposPage /> },
+      { path: "chat", element: <TeamChatPage /> },
+      { path: "discussions", element: <TeamDiscussionsPage /> },
+      { path: "documentation", element: <TeamDocumentationPage /> },
+      { path: "code-reviews", element: <TeamCodeReviewsPage /> },
+      { path: "testing", element: <TeamTestingPage /> },
+      { path: "analytics", element: <TeamAnalyticsPage /> },
+      { path: "activity", element: <TeamActivityPage /> },
+      { path: "notifications", element: <TeamNotificationsPage /> },
+      { path: "settings", element: <TeamSettingsPage /> },
+    ],
+  },
   { path: "/repositories", element: <LazyPage><ProtectedRoute><RepositoryPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id", element: <LazyPage><ProtectedRoute><RepositoryDetailsPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/chat", element: <LazyPage><ProtectedRoute><RepositoryChatPage /></ProtectedRoute></LazyPage> },

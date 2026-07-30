@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import Sidebar from "@/components/sidebar/Sidebar";
 import TopBar from "@/components/layout/TopBar";
+import ScrollToTop from "@/components/common/ScrollToTop";
 import { useTheme } from "@/context/ThemeContext";
 
 interface Props {
@@ -18,6 +19,7 @@ export default function DashboardLayout({ children }: Props) {
         ? "bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950"
         : "bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50"
     }`}>
+      <ScrollToTop />
       <Sidebar />
 
       <div className="flex flex-1 flex-col overflow-hidden">

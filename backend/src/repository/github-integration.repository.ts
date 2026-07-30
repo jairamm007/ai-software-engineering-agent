@@ -1,4 +1,5 @@
 import { prisma } from "../database/prisma.js";
+import { encryptToken, decryptToken } from "../utils/encryption.js";
 
 export const getGitHubOAuthToken = async (userId: string) => {
   const account = await prisma.account.findFirst({
@@ -14,45 +15,69 @@ export const createIntegration = async (
   token: string
 ) => {
   return prisma.gitHubIntegration.create({
-    data: { userId, githubUrl, token },
+    data: { userId, githubUrl, token: encryptToken(token) },
   });
 };
 
 export const getIntegrationById = async (id: string) => {
-  return prisma.gitHubIntegration.findUnique({
+  const integration = await prisma.gitHubIntegration.findUnique({
     where: { id },
     include: {
       repos: { orderBy: { updatedAt: "desc" } },
     },
   });
+
+  if (integration) {
+    integration.token = decryptToken(integration.token);
+  }
+
+  return integration;
 };
 
 export const getIntegrationByUserAndUrl = async (
   userId: string,
   githubUrl: string
 ) => {
-  return prisma.gitHubIntegration.findUnique({
+  const integration = await prisma.gitHubIntegration.findUnique({
     where: { userId_githubUrl: { userId, githubUrl } },
   });
+
+  if (integration) {
+    integration.token = decryptToken(integration.token);
+  }
+
+  return integration;
 };
 
 export const getUserIntegrations = async (userId: string) => {
-  return prisma.gitHubIntegration.findMany({
+  const integrations = await prisma.gitHubIntegration.findMany({
     where: { userId },
     include: {
       _count: { select: { repos: true } },
     },
     orderBy: { createdAt: "desc" },
   });
+
+  for (const integration of integrations) {
+    integration.token = decryptToken(integration.token);
+  }
+
+  return integrations;
 };
 
 export const updateIntegration = async (
   id: string,
-  data: { isActive?: boolean; lastSyncAt?: Date }
+  data: { isActive?: boolean; lastSyncAt?: Date; token?: string }
 ) => {
+  const updateData: Record<string, unknown> = {};
+
+  if (data.isActive !== undefined) updateData.isActive = data.isActive;
+  if (data.lastSyncAt !== undefined) updateData.lastSyncAt = data.lastSyncAt;
+  if (data.token !== undefined) updateData.token = encryptToken(data.token);
+
   return prisma.gitHubIntegration.update({
     where: { id },
-    data,
+    data: updateData,
   });
 };
 

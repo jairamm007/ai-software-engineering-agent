@@ -9,7 +9,7 @@ const UseCases = lazy(() => import("@/components/landing/UseCases"));
 const CTA = lazy(() => import("@/components/landing/CTA"));
 
 function SectionLoader() {
-  return <div className="h-20 w-full animate-pulse bg-slate-200/5 dark:bg-slate-800/50 rounded-lg" />;
+  return <div className="h-20 w-full animate-pulse rounded-lg bg-slate-200/5 dark:bg-slate-800/50" />;
 }
 
 export default function LandingPage() {
@@ -22,22 +22,29 @@ export default function LandingPage() {
     }`}>
       <div className="relative z-10">
         <Hero />
+
         <Suspense fallback={<SectionLoader />}>
           <Features />
         </Suspense>
-        <div className={`mx-auto my-8 h-px w-full max-w-4xl ${isDark ? "bg-white/5" : "bg-slate-200"}`} />
+
+        <div className={`mx-auto h-px w-full max-w-4xl ${isDark ? "bg-white/5" : "bg-slate-200"}`} />
+
         <Suspense fallback={<SectionLoader />}>
           <Statistics />
         </Suspense>
-        <div className={`mx-auto my-8 h-px w-full max-w-4xl ${isDark ? "bg-white/5" : "bg-slate-200"}`} />
+
         <Suspense fallback={<SectionLoader />}>
           <Workflow />
         </Suspense>
-        <div className={`mx-auto my-8 h-px w-full max-w-4xl ${isDark ? "bg-white/5" : "bg-slate-200"}`} />
+
+        <div className={`mx-auto h-px w-full max-w-4xl ${isDark ? "bg-white/5" : "bg-slate-200"}`} />
+
         <Suspense fallback={<SectionLoader />}>
           <UseCases />
         </Suspense>
-        <div className={`mx-auto my-8 h-px w-full max-w-4xl ${isDark ? "bg-white/5" : "bg-slate-200"}`} />
+
+        <div className={`mx-auto h-px w-full max-w-4xl ${isDark ? "bg-white/5" : "bg-slate-200"}`} />
+
         <Suspense fallback={<SectionLoader />}>
           <CTA />
         </Suspense>
