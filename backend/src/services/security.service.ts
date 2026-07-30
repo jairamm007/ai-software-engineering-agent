@@ -4,6 +4,7 @@ import { getRepositoryById } from "../repository/repository.repository.js";
 import {
   createSecurityScan,
   updateSecurityScan,
+  getSecurityScanById,
   createSecurityIssues,
   createSecurityReport,
 } from "../repository/security.repository.js";
@@ -44,17 +45,17 @@ async function getModel(userId: string): Promise<string | undefined> {
 const SECRET_PATTERNS: { name: string; regex: RegExp; severity: string }[] = [
   { name: "OpenAI API Key", regex: /sk-[A-Za-z0-9]{32,}/g, severity: "critical" },
   { name: "AWS Access Key", regex: /AKIA[0-9A-Z]{16}/g, severity: "critical" },
-  { name: "AWS Secret Key", regex: /(?i)aws[_ ]?secret[_ ]?access[_ ]?key['"]?\s*[:=]\s*['"][A-Za-z0-9\/+=]{40}['"]/g, severity: "critical" },
-  { name: "JWT Secret", regex: /(?i)jwt[_ ]?secret['"]?\s*[:=]\s*['"][^'"]{16,}['"]/g, severity: "high" },
+  { name: "AWS Secret Key", regex: /aws[_ ]?secret[_ ]?access[_ ]?key['"]?\s*[:=]\s*['"][A-Za-z0-9\/+=]{40}['"]/gi, severity: "critical" },
+  { name: "JWT Secret", regex: /jwt[_ ]?secret['"]?\s*[:=]\s*['"][^'"]{16,}['"]/gi, severity: "high" },
   { name: "Database URL", regex: /(?:postgres|mysql|mongodb|redis):\/\/[^@\s]+:[^@\s]+@/g, severity: "critical" },
   { name: "Private Key", regex: /-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/g, severity: "critical" },
   { name: "Google API Key", regex: /AIza[0-9A-Za-z\-_]{35}/g, severity: "high" },
   { name: "Slack Token", regex: /xox[baprs]-[0-9a-zA-Z\-]{10,}/g, severity: "high" },
   { name: "GitHub Token", regex: /gh[ps]_[0-9A-Za-z]{36,}/g, severity: "critical" },
-  { name: "Hardcoded Password", regex: /(?i)password\s*[:=]\s*['"][^'"]{4,}['"]/g, severity: "high" },
+  { name: "Hardcoded Password", regex: /password\s*[:=]\s*['"][^'"]{4,}['"]/gi, severity: "high" },
   { name: "NPM Token", regex: /npm_[A-Za-z0-9]{36,}/g, severity: "high" },
   { name: "Stripe API Key", regex: /sk_live_[0-9A-Za-z]{24,}/g, severity: "critical" },
-  { name: "Heroku API Key", regex: /(?i)heroku[_ ]?api[_ ]?key['"]?\s*[:=]\s*['"][A-Za-z0-9\-]{36}['"]/g, severity: "high" },
+  { name: "Heroku API Key", regex: /heroku[_ ]?api[_ ]?key['"]?\s*[:=]\s*['"][A-Za-z0-9\-]{36}['"]/gi, severity: "high" },
 ];
 
 function scanForSecrets(code: string, filePath: string): CreateSecurityIssueInput[] {

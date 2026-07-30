@@ -27,7 +27,7 @@ function toHeaders(req: Request): Headers {
   return headers;
 }
 
-router.all("/*", async (req: Request, res) => {
+router.all("/{*path}", async (req: Request, res) => {
   try {
     const url = new URL(req.originalUrl, authBaseURL);
 
