@@ -18,10 +18,6 @@ import {
   Copy as CopyIcon,
   CheckCheck,
   FileCode2,
-  Lines,
-  BarChart3,
-  Layers,
-  Activity,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
