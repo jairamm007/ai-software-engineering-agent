@@ -20,6 +20,7 @@ const CodeReviewPage = lazy(() => import("@/pages/Dashboard/CodeReviewPage"));
 const CodeGenerationPage = lazy(() => import("@/pages/CodeGeneration/CodeGenerationPage"));
 const DebuggingPage = lazy(() => import("@/pages/Debugging/DebuggingPage"));
 const SecurityPage = lazy(() => import("@/pages/Security/SecurityPage"));
+const PerformancePage = lazy(() => import("@/pages/Performance/PerformancePage"));
 const ArchitecturePage = lazy(() => import("@/pages/Dashboard/ArchitecturePage"));
 const DocumentationPage = lazy(() => import("@/pages/Dashboard/DocumentationPage"));
 const TestingPage = lazy(() => import("@/pages/Dashboard/TestingPage"));
@@ -152,6 +153,7 @@ export const router = createBrowserRouter([
   { path: "/code-generation", element: <LazyPage><ProtectedRoute><CodeGenerationPage /></ProtectedRoute></LazyPage> },
   { path: "/debugging", element: <LazyPage><ProtectedRoute><DebuggingPage /></ProtectedRoute></LazyPage> },
   { path: "/security", element: <LazyPage><ProtectedRoute><SecurityPage /></ProtectedRoute></LazyPage> },
+  { path: "/performance", element: <LazyPage><ProtectedRoute><PerformancePage /></ProtectedRoute></LazyPage> },
   { path: "/architecture", element: <LazyPage><ProtectedRoute><ArchitecturePage /></ProtectedRoute></LazyPage> },
   { path: "/documentation", element: <LazyPage><ProtectedRoute><DocumentationPage /></ProtectedRoute></LazyPage> },
   { path: "/testing", element: <LazyPage><ProtectedRoute><TestingPage /></ProtectedRoute></LazyPage> },

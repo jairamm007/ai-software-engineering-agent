@@ -215,10 +215,11 @@ export const generateReport = async (scanId: string, userId: string, format: str
   const scan = await getSecurityScanById(scanId, userId);
   if (!scan) throw new Error("Scan not found");
 
-  const critical = scan.issues.filter((i) => i.severity === "critical").length;
-  const high = scan.issues.filter((i) => i.severity === "high").length;
-  const medium = scan.issues.filter((i) => i.severity === "medium").length;
-  const low = scan.issues.filter((i) => i.severity === "low").length;
+  const issues = scan.issues as Array<{ severity: string; filePath?: string; issueType: string; title: string; description?: string; recommendation?: string; status: string }>;
+  const critical = issues.filter((i) => i.severity === "critical").length;
+  const high = issues.filter((i) => i.severity === "high").length;
+  const medium = issues.filter((i) => i.severity === "medium").length;
+  const low = issues.filter((i) => i.severity === "low").length;
 
   const content = [
     `# Security Scan Report`,
@@ -241,7 +242,7 @@ export const generateReport = async (scanId: string, userId: string, format: str
     ``,
   ].join("\n");
 
-  const issuesContent = scan.issues
+  const issuesContent = issues
     .map(
       (issue, i) =>
         `### ${i + 1}. [${issue.severity.toUpperCase()}] ${issue.title}` +
