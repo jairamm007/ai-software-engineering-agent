@@ -27,7 +27,7 @@ function toHeaders(req: Request): Headers {
   return headers;
 }
 
-router.all("/{*path}", async (req: Request, res) => {
+router.all("/*", async (req: Request, res) => {
   try {
     const url = new URL(req.originalUrl, authBaseURL);
 
@@ -47,7 +47,7 @@ router.all("/{*path}", async (req: Request, res) => {
     const location = response.headers.get("location");
 
     for (const cookie of setCookieHeaders) {
-      res.appendHeader("Set-Cookie", cookie);
+      res.append("Set-Cookie", cookie);
     }
 
     if (bodyText) {
