@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { GitBranch, ChevronDown } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import type { GitHubBranch as BranchType } from "@/types/github-integration";
@@ -16,8 +15,6 @@ export default function GitHubBranchSelector({
 }: GitHubBranchSelectorProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-
-  const selected = branches.find((b) => b.name === selectedBranch);
 
   return (
     <div className="relative">

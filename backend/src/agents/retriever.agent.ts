@@ -78,7 +78,7 @@ async function iterativeSearch(
 }
 
 function filterByTask(chunks: any[], task: string): any[] {
-  const taskFilePatterns: Record<string, string[]> = {
+  const taskFilePatterns: Record<string, RegExp[]> = {
     test: [/.test\./i, /.spec\./i, /__tests__/, /test/],
     security: [/.env/i, /auth/i, /middleware/i, /config/i, /secur/i],
     architecture: [/index\./i, /app\./i, /main\./i, /server\./i, /router/i, /types?\./i],

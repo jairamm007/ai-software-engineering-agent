@@ -80,7 +80,7 @@ describe("GitHub Integration Repository", () => {
       data: {
         userId: "user-1",
         githubUrl: "https://github.com",
-        token: "ghp_xxx",
+        token: expect.stringMatching(/^[0-9a-f]+:[0-9a-f]+:[0-9a-f]+$/),
       },
     });
     expect(result.id).toBe("int-1");
@@ -90,6 +90,7 @@ describe("GitHub Integration Repository", () => {
     mockPrisma.gitHubIntegration.findUnique.mockResolvedValue({
       id: "int-1",
       userId: "user-1",
+      token: "ghp_xxx",
       repos: [{ id: "repo-1", name: "my-app" }],
     } as any);
 
@@ -106,6 +107,7 @@ describe("GitHub Integration Repository", () => {
     mockPrisma.gitHubIntegration.findUnique.mockResolvedValue({
       id: "int-1",
       userId: "user-1",
+      token: "ghp_xxx",
     } as any);
 
     const result = await getIntegrationByUserAndUrl("user-1", "https://github.com");
@@ -118,8 +120,8 @@ describe("GitHub Integration Repository", () => {
 
   it("should get all user integrations", async () => {
     mockPrisma.gitHubIntegration.findMany.mockResolvedValue([
-      { id: "int-1", _count: { repos: 5 } },
-      { id: "int-2", _count: { repos: 2 } },
+      { id: "int-1", token: "ghp_xxx", _count: { repos: 5 } },
+      { id: "int-2", token: "ghp_xxx", _count: { repos: 2 } },
     ] as any);
 
     const result = await getUserIntegrations("user-1");

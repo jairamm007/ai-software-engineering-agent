@@ -12,7 +12,7 @@ export const runAgent = async (
 
   const chunks = await retrieverAgent(plan);
 
-  const reasoning = await reasonerAgent(chunks);
+  const reasoning = await reasonerAgent(chunks.chunks);
 
   const answer = await answerAgent(
     plan,

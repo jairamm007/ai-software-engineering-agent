@@ -4,6 +4,7 @@ import { Shield, Crown, Users, RefreshCw } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { listAdmins, type AdminAdmin } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const stagger = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
 const fadeUp = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
@@ -50,7 +51,7 @@ export default function AdminManagementPage() {
           </div>
         </div>
         <button onClick={() => void fetchAdmins()} className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
+          {loading ? <LoadingIndicator size="sm" /> : <RefreshCw size={14} />} Refresh
         </button>
       </motion.div>
 

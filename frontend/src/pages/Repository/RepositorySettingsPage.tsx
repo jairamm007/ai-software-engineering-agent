@@ -6,6 +6,7 @@ import { useTheme } from "@/context/ThemeContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import BackButton from "@/components/common/BackButton";
 import { getRepository, deleteRepository, reindexRepository } from "@/services/repository";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function RepositorySettingsPage() {
   const { id } = useParams();
@@ -48,7 +49,7 @@ export default function RepositorySettingsPage() {
     return (
       <DashboardLayout>
         <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+          <LoadingIndicator size="md" />
           <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             Loading repository...
           </p>
@@ -180,7 +181,7 @@ export default function RepositorySettingsPage() {
                 className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5 disabled:opacity-50"
               >
                 {reindexMutation.isPending ? (
-                  <RefreshCw size={12} className="animate-spin" />
+                  <LoadingIndicator size="sm" />
                 ) : (
                   <RefreshCw size={12} />
                 )}
@@ -210,7 +211,7 @@ export default function RepositorySettingsPage() {
                   className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/20 dark:text-red-400 dark:hover:bg-red-500/10 disabled:opacity-50"
                 >
                   {deleteMutation.isPending ? (
-                    <Trash2 size={12} className="animate-spin" />
+                    <LoadingIndicator size="sm" />
                   ) : (
                     <Trash2 size={12} />
                   )}

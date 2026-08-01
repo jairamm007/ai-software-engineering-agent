@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Sparkles,
-  FileText,
-  CheckCircle,
-  XCircle,
-  MessageSquare,
-  Loader2,
-  Lightbulb,
-  AlertCircle,
-} from "lucide-react";
+import { Sparkles, FileText, CheckCircle, XCircle, MessageSquare, Lightbulb, AlertCircle } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -20,6 +11,7 @@ import type {
   AIPRAssistReviewResult,
   AIPRAssistTitleSuggestion,
 } from "@/types/github-integration";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function GitHubAIPRAssistantTab() {
   const { theme } = useTheme();
@@ -193,7 +185,7 @@ export default function GitHubAIPRAssistantTab() {
         </div>
         <div className="mt-4 flex items-center gap-3">
           <Button onClick={handleGenerateDescription} disabled={generating || !descOwner || !descRepo || !descHead}>
-            {generating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+            {generating ? <LoadingIndicator size="sm" /> : <Sparkles size={14} />}
             <span className="ml-1.5">{generating ? "Generating..." : "Generate Description"}</span>
           </Button>
           {descError && (
@@ -245,7 +237,7 @@ export default function GitHubAIPRAssistantTab() {
         </div>
         <div className="mt-4 flex items-center gap-3">
           <Button onClick={handleSuggestTitles} disabled={suggesting || !titleHead}>
-            {suggesting ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+            {suggesting ? <LoadingIndicator size="sm" /> : <Sparkles size={14} />}
             <span className="ml-1.5">{suggesting ? "Suggesting..." : "Suggest Titles"}</span>
           </Button>
           {titleError && (
@@ -310,7 +302,7 @@ export default function GitHubAIPRAssistantTab() {
         </div>
         <div className="mt-4 flex items-center gap-3">
           <Button onClick={handleReview} disabled={reviewing || !reviewOwner || !reviewRepo || !reviewPullNumber}>
-            {reviewing ? <Loader2 size={14} className="animate-spin" /> : <ListChecks size={14} />}
+            {reviewing ? <LoadingIndicator size="sm" /> : <ListChecks size={14} />}
             <span className="ml-1.5">{reviewing ? "Reviewing..." : "Review PR"}</span>
           </Button>
           {reviewError && (

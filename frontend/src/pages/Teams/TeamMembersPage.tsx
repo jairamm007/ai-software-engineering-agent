@@ -2,13 +2,12 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  Crown, Shield, UserMinus, Send, Loader2,
-} from "lucide-react";
+import { Crown, UserMinus, Send } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { inviteMember, removeMember, changeMemberRole, inviteByUserCode } from "@/services/team";
 import type { Team, TeamMember, TeamRole } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const ROLE_COLORS: Record<string, string> = {
   owner: "bg-amber-500/15 text-amber-400",
@@ -114,7 +113,7 @@ export default function TeamMembersPage() {
               disabled={!inviteEmail.trim() || inviteMutation.isPending}
               className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
             >
-              {inviteMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+              {inviteMutation.isPending ? <LoadingIndicator size="sm" /> : <Send size={13} />}
               Invite
             </button>
           </div>
@@ -148,7 +147,7 @@ export default function TeamMembersPage() {
                 disabled={!inviteCode.trim() || inviteCodeMutation.isPending}
                 className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
               >
-                {inviteCodeMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+                {inviteCodeMutation.isPending ? <LoadingIndicator size="sm" /> : <Send size={13} />}
                 Send
               </button>
             </div>

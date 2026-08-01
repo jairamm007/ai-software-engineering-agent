@@ -2,29 +2,7 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Users,
-  FolderGit2,
-  Activity,
-  MessageSquare,
-  Settings,
-  BarChart3,
-  Bell,
-  ArrowLeft,
-  Loader2,
-  Crown,
-  Shield,
-  UserMinus,
-  Mail,
-  Trash2,
-  Check,
-  Send,
-  Search,
-  Lock,
-  GitBranch,
-  Plus,
-  Sparkles,
-} from "lucide-react";
+import { Users, FolderGit2, Activity, MessageSquare, Settings, BarChart3, Bell, ArrowLeft, Crown, UserMinus, Mail, Trash2, Check, Send, GitBranch, Plus } from "lucide-react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
@@ -47,6 +25,7 @@ import { getRepositories } from "@/services/repository";
 import { getTeamAnalytics } from "@/services/teamAnalytics";
 import { getUnreadCount } from "@/services/teamNotification";
 import type { TeamMember, TeamInvitation, TeamActivity, Comment, TeamRole } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 type Tab = "dashboard" | "members" | "repos" | "activity" | "comments" | "settings";
 
@@ -152,7 +131,7 @@ export default function TeamDetailPage() {
 
   const { data: userRepos = [] } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
     enabled: activeTab === "repos" && isAdmin,
   });
 
@@ -243,7 +222,7 @@ export default function TeamDetailPage() {
     return (
       <DashboardLayout>
         <div className="flex h-64 items-center justify-center">
-          <Loader2 size={24} className="animate-spin accent-text" />
+          <LoadingIndicator size="md" />
         </div>
       </DashboardLayout>
     );
@@ -490,7 +469,7 @@ export default function TeamDetailPage() {
                       disabled={!inviteEmail.trim() || inviteMutation.isPending}
                       className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
                     >
-                      {inviteMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+                      {inviteMutation.isPending ? <LoadingIndicator size="sm" /> : <Send size={13} />}
                       Invite
                     </button>
                   </div>
@@ -651,7 +630,7 @@ export default function TeamDetailPage() {
               <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
                 {activitiesLoading ? (
                   <div className="py-12 flex justify-center">
-                    <Loader2 size={20} className="animate-spin accent-text" />
+                    <LoadingIndicator size="md" />
                   </div>
                 ) : activities.length === 0 ? (
                   <div className="py-12 text-center">
@@ -706,7 +685,7 @@ export default function TeamDetailPage() {
                       disabled={!commentText.trim() || postCommentMutation.isPending}
                       className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
                     >
-                      {postCommentMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+                      {postCommentMutation.isPending ? <LoadingIndicator size="sm" /> : <Send size={13} />}
                       Post
                     </button>
                   </div>
@@ -717,7 +696,7 @@ export default function TeamDetailPage() {
               <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
                 {commentsLoading ? (
                   <div className="py-12 flex justify-center">
-                    <Loader2 size={20} className="animate-spin accent-text" />
+                    <LoadingIndicator size="md" />
                   </div>
                 ) : comments.length === 0 ? (
                   <div className="py-12 text-center">
@@ -812,7 +791,7 @@ export default function TeamDetailPage() {
                     disabled={updateMutation.isPending}
                     className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
                   >
-                    {updateMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                    {updateMutation.isPending ? <LoadingIndicator size="sm" /> : <Check size={13} />}
                     Save Changes
                   </button>
                 </div>
@@ -872,7 +851,7 @@ export default function TeamDetailPage() {
                     disabled={deleteMutation.isPending}
                     className="flex items-center gap-2 rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-50"
                   >
-                    {deleteMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                    {deleteMutation.isPending ? <LoadingIndicator size="sm" /> : <Trash2 size={13} />}
                     Delete Team
                   </button>
                 </div>

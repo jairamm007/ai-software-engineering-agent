@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Plus, Loader2, Trash2, Edit3, X, Check } from "lucide-react";
+import { FileText, Plus, Trash2, Edit3, X, Check } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { getTeamDocuments, createTeamDocument, updateTeamDocument, deleteTeamDocument } from "@/services/team";
 import type { Team, SharedDocument, TeamRole } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface OutletContext {
   team: Team;
@@ -129,7 +130,7 @@ export default function TeamDocumentationPage() {
                 disabled={!newTitle.trim() || createMutation.isPending}
                 className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
               >
-                {createMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                {createMutation.isPending ? <LoadingIndicator size="sm" /> : <Check size={13} />}
                 Create
               </button>
             </div>
@@ -140,7 +141,7 @@ export default function TeamDocumentationPage() {
       {/* Documents List */}
       {isLoading ? (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 size={20} className="animate-spin accent-text" />
+          <LoadingIndicator size="md" />
         </div>
       ) : docs.length === 0 && !showCreate ? (
         <div className={`rounded-2xl border py-16 text-center ${isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"}`}>

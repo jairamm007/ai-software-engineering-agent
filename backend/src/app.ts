@@ -32,10 +32,7 @@ import githubIntegrationRoutes from "./routes/github-integration.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 import aiPRRoutes from "./routes/ai-pr-assistant.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import codeGenerationRoutes from "./routes/code-generation.routes.js";
-import debugRoutes from "./routes/debug.routes.js";
-import securityRoutes from "./routes/security.routes.js";
-import performanceRoutes from "./routes/performance.routes.js";
+import pipelineRoutes from "./pipeline/routes.js";
 
 const app = express();
 
@@ -86,10 +83,7 @@ app.use("/api", githubIntegrationRoutes);
 app.use("/api", webhookRoutes);
 app.use("/api", aiPRRoutes);
 app.use("/api", adminRoutes);
-app.use("/api/ai", codeGenerationRoutes);
-app.use("/api", debugRoutes);
-app.use("/api", securityRoutes);
-app.use("/api", performanceRoutes);
+app.use("/api", pipelineRoutes);
 
 // Catch Better Auth /error requests and redirect to frontend login
 app.get("/error", (req, res) => {

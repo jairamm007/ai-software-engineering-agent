@@ -49,7 +49,7 @@ import {
 
 const router = Router();
 
-router.use(requireAdmin);
+router.use("/admin", requireAdmin);
 
 // Dashboard
 router.get("/admin/stats", getAdminStats);

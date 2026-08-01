@@ -2,22 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  GitPullRequest,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
-  Shield,
-  Zap,
-  Play,
-  RotateCcw,
-  Search,
-  FileCode2,
-  FileStack,
-  FolderOpen,
-  CheckSquare,
-  Square,
-} from "lucide-react";
+import { GitPullRequest, CheckCircle2, AlertTriangle, Clock, Shield, Zap, Play, Search, FileCode2, FileStack, FolderOpen, CheckSquare, Square } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import AIResult from "@/components/repository/AIResult";
@@ -25,6 +10,7 @@ import { getRepositories, getRepository } from "@/services/repository";
 import { askRepository } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, getFileExtension, formatFileSize } from "@/utils/fileIcons";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const statCards = [
   { label: "Overall Score", value: "87%", icon: CheckCircle2, color: "emerald" },
@@ -171,7 +157,7 @@ export default function CodeReviewPage() {
           <div className="p-5">
             {reposLoading ? (
               <div className="flex h-20 items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                <LoadingIndicator size="sm" />
               </div>
             ) : !repos || repos.length === 0 ? (
                 <div className={`rounded-xl border border-dashed p-8 text-center ${isDark ? "border-white/10" : "border-slate-200"}`}>
@@ -219,7 +205,7 @@ export default function CodeReviewPage() {
 
             {repoLoading ? (
               <div className="flex h-32 items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                <LoadingIndicator size="sm" />
               </div>
             ) : (
               <>
@@ -281,7 +267,7 @@ export default function CodeReviewPage() {
                     >
                       {loading ? (
                         <>
-                          <RotateCcw size={14} className="animate-spin" />
+                          <LoadingIndicator size="sm" />
                           Reviewing...
                         </>
                       ) : (

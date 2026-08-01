@@ -1,20 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  Users,
-  FolderGit2,
-  MessageSquare,
-  Activity,
-  FileText,
-  Code2,
-  FlaskConical,
-  Loader2,
-  BarChart3,
-} from "lucide-react";
+import { Users, FolderGit2, MessageSquare, Activity, FileText, Code2, FlaskConical, BarChart3 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { getTeamAnalytics } from "@/services/teamAnalytics";
-import type { TeamAnalyticsData } from "@/services/teamAnalytics";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const STAT_CARDS = [
   { key: "members", label: "Members", icon: Users, color: "text-blue-400 bg-blue-500/10" },
@@ -61,7 +51,7 @@ export default function TeamAnalyticsPage() {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 size={24} className="animate-spin accent-text" />
+        <LoadingIndicator size="md" />
       </div>
     );
   }

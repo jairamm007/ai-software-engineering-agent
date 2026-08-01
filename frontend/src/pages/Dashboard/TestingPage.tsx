@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { FlaskConical, Play, RotateCcw, Search, FileCode2, FolderGit2, CheckCircle2, XCircle, TrendingUp, FileStack, FolderOpen, CheckSquare, Square } from "lucide-react";
+import { FlaskConical, Play, Search, FileCode2, FolderGit2, CheckCircle2, XCircle, TrendingUp, FileStack, FolderOpen, CheckSquare, Square } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import AIResult from "@/components/repository/AIResult";
@@ -10,6 +10,7 @@ import { getRepositories, getRepository } from "@/services/repository";
 import { askRepository } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, getFileExtension, formatFileSize } from "@/utils/fileIcons";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const stats = [
   { label: "Total Tests", value: "248", icon: FlaskConical, colorClass: "accent-text-base" },
@@ -136,7 +137,7 @@ export default function TestingPage() {
           <div className="p-5">
             {reposLoading ? (
               <div className="flex h-20 items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                <LoadingIndicator size="sm" />
               </div>
             ) : !repos || repos.length === 0 ? (
               <div className={`rounded-xl border border-dashed p-8 text-center ${isDark ? "border-white/10" : "border-slate-200"}`}>
@@ -222,7 +223,7 @@ export default function TestingPage() {
 
             {repoLoading ? (
               <div className="flex h-32 items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                <LoadingIndicator size="sm" />
               </div>
             ) : (
               <>
@@ -303,7 +304,7 @@ export default function TestingPage() {
                     >
                       {loading ? (
                         <>
-                          <RotateCcw size={14} className="animate-spin" />
+                          <LoadingIndicator size="sm" />
                           Generating...
                         </>
                       ) : (
@@ -321,7 +322,7 @@ export default function TestingPage() {
                     >
                       {loading ? (
                         <>
-                          <RotateCcw size={14} className="animate-spin" />
+                          <LoadingIndicator size="sm" />
                           Generating...
                         </>
                       ) : (

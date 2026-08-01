@@ -6,6 +6,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import PublicLayout from "@/layouts/PublicLayout";
 import TeamLayout from "@/layouts/TeamLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const LandingPage = lazy(() => import("@/pages/Landing/LandingPage"));
 const FAQPage = lazy(() => import("@/pages/FAQ/FAQPage"));
@@ -17,10 +18,9 @@ const VerifyEmailPage = lazy(() => import("@/pages/Auth/VerifyEmailPage"));
 const DashboardPage = lazy(() => import("@/pages/Dashboard/DashboardPage"));
 const SearchPage = lazy(() => import("@/pages/Dashboard/SearchPage"));
 const CodeReviewPage = lazy(() => import("@/pages/Dashboard/CodeReviewPage"));
-const CodeGenerationPage = lazy(() => import("@/pages/CodeGeneration/CodeGenerationPage"));
-const DebuggingPage = lazy(() => import("@/pages/Debugging/DebuggingPage"));
-const SecurityPage = lazy(() => import("@/pages/Security/SecurityPage"));
-const PerformancePage = lazy(() => import("@/pages/Performance/PerformancePage"));
+const RunsListPage = lazy(() => import("@/pages/Runs/RunsListPage"));
+const NewRunPage = lazy(() => import("@/pages/Runs/NewRunPage"));
+const RunDetailPage = lazy(() => import("@/pages/Runs/RunDetailPage"));
 const ArchitecturePage = lazy(() => import("@/pages/Dashboard/ArchitecturePage"));
 const DocumentationPage = lazy(() => import("@/pages/Dashboard/DocumentationPage"));
 const TestingPage = lazy(() => import("@/pages/Dashboard/TestingPage"));
@@ -89,10 +89,18 @@ const CareersPage = lazy(() => import("@/pages/Info/CareersPage"));
 const PrivacyPage = lazy(() => import("@/pages/Info/PrivacyPage"));
 const TermsPage = lazy(() => import("@/pages/Info/TermsPage"));
 
+const pageModules = import.meta.glob("/src/pages/**/*.tsx");
+
+export function prefetchRoutes(): void {
+  for (const loader of Object.values(pageModules)) {
+    void loader();
+  }
+}
+
 function PageLoader() {
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 accent-border border-t-transparent" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <LoadingIndicator size="lg" label="Loading page" />
     </div>
   );
 }
@@ -150,10 +158,9 @@ export const router = createBrowserRouter([
   { path: "/search", element: <LazyPage><ProtectedRoute><SearchPage /></ProtectedRoute></LazyPage> },
   { path: "/chat", element: <LazyPage><ProtectedRoute><AIChatPage /></ProtectedRoute></LazyPage> },
   { path: "/code-review", element: <LazyPage><ProtectedRoute><CodeReviewPage /></ProtectedRoute></LazyPage> },
-  { path: "/code-generation", element: <LazyPage><ProtectedRoute><CodeGenerationPage /></ProtectedRoute></LazyPage> },
-  { path: "/debugging", element: <LazyPage><ProtectedRoute><DebuggingPage /></ProtectedRoute></LazyPage> },
-  { path: "/security", element: <LazyPage><ProtectedRoute><SecurityPage /></ProtectedRoute></LazyPage> },
-  { path: "/performance", element: <LazyPage><ProtectedRoute><PerformancePage /></ProtectedRoute></LazyPage> },
+  { path: "/runs", element: <LazyPage><ProtectedRoute><RunsListPage /></ProtectedRoute></LazyPage> },
+  { path: "/runs/new", element: <LazyPage><ProtectedRoute><NewRunPage /></ProtectedRoute></LazyPage> },
+  { path: "/runs/:runId", element: <LazyPage><ProtectedRoute><RunDetailPage /></ProtectedRoute></LazyPage> },
   { path: "/architecture", element: <LazyPage><ProtectedRoute><ArchitecturePage /></ProtectedRoute></LazyPage> },
   { path: "/documentation", element: <LazyPage><ProtectedRoute><DocumentationPage /></ProtectedRoute></LazyPage> },
   { path: "/testing", element: <LazyPage><ProtectedRoute><TestingPage /></ProtectedRoute></LazyPage> },

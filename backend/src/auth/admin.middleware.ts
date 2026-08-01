@@ -1,9 +1,10 @@
 import { auth } from "./auth.config.js";
 import type { Request, Response, NextFunction } from "express";
+import type { ParamsFlatDictionary } from "express-serve-static-core";
 
 type Session = typeof auth.$Infer.Session;
 
-export interface AuthRequest extends Request {
+export interface AuthRequest extends Request<ParamsFlatDictionary> {
   userId?: string;
   session?: Session;
 }

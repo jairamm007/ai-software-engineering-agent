@@ -20,6 +20,7 @@ import RepositoryAnalytics from "@/components/repository/RepositoryAnalytics";
 import { getRepository } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, formatFileSize, getFileExtension } from "@/utils/fileIcons";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const container = {
   hidden: {},
@@ -62,7 +63,7 @@ export default function RepositoryOverviewPage() {
     return (
       <DashboardLayout>
         <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+          <LoadingIndicator size="md" />
           <div className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             Loading repository...
           </div>
@@ -195,10 +196,10 @@ export default function RepositoryOverviewPage() {
                       isDark
                         ? "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
                         : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-                    } ${reindexing ? "animate-spin" : ""}`}
+                    }`}
                     title="Refresh repository"
                   >
-                    <RefreshCw size={13} />
+                    {reindexing ? <LoadingIndicator size="sm" /> : <RefreshCw size={13} />}
                   </button>
                 </div>
               </div>

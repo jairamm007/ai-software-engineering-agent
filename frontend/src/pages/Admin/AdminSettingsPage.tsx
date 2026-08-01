@@ -1,21 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Settings,
-  Globe,
-  Palette,
-  Mail,
-  Bot,
-  AlertTriangle,
-  Save,
-  RefreshCw,
-  Database,
-  Shield,
-  ChevronRight,
-} from "lucide-react";
+import { Globe, Palette, Mail, Bot, AlertTriangle, Save, Database, Shield, ChevronRight } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { getSystemSettings, updateSystemSettings } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface SettingsSection {
   key: string;
@@ -145,7 +134,7 @@ export default function AdminSettingsPage() {
           disabled={saving}
           className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 px-5 py-2.5 text-[13px] font-medium text-white shadow-lg shadow-rose-500/20 transition-all hover:shadow-rose-500/30 disabled:opacity-50"
         >
-          {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+          {saving ? <LoadingIndicator size="sm" /> : <Save size={14} />}
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </motion.div>
@@ -208,7 +197,7 @@ export default function AdminSettingsPage() {
         >
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+              <LoadingIndicator size="sm" />
             </div>
           ) : (
             <AnimatePresence mode="wait">

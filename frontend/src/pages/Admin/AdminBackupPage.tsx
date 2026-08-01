@@ -19,6 +19,7 @@ import {
   deleteBackup,
   type AdminBackup,
 } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
 const fadeUp = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
@@ -121,7 +122,7 @@ export default function AdminBackupPage() {
             className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-rose-500/25 transition-all hover:shadow-xl hover:shadow-rose-500/30 disabled:opacity-50"
           >
             {creating ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <LoadingIndicator size="sm" />
             ) : (
               <Plus size={16} />
             )}
@@ -190,7 +191,7 @@ export default function AdminBackupPage() {
                 <tr>
                   <td colSpan={6} className="px-5 py-16 text-center">
                     <div className="flex items-center justify-center gap-3">
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                      <LoadingIndicator size="sm" />
                       <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                         Loading backups...
                       </span>

@@ -4,6 +4,7 @@ import { Activity, Search, RefreshCw, ChevronLeft, ChevronRight } from "lucide-r
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { listActivityLogs, type AdminActivityLog } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const stagger = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
 const fadeUp = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
@@ -62,7 +63,7 @@ export default function AdminActivityLogsPage() {
             <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>All platform activity and audit trails</p>
           </div>
         </div>
-        <button onClick={() => void fetchLogs()} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}><RefreshCw size={14} className={loading ? "animate-spin" : ""} /></button>
+        <button onClick={() => void fetchLogs()} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}>{loading ? <LoadingIndicator size="sm" /> : <RefreshCw size={14} />}</button>
       </motion.div>
 
       <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-3">

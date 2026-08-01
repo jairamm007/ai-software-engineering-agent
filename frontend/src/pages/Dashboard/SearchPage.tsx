@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, FileCode2, Bot, ArrowRight, Loader2, Code2, Layers } from "lucide-react";
+import { Search, FileCode2, Bot, ArrowRight, Code2, Layers } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { askRepository } from "@/services/chat";
 import { getRepositories } from "@/services/repository";
 import { useQuery } from "@tanstack/react-query";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const tabs = ["All", "Files", "Functions", "Repositories"];
 
@@ -99,7 +100,7 @@ export default function SearchPage() {
               disabled={loading || !query.trim()}
               className={`absolute right-3 top-1/2 -translate-y-1/2 rounded-xl px-4 py-2 text-sm font-medium font-[Inter] transition-all ${loading || !query.trim() ? isDark ? "bg-white/5 text-slate-600 cursor-not-allowed" : "bg-slate-100 text-slate-400 cursor-not-allowed" : "accent-gradient text-white hover:shadow-lg accent-shadow hover:scale-[1.02] active:scale-[0.98]"}`}
             >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : <><ArrowRight size={16} /></>}
+              {loading ? <LoadingIndicator size="sm" /> : <><ArrowRight size={16} /></>}
             </button>
           </div>
         </motion.div>

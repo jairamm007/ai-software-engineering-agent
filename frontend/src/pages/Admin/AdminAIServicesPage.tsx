@@ -15,9 +15,10 @@ import {
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { getAIStats, type AIStats } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const container = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
-const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] } } };
+const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } } };
 
 function formatShortDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -172,7 +173,7 @@ export default function AdminAIServicesPage() {
         <div className="p-6">
           {loading ? (
             <div className="flex h-48 items-center justify-center">
-              <div className="h-7 w-7 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+              <LoadingIndicator size="md" />
             </div>
           ) : chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
@@ -240,7 +241,7 @@ export default function AdminAIServicesPage() {
         <div className="divide-y">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-7 w-7 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+              <LoadingIndicator size="md" />
             </div>
           ) : (
             data?.providers.map((p, i) => (

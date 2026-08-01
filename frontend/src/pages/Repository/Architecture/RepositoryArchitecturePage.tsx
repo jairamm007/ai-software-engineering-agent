@@ -12,6 +12,7 @@ import { getRepository } from "@/services/repository";
 import { streamChat } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, getFileExtension, formatFileSize } from "@/utils/fileIcons";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function RepositoryArchitecturePage() {
   const { id } = useParams<{ id: string }>();
@@ -85,7 +86,7 @@ export default function RepositoryArchitecturePage() {
     return (
       <DashboardLayout>
         <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+          <LoadingIndicator size="md" />
           <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>Loading repository...</p>
         </div>
       </DashboardLayout>

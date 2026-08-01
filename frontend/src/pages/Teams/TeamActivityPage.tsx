@@ -1,11 +1,12 @@
 import { useOutletContext } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Activity, Loader2, Filter } from "lucide-react";
+import { Activity, Filter } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { getActivities } from "@/services/activity";
 import type { Team, TeamActivity, TeamRole } from "@/types/team";
 import { useState } from "react";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface OutletContext {
   team: Team;
@@ -68,7 +69,7 @@ export default function TeamActivityPage() {
 
       {isLoading ? (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 size={20} className="animate-spin accent-text" />
+          <LoadingIndicator size="md" />
         </div>
       ) : activities.length === 0 ? (
         <div className={`rounded-2xl border py-16 text-center ${isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"}`}>

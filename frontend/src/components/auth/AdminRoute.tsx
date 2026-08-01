@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/context/ThemeContext";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface Props {
   children: React.ReactNode;
@@ -8,19 +8,12 @@ interface Props {
 
 export default function AdminRoute({ children }: Props) {
   const { isAuthenticated, isLoading, user } = useAuth();
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
   const location = useLocation();
 
   if (isLoading) {
     return (
-      <div className={`flex min-h-screen items-center justify-center ${
-        isDark ? "bg-slate-900" : "bg-slate-50"
-      }`}>
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-red-500 border-t-transparent" />
-          <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>Verifying admin access...</p>
-        </div>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <LoadingIndicator size="lg" label="Verifying admin access" />
       </div>
     );
   }

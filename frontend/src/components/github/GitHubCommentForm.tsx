@@ -4,6 +4,7 @@ import { MessageSquare, X, AlertCircle } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createGitHubIssueComment, createGitHubPRComment } from "@/services/github-integration";
+import type { GitHubCreatedComment, GitHubCreatedReview } from "@/types/github-integration";
 
 interface GitHubCommentFormProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ export default function GitHubCommentForm({
   const queryClient = useQueryClient();
   const [body, setBody] = useState("");
 
-  const createMutation = useMutation({
+  const createMutation = useMutation<GitHubCreatedComment | GitHubCreatedReview, Error, string>({
     mutationFn: (commentBody: string) =>
       type === "issue"
         ? createGitHubIssueComment(integrationId, owner, repo, number, commentBody)

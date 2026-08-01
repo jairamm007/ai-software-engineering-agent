@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { Sparkles, Send, Loader2, Lightbulb } from "lucide-react";
+import { Sparkles, Send, Lightbulb } from "lucide-react";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface Props {
   onSearch: (query: string) => void;
@@ -54,7 +55,7 @@ export default function NaturalLanguageQuery({ onSearch, isLoading }: Props) {
           disabled={isLoading || !query.trim()}
           className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {isLoading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+          {isLoading ? <LoadingIndicator size="sm" /> : <Send size={14} />}
           Search
         </button>
       </form>

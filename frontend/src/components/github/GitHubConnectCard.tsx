@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Loader2, GitBranch, KeyRound, ChevronDown, ChevronUp } from "lucide-react";
+import { GitBranch, KeyRound, ChevronDown, ChevronUp } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface GitHubConnectCardProps {
   isConnecting: boolean;
@@ -46,7 +47,7 @@ export default function GitHubConnectCard({
           className="inline-flex items-center gap-2 rounded-xl bg-[#24292f] px-6 py-3 text-sm font-medium text-white transition-all hover:bg-[#32383f] disabled:opacity-50"
         >
           {isConnecting ? (
-            <Loader2 size={16} className="animate-spin" />
+            <LoadingIndicator size="sm" />
           ) : (
             <GitBranch size={16} />
           )}
@@ -111,7 +112,7 @@ export default function GitHubConnectCard({
               className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isConnectingPAT ? (
-                <Loader2 size={14} className="animate-spin" />
+                <LoadingIndicator size="sm" />
               ) : (
                 <KeyRound size={14} />
               )}

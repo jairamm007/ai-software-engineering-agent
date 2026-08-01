@@ -5,6 +5,7 @@ import { Check, X, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function VerifyEmailPage() {
   const { theme } = useTheme();
@@ -28,7 +29,7 @@ export default function VerifyEmailPage() {
   }, [token, verifyEmail]);
 
   const icons = {
-    verifying: <div className="h-16 w-16 animate-spin rounded-full border-4 border-[var(--accent)] border-t-transparent" />,
+    verifying: <LoadingIndicator size="lg" />,
     success: (
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15">
         <Check size={28} className="text-emerald-500" />

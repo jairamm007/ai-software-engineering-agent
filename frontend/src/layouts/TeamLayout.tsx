@@ -1,24 +1,11 @@
 import { useParams, Link, useLocation, Outlet } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  LayoutDashboard,
-  Users,
-  FolderGit2,
-  MessageSquare,
-  Activity,
-  FileText,
-  Code2,
-  FlaskConical,
-  BarChart3,
-  Bell,
-  Settings,
-  ArrowLeft,
-  Loader2,
-} from "lucide-react";
+import { LayoutDashboard, Users, FolderGit2, MessageSquare, Activity, FileText, Code2, FlaskConical, BarChart3, Bell, Settings, ArrowLeft } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { getTeam } from "@/services/team";
 import { useAuth } from "@/context/AuthContext";
 import type { TeamMember, TeamRole } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface NavItem {
   icon: typeof LayoutDashboard;
@@ -63,7 +50,7 @@ export default function TeamLayout() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 size={24} className="animate-spin accent-text" />
+        <LoadingIndicator size="md" />
       </div>
     );
   }

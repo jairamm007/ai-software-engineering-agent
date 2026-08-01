@@ -1,18 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Users,
-  FolderGit2,
-  Bot,
-  Shield,
-  Activity,
-  Download,
-  FileText,
-  Loader2,
-} from "lucide-react";
+import { Users, FolderGit2, Bot, Shield, Activity, Download, FileText } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { generateReport } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const reportTypes = [
   {
@@ -185,7 +177,7 @@ export default function AdminReportsPage() {
                     } disabled:opacity-50`}
                   >
                     {isThisGenerating ? (
-                      <Loader2 size={12} className="animate-spin" />
+                      <LoadingIndicator size="sm" />
                     ) : (
                       <Download size={12} />
                     )}

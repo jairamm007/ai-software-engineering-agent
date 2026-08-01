@@ -24,11 +24,11 @@ import {
   Pie,
   Cell,
   Legend,
-  BarChart as ReBarChart,
 } from "recharts";
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { getAnalytics, type AnalyticsData } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const container = {
   hidden: {},
@@ -39,7 +39,7 @@ const item = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const },
   },
 };
 
@@ -286,7 +286,7 @@ export default function AdminAnalyticsPage() {
         toggleButton(aiChartType, setAiChartType),
         loading ? (
           <div className="flex h-[260px] items-center justify-center">
-            <div className="h-7 w-7 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+            <LoadingIndicator size="md" />
           </div>
         ) : aiChartData.length > 0 ? (
           renderBarArea(aiChartData, "Messages", "#f43f5e", aiChartType, "aiGrad")
@@ -318,7 +318,7 @@ export default function AdminAnalyticsPage() {
           <div className="p-6">
             {loading ? (
               <div className="flex h-[220px] items-center justify-center">
-                <div className="h-7 w-7 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+                <LoadingIndicator size="md" />
               </div>
             ) : storageChartData.length > 0 ? (
               renderBarArea(storageChartData, "Size (MB)", "#8b5cf6", storageChartType, "storageGrad", 220)
@@ -337,7 +337,7 @@ export default function AdminAnalyticsPage() {
           undefined,
           loading ? (
             <div className="flex h-[220px] items-center justify-center">
-              <div className="h-7 w-7 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+              <LoadingIndicator size="md" />
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
@@ -376,7 +376,7 @@ export default function AdminAnalyticsPage() {
         undefined,
         loading ? (
           <div className="flex h-[300px] items-center justify-center">
-            <div className="h-7 w-7 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+            <LoadingIndicator size="md" />
           </div>
         ) : languagePieData.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-center">

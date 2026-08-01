@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, RefreshCw, Trash2, Database, FileCode2, Zap } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { getRepositoryStats, type RepositoryStats } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const stagger = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
 const fadeUp = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
@@ -50,7 +51,7 @@ export default function AdminSearchPage() {
             <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>Manage search index and content</p>
           </div>
         </div>
-        <button onClick={() => void fetchStats()} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}><RefreshCw size={14} className={loading ? "animate-spin" : ""} /></button>
+        <button onClick={() => void fetchStats()} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}>{loading ? <LoadingIndicator size="sm" /> : <RefreshCw size={14} />}</button>
       </motion.div>
 
       <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -68,7 +69,7 @@ export default function AdminSearchPage() {
         <h3 className="text-sm font-semibold mb-4">Index Actions</h3>
         <div className="flex flex-wrap gap-3">
           <button onClick={() => void handleRebuild()} disabled={rebuilding} className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-rose-500/25 disabled:opacity-50">
-            <RefreshCw size={14} className={rebuilding ? "animate-spin" : ""} />
+            {rebuilding ? <LoadingIndicator size="sm" /> : <RefreshCw size={14} />}
             {rebuilding ? "Rebuilding..." : "Rebuild Search Index"}
           </button>
           <button onClick={handleClearCache} className={`flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}>

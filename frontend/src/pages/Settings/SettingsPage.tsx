@@ -2,30 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Sun,
-  Moon,
-  Bell,
-  Trash2,
-  Download,
-  Cpu,
-  Thermometer,
-  ChevronDown,
-  ChevronUp,
-  Check,
-  Shield,
-  Database,
-  Zap,
-  X,
-  Loader2,
-  Palette,
-  Bot,
-  Sparkles,
-} from "lucide-react";
+import { Sun, Moon, Bell, Trash2, Download, Cpu, Thermometer, ChevronDown, ChevronUp, Check, Shield, Database, Zap, X, Palette, Bot, Sparkles } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import api from "@/lib/axios";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const accentColors = [
   { id: "violet" as const, color: "bg-violet-500", ring: "ring-violet-500" },
@@ -510,7 +492,7 @@ export default function SettingsPage() {
                     Default Model
                   </label>
                   {savePrefsMutation.isPending && (
-                    <Loader2 size={12} className="animate-spin" style={{ color: "var(--accent)" }} />
+                    <LoadingIndicator size="sm" />
                   )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -573,7 +555,7 @@ export default function SettingsPage() {
                       Temperature
                     </label>
                     {savePrefsMutation.isPending && (
-                      <Loader2 size={12} className="animate-spin" style={{ color: "var(--accent)" }} />
+                      <LoadingIndicator size="sm" />
                     )}
                   </div>
                   <span
@@ -708,7 +690,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5 disabled:opacity-50"
                   >
                     {exporting ? (
-                      <Loader2 size={12} className="animate-spin" />
+                      <LoadingIndicator size="sm" />
                     ) : (
                       <Download size={12} />
                     )}
@@ -742,7 +724,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5 disabled:opacity-50"
                   >
                     {clearing ? (
-                      <Loader2 size={12} className="animate-spin" />
+                      <LoadingIndicator size="sm" />
                     ) : (
                       <Database size={12} />
                     )}
@@ -774,7 +756,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/20 dark:text-red-400 dark:hover:bg-red-500/10 disabled:opacity-50"
                   >
                     {deleting ? (
-                      <Loader2 size={12} className="animate-spin" />
+                      <LoadingIndicator size="sm" />
                     ) : (
                       <Trash2 size={12} />
                     )}

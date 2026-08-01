@@ -81,7 +81,7 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
@@ -147,7 +147,7 @@ export default function Features() {
           viewport={{ once: false, margin: "-40px" }}
           className="grid gap-5 md:grid-cols-2 lg:grid-cols-4"
         >
-          {features.map((feature, index) => {
+          {features.map((feature) => {
             const Icon = feature.icon;
             return (
               <motion.div

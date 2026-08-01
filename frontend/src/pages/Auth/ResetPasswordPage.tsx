@@ -5,6 +5,7 @@ import { Eye, EyeOff, Lock, ArrowLeft, ArrowRight, Check, Shield, RefreshCw, Clo
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const features = [
   { icon: Shield, text: "End-to-end encrypted" },
@@ -446,7 +447,7 @@ export default function ResetPasswordPage() {
                   className="shimmer-btn flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100"
                 >
                   {loading ? (
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <LoadingIndicator size="sm" />
                   ) : (
                     <>
                       Reset Password

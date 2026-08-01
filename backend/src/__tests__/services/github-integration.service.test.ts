@@ -23,27 +23,58 @@ vi.mock("../../database/prisma.js", () => ({
 }));
 
 vi.mock("octokit", () => {
+  const dataFn = () => vi.fn().mockResolvedValue({ data: [] });
   const mockOctokit = {
     rest: {
-      users: { getAuthenticated: vi.fn() },
+      users: { getAuthenticated: dataFn() },
       repos: {
-        listForAuthenticatedUser: vi.fn(),
-        get: vi.fn(),
-        listBranches: vi.fn(),
-        listCommits: vi.fn(),
-        listContributors: vi.fn(),
+        listForAuthenticatedUser: dataFn(),
+        listForOrg: dataFn(),
+        get: dataFn(),
+        listBranches: dataFn(),
+        listCommits: dataFn(),
+        listContributors: dataFn(),
+        listLanguages: dataFn(),
+        listTags: dataFn(),
+        listReleases: dataFn(),
+        listDeployments: dataFn(),
+        listDeploymentStatuses: dataFn(),
+        getCommit: dataFn(),
+        getReadme: dataFn(),
+        compareCommitsWithBasehead: dataFn(),
+        getBranchProtection: dataFn(),
+        updateBranchProtection: dataFn(),
       },
       pulls: {
-        list: vi.fn(),
-        get: vi.fn(),
-        listFiles: vi.fn(),
-        listReviews: vi.fn(),
+        list: dataFn(),
+        get: dataFn(),
+        listFiles: dataFn(),
+        listReviews: dataFn(),
+        listReviewComments: dataFn(),
+        listCommits: dataFn(),
+        create: dataFn(),
+        createReview: dataFn(),
+        merge: dataFn(),
       },
       issues: {
-        listForRepo: vi.fn(),
-        get: vi.fn(),
-        listComments: vi.fn(),
+        listForRepo: dataFn(),
+        get: dataFn(),
+        listComments: dataFn(),
+        listLabelsForRepo: dataFn(),
+        listMilestones: dataFn(),
+        create: dataFn(),
+        createComment: dataFn(),
       },
+      checks: { listForRef: dataFn() },
+      actions: {
+        listRepoWorkflows: dataFn(),
+        listWorkflowRuns: dataFn(),
+        listWorkflowRunsForRepo: dataFn(),
+        getWorkflowRun: dataFn(),
+        listJobsForWorkflowRun: dataFn(),
+      },
+      orgs: { listForAuthenticatedUser: dataFn() },
+      licenses: { getForRepo: dataFn() },
     },
   };
   return {
@@ -55,6 +86,10 @@ vi.mock("octokit", () => {
     __mockOctokit: mockOctokit,
   };
 });
+
+vi.mock("../../services/repository-index.service.js", () => ({
+  indexGitHubRepository: vi.fn(),
+}));
 
 import {
   connectGitHub,
@@ -73,6 +108,7 @@ import {
   syncRepository,
   analyzeRepository,
 } from "../../services/github-integration.service.js";
+import { indexGitHubRepository } from "../../services/repository-index.service.js";
 import { prisma } from "../../database/prisma.js";
 
 const mockPrisma = vi.mocked(prisma);
@@ -110,6 +146,7 @@ describe("GitHub Integration Service", () => {
       } as any);
       mockPrisma.gitHubIntegration.findUnique.mockResolvedValue({
         id: "int-existing",
+        token: "ghp_xxx",
         isActive: false,
       } as any);
       mockPrisma.gitHubIntegration.update.mockResolvedValue({
@@ -133,6 +170,7 @@ describe("GitHub Integration Service", () => {
     it("should create new integration", async () => {
       const mockOcto = await getMockOctokit();
       mockOcto.rest.users.getAuthenticated.mockResolvedValue({
+        headers: { "x-oauth-scopes": "repo, workflow" },
         data: { login: "octocat", id: 1 },
       });
       mockPrisma.gitHubIntegration.findUnique.mockResolvedValue(null);
@@ -151,10 +189,12 @@ describe("GitHub Integration Service", () => {
     it("should reactivate existing integration", async () => {
       const mockOcto = await getMockOctokit();
       mockOcto.rest.users.getAuthenticated.mockResolvedValue({
+        headers: { "x-oauth-scopes": "repo, workflow" },
         data: { login: "octocat", id: 1 },
       });
       mockPrisma.gitHubIntegration.findUnique.mockResolvedValue({
         id: "int-existing",
+        token: "ghp_xxx",
         isActive: false,
       } as any);
       mockPrisma.gitHubIntegration.update.mockResolvedValue({
@@ -174,6 +214,7 @@ describe("GitHub Integration Service", () => {
       mockPrisma.gitHubIntegration.findUnique.mockResolvedValue({
         id: "int-1",
         userId: "user-1",
+        token: "ghp_xxx",
       } as any);
       mockPrisma.gitHubIntegration.delete.mockResolvedValue({} as any);
 
@@ -191,6 +232,7 @@ describe("GitHub Integration Service", () => {
       mockPrisma.gitHubIntegration.findUnique.mockResolvedValue({
         id: "int-1",
         userId: "user-2",
+        token: "ghp_xxx",
       } as any);
 
       await expect(disconnectGitHub("user-1", "int-1")).rejects.toThrow("Integration not found");
@@ -200,7 +242,7 @@ describe("GitHub Integration Service", () => {
   describe("listIntegrations", () => {
     it("should return user integrations", async () => {
       mockPrisma.gitHubIntegration.findMany.mockResolvedValue([
-        { id: "int-1", _count: { repos: 5 } },
+        { id: "int-1", token: "ghp_xxx", _count: { repos: 5 } },
       ] as any);
 
       const result = await listIntegrations("user-1");
@@ -213,6 +255,7 @@ describe("GitHub Integration Service", () => {
       mockPrisma.gitHubIntegration.findUnique.mockResolvedValue({
         id: "int-1",
         userId: "user-1",
+        token: "ghp_xxx",
         repos: [],
       } as any);
 
@@ -287,9 +330,14 @@ describe("GitHub Integration Service", () => {
         name: "hello-world",
       } as any);
       mockPrisma.gitHubIntegration.update.mockResolvedValue({} as any);
+      vi.mocked(indexGitHubRepository).mockResolvedValue({
+        repository: null,
+        indexResult: null,
+        fileTree: null,
+      } as any);
 
       const result = await importRepository("user-1", "int-1", "octocat", "hello-world");
-      expect(result.name).toBe("hello-world");
+      expect(result.integrationRepo.name).toBe("hello-world");
     });
   });
 
@@ -408,6 +456,7 @@ describe("GitHub Integration Service", () => {
           created_at: "2025-01-01",
           updated_at: "2025-01-02",
           merged_at: null,
+          labels: [],
         },
       });
       mockOcto.rest.pulls.listFiles.mockResolvedValue({
@@ -564,7 +613,7 @@ describe("GitHub Integration Service", () => {
       mockPrisma.gitHubIntegration.update.mockResolvedValue({} as any);
 
       const result = await syncRepository("user-1", "int-1", "octocat", "hello-world");
-      expect(result.starsCount).toBe(20);
+      expect(result.repository.starsCount).toBe(20);
     });
 
     it("should throw if repo not imported", async () => {

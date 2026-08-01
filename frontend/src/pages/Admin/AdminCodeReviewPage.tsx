@@ -4,6 +4,7 @@ import { GitPullRequest, Plus, Trash2, AlertTriangle, AlertCircle, Info, Refresh
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import { listCodeReviews, createCodeReview, deleteCodeReview, type AdminReview } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const stagger = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
 const fadeUp = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
@@ -67,7 +68,7 @@ export default function AdminCodeReviewPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => void fetchReviews()} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}><RefreshCw size={14} className={loading ? "animate-spin" : ""} /></button>
+          <button onClick={() => void fetchReviews()} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${isDark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}>{loading ? <LoadingIndicator size="sm" /> : <RefreshCw size={14} />}</button>
           <button onClick={() => void handleCreate()} className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-rose-500/25"><Plus size={15} /> Run Review</button>
         </div>
       </motion.div>

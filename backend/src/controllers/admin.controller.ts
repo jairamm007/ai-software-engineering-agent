@@ -177,7 +177,7 @@ export async function listUsers(req: Request, res: Response) {
   }
 }
 
-export async function getUser(req: Request, res: Response) {
+export async function getUser(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const user = await prisma.user.findUnique({
@@ -221,7 +221,7 @@ export async function getUser(req: Request, res: Response) {
   }
 }
 
-export async function updateUser(req: Request, res: Response) {
+export async function updateUser(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const { name, role } = req.body;
@@ -243,7 +243,7 @@ export async function updateUser(req: Request, res: Response) {
   }
 }
 
-export async function deleteUser(req: Request, res: Response) {
+export async function deleteUser(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
@@ -256,7 +256,7 @@ export async function deleteUser(req: Request, res: Response) {
   }
 }
 
-export async function suspendUser(req: Request, res: Response) {
+export async function suspendUser(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const user = await prisma.user.update({
@@ -274,7 +274,7 @@ export async function suspendUser(req: Request, res: Response) {
   }
 }
 
-export async function activateUser(req: Request, res: Response) {
+export async function activateUser(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const user = await prisma.user.update({
@@ -290,7 +290,7 @@ export async function activateUser(req: Request, res: Response) {
   }
 }
 
-export async function promoteUser(req: Request, res: Response) {
+export async function promoteUser(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const user = await prisma.user.update({
@@ -306,7 +306,7 @@ export async function promoteUser(req: Request, res: Response) {
   }
 }
 
-export async function demoteUser(req: Request, res: Response) {
+export async function demoteUser(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const user = await prisma.user.update({
@@ -425,7 +425,7 @@ export async function getRepositoryStats(_req: Request, res: Response) {
   }
 }
 
-export async function deleteRepository(req: Request, res: Response) {
+export async function deleteRepository(req: AuthRequest, res: Response) {
   try {
     const { repoId } = req.params;
     const repo = await prisma.repository.findUnique({ where: { id: repoId }, select: { name: true } });
@@ -617,7 +617,7 @@ export async function getSecurityLogs(req: Request, res: Response) {
   }
 }
 
-export async function forceLogout(req: Request, res: Response) {
+export async function forceLogout(req: AuthRequest, res: Response) {
   try {
     const { sessionId } = req.params;
     const session = await prisma.session.findUnique({ where: { id: sessionId } });
@@ -634,7 +634,7 @@ export async function forceLogout(req: Request, res: Response) {
   }
 }
 
-export async function forceLogoutAllUserSessions(req: Request, res: Response) {
+export async function forceLogoutAllUserSessions(req: AuthRequest, res: Response) {
   try {
     const { userId } = req.params;
     const { count } = await prisma.session.deleteMany({ where: { userId } });
@@ -678,7 +678,7 @@ export async function createNotification(req: Request, res: Response) {
   }
 }
 
-export async function deleteNotification(req: Request, res: Response) {
+export async function deleteNotification(req: AuthRequest, res: Response) {
   try {
     const { notificationId } = req.params;
     await prisma.notification.delete({ where: { id: notificationId } });
@@ -914,7 +914,7 @@ export async function createDocumentation(req: Request, res: Response) {
   }
 }
 
-export async function deleteDocumentation(req: Request, res: Response) {
+export async function deleteDocumentation(req: AuthRequest, res: Response) {
   try {
     const { docId } = req.params;
     await prisma.documentation.delete({ where: { id: docId } });
@@ -970,7 +970,7 @@ export async function createCodeReview(req: Request, res: Response) {
   }
 }
 
-export async function deleteCodeReview(req: Request, res: Response) {
+export async function deleteCodeReview(req: AuthRequest, res: Response) {
   try {
     const { reviewId } = req.params;
     await prisma.codeReview.delete({ where: { id: reviewId } });
@@ -1026,7 +1026,7 @@ export async function createTestReport(req: Request, res: Response) {
   }
 }
 
-export async function deleteTestReport(req: Request, res: Response) {
+export async function deleteTestReport(req: AuthRequest, res: Response) {
   try {
     const { reportId } = req.params;
     await prisma.testReport.delete({ where: { id: reportId } });
@@ -1067,7 +1067,7 @@ export async function listSupportMessages(req: Request, res: Response) {
   }
 }
 
-export async function replyToSupportMessage(req: Request, res: Response) {
+export async function replyToSupportMessage(req: AuthRequest, res: Response) {
   try {
     const { messageId } = req.params;
     const { reply } = req.body;
@@ -1083,7 +1083,7 @@ export async function replyToSupportMessage(req: Request, res: Response) {
   }
 }
 
-export async function updateSupportMessageStatus(req: Request, res: Response) {
+export async function updateSupportMessageStatus(req: AuthRequest, res: Response) {
   try {
     const { messageId } = req.params;
     const { status } = req.body;
@@ -1095,7 +1095,7 @@ export async function updateSupportMessageStatus(req: Request, res: Response) {
   }
 }
 
-export async function deleteSupportMessage(req: Request, res: Response) {
+export async function deleteSupportMessage(req: AuthRequest, res: Response) {
   try {
     const { messageId } = req.params;
     await prisma.supportMessage.delete({ where: { id: messageId } });
@@ -1133,7 +1133,7 @@ export async function createBackup(req: Request, res: Response) {
   }
 }
 
-export async function deleteBackup(req: Request, res: Response) {
+export async function deleteBackup(req: AuthRequest, res: Response) {
   try {
     const { backupId } = req.params;
     await prisma.backupRecord.delete({ where: { id: backupId } });

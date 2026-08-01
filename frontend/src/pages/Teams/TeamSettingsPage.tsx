@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Settings, Loader2, Check, Copy, Trash2, Mail } from "lucide-react";
+import { Check, Copy, Trash2, Mail } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { updateTeam, deleteTeam, getInvitations, cancelInvitation } from "@/services/team";
 import type { Team, TeamInvitation, TeamRole } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface OutletContext {
   team: Team;
@@ -123,7 +124,7 @@ export default function TeamSettingsPage() {
             disabled={updateMutation.isPending}
             className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >
-            {updateMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+            {updateMutation.isPending ? <LoadingIndicator size="sm" /> : <Check size={13} />}
             Save Changes
           </button>
         </div>
@@ -183,7 +184,7 @@ export default function TeamSettingsPage() {
             disabled={deleteMutation.isPending}
             className="flex items-center gap-2 rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-50"
           >
-            {deleteMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+            {deleteMutation.isPending ? <LoadingIndicator size="sm" /> : <Trash2 size={13} />}
             Delete Team
           </button>
         </div>

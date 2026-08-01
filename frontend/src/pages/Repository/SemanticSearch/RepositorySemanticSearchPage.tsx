@@ -14,7 +14,8 @@ import ClassSearch from "@/components/repository/search/ClassSearch";
 import NaturalLanguageQuery from "@/components/repository/search/NaturalLanguageQuery";
 import { combinedSearch } from "@/services/semanticSearch";
 import type { SearchFilters as SearchFiltersType } from "@/services/semanticSearch";
-import { Search, FileText, FunctionSquare, Box, Brain, Loader2 } from "lucide-react";
+import { Search, FileText, FunctionSquare, Box, Brain } from "lucide-react";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 type Tab = "all" | "semantic" | "files" | "functions" | "classes";
 
@@ -123,7 +124,7 @@ export default function RepositorySemanticSearchPage() {
 
         {isLoading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 size={32} className="animate-spin text-[var(--accent)]" />
+            <LoadingIndicator size="md" />
             <span className={`ml-3 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               Searching...
             </span>

@@ -1,17 +1,14 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Layers, Boxes, GitBranch, Database, Globe,
-  FolderOpen, FileCode2, ArrowRight, ChevronRight,
-  ChevronDown, Play, RotateCcw, Search, FileStack,
-} from "lucide-react";
+import { Layers, Boxes, GitBranch, Database, Globe, FolderOpen, FileCode2, ArrowRight, ChevronRight, ChevronDown, Play, Search, FileStack } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import AIResult from "@/components/repository/AIResult";
 import { getRepositories, getRepository } from "@/services/repository";
 import { askRepository } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 /* ── Helpers ─────────────────────────────────────────── */
 
@@ -275,7 +272,7 @@ export default function ArchitecturePage() {
           <div className="p-5">
             {reposLoading ? (
               <div className="flex h-20 items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                <LoadingIndicator size="sm" />
               </div>
             ) : !repos || repos.length === 0 ? (
               <p className={`py-6 text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>No repositories found.</p>
@@ -328,7 +325,7 @@ export default function ArchitecturePage() {
               </div>
               {repoLoading ? (
                 <div className="flex h-40 items-center justify-center">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                  <LoadingIndicator size="sm" />
                 </div>
               ) : (
                 <div className="max-h-[520px] overflow-y-auto p-3">
@@ -456,7 +453,7 @@ export default function ArchitecturePage() {
                   className="flex items-center gap-2 rounded-xl accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg accent-shadow disabled:opacity-50 disabled:shadow-none font-[Inter]"
                 >
                   {loading ? (
-                    <><RotateCcw size={14} className="animate-spin" /> Analyzing...</>
+                    <><LoadingIndicator size="sm" /> Analyzing...</>
                   ) : (
                     <><Play size={14} /> Analyze Architecture</>
                   )}

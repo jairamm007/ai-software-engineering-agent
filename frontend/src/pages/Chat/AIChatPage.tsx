@@ -2,33 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  MessageSquare,
-  FolderGit2,
-  ChevronDown,
-  Sparkles,
-  ArrowRight,
-  Check,
-  Plus,
-  Trash2,
-  Copy,
-  Download,
-  FileText,
-  FileType,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Loader2,
-  Send,
-  Square,
-  RefreshCw,
-  Pencil,
-  Clock,
-  GitBranch,
-  Brain,
-  Search,
-  Code2,
-  Bot,
-} from "lucide-react";
+import { MessageSquare, FolderGit2, ChevronDown, Sparkles, ArrowRight, Check, Plus, Trash2, Copy, Download, FileText, FileType, PanelLeftClose, PanelLeftOpen, Send, Square, RefreshCw, Pencil, Clock, GitBranch, Brain, Search, Code2, Bot } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import {
@@ -44,6 +18,7 @@ import { useAuth } from "@/context/AuthContext";
 import MarkdownMessage from "@/components/chat/MarkdownMessage";
 import type { ChatMessage } from "@/types/chat";
 import type { RepositoryListItem } from "@/types/repository";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const PROMPT_CATEGORIES = [
   {
@@ -423,7 +398,7 @@ export default function AIChatPage() {
               <div className="flex-1 overflow-y-auto p-2">
                 {convosLoading ? (
                   <div className="flex justify-center py-8">
-                    <Loader2 size={18} className={`animate-spin ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+                    <LoadingIndicator size="md" />
                   </div>
                 ) : repoConversations.length === 0 ? (
                   <p className={`px-3 py-8 text-center text-xs ${isDark ? "text-slate-600" : "text-slate-400"}`}>
@@ -695,7 +670,7 @@ export default function AIChatPage() {
                     }`}>
                       {thinkingStage ? (
                         <div className="flex items-center gap-2">
-                          <Loader2 size={14} className="animate-spin accent-text-base" />
+                          <LoadingIndicator size="sm" />
                           <span className={`text-sm font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                             {thinkingStage}
                           </span>

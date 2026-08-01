@@ -2,28 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Camera,
-  Save,
-  FolderGit2,
-  MessageSquare,
-  FileCode2,
-  Shield,
-  Clock,
-  Lock,
-  Trash2,
-  ExternalLink,
-  Check,
-  X,
-  Loader2,
-  User,
-  Globe,
-  ImagePlus,
-  Trash,
-  Link2,
-  Unlink,
-  AlertCircle,
-} from "lucide-react";
+import { Camera, Save, FolderGit2, MessageSquare, FileCode2, Shield, Clock, Lock, Trash2, ExternalLink, Check, X, User, Globe, ImagePlus, Trash, Link2, Unlink, AlertCircle } from "lucide-react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
@@ -34,6 +13,7 @@ import {
   disconnectGitHub,
 } from "@/services/github-integration";
 import type { GitHubIntegration } from "@/types/github-integration";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 function LinkedinIcon({ size = 12 }: { size?: number }) {
   return (
@@ -301,7 +281,7 @@ export default function ProfilePage() {
               bannerHover ? "opacity-100" : "opacity-0"
             }`}>
               {bannerLoading ? (
-                <Loader2 size={24} className="text-white animate-spin" />
+                <LoadingIndicator size="md" />
               ) : user?.bannerUrl ? (
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 rounded-lg bg-white/20 backdrop-blur-sm px-3 py-2 text-sm text-white font-medium">
@@ -383,7 +363,7 @@ export default function ProfilePage() {
                 <div className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium ${
                   isDark ? "border-white/10 text-slate-500" : "border-slate-200 text-slate-400"
                 }`}>
-                  <Loader2 size={12} className="animate-spin" />
+                  <LoadingIndicator size="sm" />
                   Loading...
                 </div>
               ) : githubIntegration ? (
@@ -402,7 +382,7 @@ export default function ProfilePage() {
                     title="Disconnect GitHub"
                   >
                     {disconnectMutation.isPending ? (
-                      <Loader2 size={10} className="animate-spin" />
+                      <LoadingIndicator size="sm" />
                     ) : (
                       <Unlink size={10} />
                     )}
@@ -422,7 +402,7 @@ export default function ProfilePage() {
                   }`}
                 >
                   {connectMutation.isPending ? (
-                    <Loader2 size={12} className="animate-spin" />
+                    <LoadingIndicator size="sm" />
                   ) : (
                     <Link2 size={12} />
                   )}
@@ -798,7 +778,7 @@ export default function ProfilePage() {
                   disabled={deleting}
                   className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/20 dark:text-red-400 dark:hover:bg-red-500/10 disabled:opacity-50"
                 >
-                  {deleting ? <Loader2 size={12} className="animate-spin" /> : "Delete"}
+                  {deleting ? <LoadingIndicator size="sm" /> : "Delete"}
                 </button>
               </div>
             </div>
@@ -865,7 +845,7 @@ export default function ProfilePage() {
                   disabled={deleting}
                   className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:opacity-50"
                 >
-                  {deleting && <Loader2 size={14} className="animate-spin" />}
+                  {deleting && <LoadingIndicator size="sm" />}
                   {deleting ? "Deleting..." : "Delete Account"}
                 </button>
               </div>
@@ -984,7 +964,7 @@ export default function ProfilePage() {
                   className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50"
                   style={{ backgroundColor: "var(--accent)" }}
                 >
-                  {passwordLoading && <Loader2 size={14} className="animate-spin" />}
+                  {passwordLoading && <LoadingIndicator size="sm" />}
                   {passwordLoading ? "Changing..." : passwordSuccess ? "Done" : "Change Password"}
                 </button>
               </div>

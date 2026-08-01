@@ -2,21 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
-import {
-  GitBranch,
-  Unlink,
-  Loader2,
-  GitPullRequest,
-  GitCommit,
-  AlertCircle,
-  Code2,
-  FolderGit2,
-  CheckCircle,
-  RotateCw,
-  Webhook,
-  Sparkles,
-  ShieldCheck,
-} from "lucide-react";
+import { GitBranch, Unlink, GitPullRequest, GitCommit, AlertCircle, Code2, FolderGit2, CheckCircle, RotateCw, Webhook, Sparkles, ShieldCheck } from "lucide-react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useTheme } from "@/context/ThemeContext";
 import {
@@ -55,6 +41,7 @@ import GitHubWebhooksTab from "@/components/github/GitHubWebhooksTab";
 import GitHubAIPRAssistantTab from "@/components/github/GitHubAIPRAssistantTab";
 import GitHubBranchProtectionTab from "@/components/github/GitHubBranchProtectionTab";
 import { motion } from "framer-motion";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 type Tab = "repos" | "pulls" | "issues" | "commits" | "cicd" | "webhooks" | "ai-pr" | "protection" | "analysis";
 
@@ -236,7 +223,7 @@ export default function GitHubIntegrationPage() {
     return (
       <DashboardLayout>
         <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <Loader2 size={24} className="animate-spin text-[var(--accent)]" />
+          <LoadingIndicator size="md" />
           <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>Loading...</p>
         </div>
       </DashboardLayout>
@@ -311,7 +298,7 @@ export default function GitHubIntegrationPage() {
                 isDark ? "border-white/10 text-slate-400 hover:bg-white/5 hover:text-red-400" : "border-slate-200 text-slate-500 hover:bg-red-50 hover:text-red-500"
               }`}
             >
-              {disconnectMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <Unlink size={12} />}
+              {disconnectMutation.isPending ? <LoadingIndicator size="sm" /> : <Unlink size={12} />}
               Disconnect
             </button>
           </div>
@@ -371,7 +358,6 @@ export default function GitHubIntegrationPage() {
               onBack={() => setSelectedPR(null)}
               timeAgo={timeAgo}
               onCreatePR={() => setShowCreatePR(true)}
-              onAddComment={(num) => setCommentTarget({ type: "pr", number: num })}
               onReview={(num) => setReviewTarget(num)}
               onMerge={(num) => setMergeTarget(num)}
             />

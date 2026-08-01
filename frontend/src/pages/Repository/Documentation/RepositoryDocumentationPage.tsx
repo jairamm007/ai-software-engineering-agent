@@ -2,11 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  Search, Play, RotateCcw, BookOpen,
-  File, FolderOpen, CheckSquare, Square, FileStack,
-  Copy, Download, Check,
-} from "lucide-react";
+import { Search, Play, BookOpen, File, FolderOpen, CheckSquare, Square, FileStack, Copy, Download, Check } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import BackButton from "@/components/common/BackButton";
@@ -16,6 +12,7 @@ import { getRepository } from "@/services/repository";
 import { askRepository } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, getFileExtension, formatFileSize } from "@/utils/fileIcons";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 type DocScope = "single" | "multiple" | "repository";
 
@@ -159,7 +156,7 @@ export default function RepositoryDocumentationPage() {
     return (
       <DashboardLayout>
         <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+          <LoadingIndicator size="md" />
           <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>Loading repository...</p>
         </div>
       </DashboardLayout>
@@ -383,7 +380,7 @@ export default function RepositoryDocumentationPage() {
               >
                 {loading ? (
                   <>
-                    <RotateCcw size={14} className="animate-spin" />
+                    <LoadingIndicator size="sm" />
                     Generating...
                   </>
                 ) : (

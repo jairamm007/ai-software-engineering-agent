@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { deleteRepository, toggleFavorite, reindexRepository } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
 import type { RepositoryListItem } from "@/types/repository";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface Props {
   repositories: RepositoryListItem[];
@@ -100,9 +101,19 @@ export default function RepositoryTable({ repositories }: Props) {
                         <span className="truncate">{repo.name}</span>
                         <ExternalLink size={12} className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
                       </Link>
-                      <p className={`mt-0.5 max-w-[150px] truncate text-xs sm:max-w-[250px] md:max-w-[300px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                        {repo.githubUrl}
-                      </p>
+                      <a
+                        href={repo.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        title={`Open ${repo.githubUrl} on GitHub`}
+                        onClick={(e) => e.stopPropagation()}
+                        className={`mt-0.5 flex max-w-[150px] items-center gap-1 truncate text-xs transition-colors hover:text-[var(--accent)] sm:max-w-[250px] md:max-w-[300px] ${
+                          isDark ? "text-slate-500" : "text-slate-400"
+                        }`}
+                      >
+                        <span className="truncate">{repo.githubUrl}</span>
+                        <ExternalLink size={12} className="shrink-0" />
+                      </a>
                     </div>
                   </div>
                 </td>
@@ -154,7 +165,7 @@ export default function RepositoryTable({ repositories }: Props) {
                           : "text-slate-400 hover:bg-violet-50 hover:text-violet-500"
                       }`}
                     >
-                      <RefreshCw size={16} className={reindexingId === repo.id ? "animate-spin" : ""} />
+                      {reindexingId === repo.id ? <LoadingIndicator size="sm" /> : <RefreshCw size={16} />}
                     </button>
                     <button
                       type="button"

@@ -19,7 +19,7 @@ import { setupGlobalErrorHandlers } from "@/lib/error-tracking";
 
 import "./index.css";
 
-import { router } from "./router";
+import { router, prefetchRoutes } from "./router";
 
 setupGlobalErrorHandlers();
 
@@ -54,3 +54,5 @@ createRoot(
     </QueryClientProvider>
   </StrictMode>
 );
+
+window.setTimeout(prefetchRoutes, 150);

@@ -5,7 +5,6 @@ import {
   GitPullRequest,
   AlertCircle,
   Eye,
-  ExternalLink,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import type { GitHubRepositoryAnalysis } from "@/types/github-integration";

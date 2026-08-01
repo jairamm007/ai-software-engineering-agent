@@ -6,7 +6,7 @@ import {
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { Trash2, Settings } from "lucide-react";
+import { Trash2, Settings, ExternalLink, FolderGit2 } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -16,6 +16,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import RepositoryWorkspaceLayout from "@/layouts/RepositoryWorkspaceLayout";
 
 import BackButton from "@/components/common/BackButton";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 import RepositoryTabs from "@/components/repository/RepositoryTabs";
 import FileExplorer from "@/components/repository/FileExplorer";
 import FileViewer from "@/components/repository/FileViewer";
@@ -470,11 +471,8 @@ export default function RepositoryDetailsPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
-          <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-            Loading repository...
-          </p>
+        <div className="flex h-64 items-center justify-center">
+          <LoadingIndicator size="md" label="Loading repository" />
         </div>
       </DashboardLayout>
     );
@@ -503,12 +501,34 @@ export default function RepositoryDetailsPage() {
               {data.name}
             </h1>
 
-            <p className={`mt-2 min-w-0 truncate text-sm sm:text-base ${isDark ? "text-slate-400" : "text-slate-500"}`} title={data.githubUrl}>
-              {data.githubUrl}
-            </p>
+            <a
+              href={data.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              title={`Open ${data.githubUrl} on GitHub`}
+              className={`mt-2 flex min-w-0 items-center gap-1.5 truncate text-sm transition-colors hover:text-[var(--accent)] sm:text-base ${
+                isDark ? "text-slate-400 hover:text-[var(--accent)]" : "text-slate-500 hover:text-[var(--accent)]"
+              }`}
+            >
+              <span className="truncate">{data.githubUrl}</span>
+              <ExternalLink size={14} className="shrink-0" />
+            </a>
           </div>
 
-          <div className="flex shrink-0 gap-2">
+          <div className="flex shrink-0 items-center gap-2">
+            <a
+              href={data.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              title="Open repository on GitHub"
+              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition hover:border-[var(--accent)] hover:bg-[var(--accent-light)] hover:text-[var(--accent)] ${
+                isDark ? "border-white/20 text-white" : "border-slate-300 text-slate-700"
+              }`}
+            >
+              <FolderGit2 size={18} />
+              <span className="hidden sm:inline">Open in GitHub</span>
+              <ExternalLink size={14} />
+            </a>
             <button
               type="button"
               onClick={() => navigate(`/repositories/${id}/settings`)}

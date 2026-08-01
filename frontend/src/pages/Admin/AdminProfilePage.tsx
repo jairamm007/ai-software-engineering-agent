@@ -4,8 +4,8 @@ import {
   User,
   Save,
   X,
-  Linkedin,
-  Github,
+  Briefcase,
+  GitBranch,
   Globe,
   CalendarDays,
 } from "lucide-react";
@@ -16,6 +16,7 @@ import {
   updateAdminProfile,
   type AdminProfile,
 } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
 const fadeUp = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
@@ -103,7 +104,7 @@ export default function AdminProfilePage() {
     return (
       <div className={`flex min-h-full items-center justify-center ${isDark ? "bg-[#0a0a0f]" : "bg-[#f8fafc]"}`}>
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+          <LoadingIndicator size="md" />
           <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>Loading profile...</span>
         </div>
       </div>
@@ -235,7 +236,7 @@ export default function AdminProfilePage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className={`${labelClass} flex items-center gap-1.5`}>
-                <Linkedin size={13} /> LinkedIn URL
+                <Briefcase size={13} /> LinkedIn URL
               </label>
               <input
                 type="text"
@@ -247,7 +248,7 @@ export default function AdminProfilePage() {
             </div>
             <div>
               <label className={`${labelClass} flex items-center gap-1.5`}>
-                <Github size={13} /> GitHub URL
+                <GitBranch size={13} /> GitHub URL
               </label>
               <input
                 type="text"
@@ -289,7 +290,7 @@ export default function AdminProfilePage() {
               className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-rose-500/25 transition-all hover:shadow-xl hover:shadow-rose-500/30 disabled:opacity-50"
             >
               {saving ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <LoadingIndicator size="sm" />
               ) : (
                 <Save size={14} />
               )}

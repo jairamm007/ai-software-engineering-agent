@@ -32,6 +32,7 @@ import { getAIProviders } from "@/services/aiProviders";
 import { getConversations } from "@/services/chat";
 import type { RepositoryListItem } from "@/types/repository";
 import type { Conversation } from "@/types/chat";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface Activity {
   action: string;
@@ -325,7 +326,7 @@ export default function DashboardPage() {
             <div className={`rounded-2xl border p-10 text-center shadow-sm ${
               isDark ? "border-slate-700 bg-slate-800/80" : "border-slate-200 bg-white"
             }`}>
-              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+              <LoadingIndicator size="md" />
               <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-400"}`}>Loading repositories...</p>
             </div>
           ) : recentRepos.length === 0 ? (

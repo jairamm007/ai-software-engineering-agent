@@ -1,10 +1,11 @@
 import { useOutletContext } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { FlaskConical, Loader2, CheckCircle2, XCircle, SkipForward, Target } from "lucide-react";
+import { FlaskConical, CheckCircle2, XCircle, SkipForward } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { getTeamTestReports } from "@/services/team";
 import type { Team, TeamTestReport, TeamRole } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface OutletContext {
   team: Team;
@@ -45,7 +46,7 @@ export default function TeamTestingPage() {
 
       {isLoading ? (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 size={20} className="animate-spin accent-text" />
+          <LoadingIndicator size="md" />
         </div>
       ) : reports.length === 0 ? (
         <div className={`rounded-2xl border py-16 text-center ${isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"}`}>

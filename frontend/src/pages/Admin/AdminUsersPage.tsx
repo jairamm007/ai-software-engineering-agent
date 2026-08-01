@@ -36,6 +36,7 @@ import {
   type AdminUser,
   type AdminUserDetail,
 } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function AdminUsersPage() {
   const { theme } = useTheme();
@@ -294,7 +295,7 @@ export default function AdminUsersPage() {
                 <tr>
                   <td colSpan={6} className="px-5 py-16 text-center">
                     <div className="flex items-center justify-center gap-3">
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                      <LoadingIndicator size="sm" />
                       <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                         Loading users...
                       </span>
@@ -575,7 +576,7 @@ export default function AdminUsersPage() {
               </div>
               {detailLoading ? (
                 <div className="py-10 text-center">
-                  <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                  <LoadingIndicator size="sm" />
                 </div>
               ) : (
                 <div className="space-y-5">

@@ -2,15 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  MessageSquare,
-  Plus,
-  Send,
-  Loader2,
-  Trash2,
-} from "lucide-react";
+import { MessageSquare, Plus, Send, Trash2 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
-import { useAuth } from "@/context/AuthContext";
 import {
   getTeamChats,
   createTeamChat,
@@ -19,12 +12,12 @@ import {
   deleteTeamChat,
 } from "@/services/teamChat";
 import type { TeamChat, TeamMessage } from "@/services/teamChat";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function TeamChatPage() {
   const { teamId } = useParams<{ teamId: string }>();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
@@ -99,7 +92,7 @@ export default function TeamChatPage() {
               className="rounded-lg accent-bg-light p-1.5"
             >
               {createChatMutation.isPending ? (
-                <Loader2 size={13} className="animate-spin accent-text" />
+                <LoadingIndicator size="sm" />
               ) : (
                 <Plus size={13} className="accent-text" />
               )}
@@ -109,7 +102,7 @@ export default function TeamChatPage() {
         <div className="flex-1 overflow-y-auto">
           {chatsLoading ? (
             <div className="p-4 flex justify-center">
-              <Loader2 size={16} className="animate-spin accent-text" />
+              <LoadingIndicator size="sm" />
             </div>
           ) : chats.length === 0 ? (
             <div className="p-4 text-center">
@@ -171,13 +164,13 @@ export default function TeamChatPage() {
               disabled={createChatMutation.isPending}
               className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white"
             >
-              {createChatMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
+              {createChatMutation.isPending ? <LoadingIndicator size="sm" /> : <Plus size={13} />}
               New Chat
             </button>
           </div>
         ) : chatLoading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 size={24} className="animate-spin accent-text" />
+            <LoadingIndicator size="md" />
           </div>
         ) : (
           <>
@@ -242,7 +235,7 @@ export default function TeamChatPage() {
                   disabled={!messageText.trim() || isSending}
                   className="rounded-xl accent-gradient p-2.5 text-white disabled:opacity-50"
                 >
-                  {isSending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                  {isSending ? <LoadingIndicator size="sm" /> : <Send size={15} />}
                 </button>
               </div>
             </div>

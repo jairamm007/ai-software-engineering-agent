@@ -1,14 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  Bell,
-  BellOff,
-  Check,
-  CheckCheck,
-  Loader2,
-  Trash2,
-} from "lucide-react";
+import { Bell, BellOff, Check, CheckCheck, Trash2 } from "lucide-react";
 
 import { useTheme } from "@/context/ThemeContext";
 import {
@@ -19,6 +12,7 @@ import {
   deleteNotification,
 } from "@/services/teamNotification";
 import type { TeamNotification } from "@/services/teamNotification";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const TYPE_ICONS: Record<string, string> = {
   member_joined: "text-emerald-400",
@@ -116,7 +110,7 @@ export default function TeamNotificationsPage() {
 
         {isLoading ? (
           <div className="flex h-64 items-center justify-center">
-            <Loader2 size={24} className="animate-spin accent-text" />
+            <LoadingIndicator size="md" />
           </div>
         ) : notifications.length === 0 ? (
           <motion.div

@@ -42,12 +42,7 @@ model user {
   codeReviews CodeReview[]
   testReports TestReport[]
   supportMessages SupportMessage[]
-  codeGenerations CodeGeneration[]
-  savedPrompts SavedPrompt[]
-  generationHistory GenerationHistory[]
-  debugSessions DebugSession[]
-  securityScans SecurityScan[]
-  performanceScans PerformanceScan[]
+  debugRuns DebugRun[]
 }
 
 model session {
@@ -108,7 +103,6 @@ model Repository {
   docs Documentation[]
   codeReviews CodeReview[]
   testReports TestReport[]
-  codeGenerations CodeGeneration[]
 
   @@unique([githubUrl, userId])
   @@index([userId])
@@ -568,225 +562,135 @@ model TestReport {
   @@index([createdAt(sort: Desc)])
 }
 
-// ─── AI Code Generation ──────────────────────────────────────────
+// ─── RepoVerify Pipeline ──────────────────────────────────────────────
 
-model CodeGeneration {
+model DebugRun {
   id             String   @id @default(cuid())
   userId         String
   repositoryId   String?
-  type           String   // generate | refactor | explain | translate | test | documentation
-  prompt         String
-  inputCode      String?
-  inputLanguage  String?
-  targetLanguage String?
-  generatedCode  String   @default("")
-  status         String   @default("pending") // pending | generating | completed | failed | accepted | rejected
-  filePath       String?
-  model          String?
-  tokensUsed     Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  user         user?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  repository   Repository?   @relation(fields: [repositoryId], references: [id], onDelete: SetNull)
-  historyItems GenerationHistory[]
-
-  @@index([userId])
-  @@index([repositoryId])
-  @@index([createdAt(sort: Desc)])
-}
-
-model SavedPrompt {
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  icon      String   @default("Code2")
-  prompt    String
-  category  String   @default("general") // authentication | crud | react | api | database | testing | refactoring | documentation | general
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([category])
-}
-
-model GenerationHistory {
-  id             String   @id @default(cuid())
-  userId         String
-  generationId   String
-  action         String   // accepted | rejected | edited
-  editedCode     String?
-  createdAt      DateTime @default(now())
-
-  generation CodeGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
-  user       user           @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([generationId])
-  @@index([userId])
-}
-
-// ─── AI Debugging Assistant ───────────────────────────────────────
-
-model DebugSession {
-  id             String   @id @default(cuid())
-  userId         String
-  repositoryId   String?
-  filePath       String?
-  sessionType    String   // error_analyzer | stack_trace | bug_detection | fix_suggestion | log_analysis | dependency_check
-  errorMessage   String?
-  inputCode      String?
-  inputLog       String?
-  explanation    String?
-  suggestedFix   String?
-  fixedCode      String?
-  status         String   @default("open") // open | resolved | unresolved
+  repoName       String?
+  repoUrl        String?
+  branch         String?
+  status         String   @default("queued") // queued | running | done | failed
+  stage          String   @default("debug")  // debug | codegen | security | performance
+  stackDetected  String?
+  failureCount   Int      @default(0)
+  currentAttempt Int      @default(0)
+  summary        String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   user user? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  historyItems DebugHistory[]
+  failures  DebugFailure[]
+  diagnoses Diagnosis[]
+  patches   Patch[]
+  security  SecurityScanResult?
+  baselines PerfBaseline[]
+  comparisons PerfComparison[]
 
   @@index([userId])
   @@index([repositoryId])
-  @@index([sessionType])
   @@index([status])
   @@index([createdAt(sort: Desc)])
-  @@index([userId, createdAt(sort: Desc)])
 }
 
-model DebugHistory {
-  id        String   @id @default(cuid())
-  sessionId String
-  action    String   // fix_applied | fix_copied | ignored | reopened | resolved
-  createdAt DateTime @default(now())
+model DebugFailure {
+  id              String   @id @default(cuid())
+  debugRunId      String
+  testName        String?
+  testFile        String?
+  errorType       String?
+  errorMessage    String?
+  stackTrace      String?
+  implicatedFiles Json?    // string[] of repo-relative file paths
+  createdAt       DateTime @default(now())
 
-  session DebugSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  debugRun DebugRun @relation(fields: [debugRunId], references: [id], onDelete: Cascade)
 
-  @@index([sessionId])
-  @@index([createdAt(sort: Desc)])
+  @@index([debugRunId])
 }
 
-// ─── Security Analysis ─────────────────────────────────────────────
-
-model SecurityScan {
+model Diagnosis {
   id            String   @id @default(cuid())
-  userId        String
-  repositoryId  String?
-  securityScore Int      @default(0)
+  debugRunId    String
+  failureId     String?
+  reasoning     String
+  rootCauseFile String?
+  rootCauseLine Int?
+  confidence    Float
+  modelUsed     String?
+  createdAt     DateTime @default(now())
+
+  debugRun DebugRun @relation(fields: [debugRunId], references: [id], onDelete: Cascade)
+
+  @@index([debugRunId])
+}
+
+model Patch {
+  id            String   @id @default(cuid())
+  debugRunId    String
+  attemptNumber Int      @default(1)
+  diffText      String
   summary       String?
-  status        String   @default("completed") // pending | running | completed | failed
+  filesTouched  Json?    // string[]
+  status        String   @default("proposed") // proposed | applied | reverted | rejected
+  testResult    String?  // pass | fail | not_run
+  testOutput    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user user? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  debugRun DebugRun @relation(fields: [debugRunId], references: [id], onDelete: Cascade)
 
-  issues  SecurityIssue[]
-  reports SecurityReport[]
-
-  @@index([userId])
-  @@index([repositoryId])
-  @@index([createdAt(sort: Desc)])
-  @@index([userId, createdAt(sort: Desc)])
-}
-
-model SecurityIssue {
-  id             String   @id @default(cuid())
-  scanId         String
-  filePath       String?
-  issueType      String   // secret | dependency | sql_injection | xss | input_validation | auth | file_upload | other
-  severity       String   // critical | high | medium | low
-  title          String
-  description    String?
-  recommendation String?
-  snippet        String?
-  status         String   @default("open") // open | resolved | ignored
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  scan SecurityScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
-
-  @@index([scanId])
-  @@index([severity])
+  @@index([debugRunId])
   @@index([status])
-  @@index([issueType])
 }
 
-model SecurityReport {
-  id         String   @id @default(cuid())
-  scanId     String
-  format     String   @default("markdown") // markdown | pdf
-  content    String?
-  filePath   String?
-  createdAt  DateTime @default(now())
+model SecurityScanResult {
+  id        String   @id @default(cuid())
+  debugRunId String   @unique
+  tool      String   @default("bandit") // bandit | semgrep | gitleaks | osv
+  summary   String?
+  findings  Json?    // SecurityFinding[]
+  blocked   Boolean  @default(false)
+  status    String   @default("running") // running | done | failed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  scan SecurityScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  debugRun DebugRun @relation(fields: [debugRunId], references: [id], onDelete: Cascade)
 
-  @@index([scanId])
-  @@index([createdAt(sort: Desc)])
+  @@index([debugRunId])
 }
 
-// ─── Performance Analysis ─────────────────────────────────────────────
+model PerfBaseline {
+  id        String   @id @default(cuid())
+  debugRunId String
+  stage     String   @default("pre") // pre | post
+  timeMs    Int?
+  memoryMb  Int?
+  queryCount Int?
+  command   String?
+  heuristic Json?    // [{file, line, kind, description}]
+  createdAt DateTime @default(now())
 
-model PerformanceScan {
-  id                  String   @id @default(cuid())
-  userId              String
-  repositoryId        String?
-  performanceScore    Int      @default(0)
-  maintainabilityScore Int     @default(0)
-  readabilityScore    Int      @default(0)
-  overallHealth       Int      @default(0)
-  filesAnalyzed       Int      @default(0)
-  summary             String?
-  status              String   @default("completed") // pending | running | completed | failed
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  debugRun DebugRun @relation(fields: [debugRunId], references: [id], onDelete: Cascade)
 
-  user user? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  issues  PerformanceIssue[]
-  reports PerformanceReport[]
-
-  @@index([userId])
-  @@index([repositoryId])
-  @@index([createdAt(sort: Desc)])
-  @@index([userId, createdAt(sort: Desc)])
+  @@index([debugRunId])
 }
 
-model PerformanceIssue {
-  id              String   @id @default(cuid())
-  scanId          String
-  filePath        String?
-  issueType       String   // complexity | duplicate | large_file | ai_suggestion
-  severity        String   // critical | high | medium | low
-  title           String
-  description     String?
-  recommendation  String?
-  snippet         String?
-  lineStart       Int?
-  lineEnd         Int?
-  createdAt       DateTime @default(now())
+model PerfComparison {
+  id          String   @id @default(cuid())
+  debugRunId  String
+  metric      String   // time_ms | memory_mb | query_count
+  beforeValue Float?
+  afterValue  Float?
+  pctChange   Float?
+  flagged     Boolean  @default(false)
+  createdAt   DateTime @default(now())
 
-  scan PerformanceScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  debugRun DebugRun @relation(fields: [debugRunId], references: [id], onDelete: Cascade)
 
-  @@index([scanId])
-  @@index([severity])
-  @@index([issueType])
-}
-
-model PerformanceReport {
-  id         String   @id @default(cuid())
-  scanId     String
-  format     String   @default("markdown") // markdown | pdf
-  content    String?
-  createdAt  DateTime @default(now())
-
-  scan PerformanceScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
-
-  @@index([scanId])
-  @@index([createdAt(sort: Desc)])
+  @@index([debugRunId])
 }
 
 // ─── Support Center ───────────────────────────────────────────────

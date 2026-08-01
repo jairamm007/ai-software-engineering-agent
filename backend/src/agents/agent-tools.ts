@@ -56,7 +56,6 @@ export function getToolsForAgent(agentType: string): AgentTool[] {
     security: ["scan_vulnerabilities", "check_owasp", "analyze_input_flows"],
     commit: ["analyze_changes", "format_conventional"],
     pullRequest: ["summarize_changes", "generate_checklist"],
-    fix: ["generate_diff", "validate_syntax"],
   };
 
   const toolNames = agentToolMap[agentType] ?? [];

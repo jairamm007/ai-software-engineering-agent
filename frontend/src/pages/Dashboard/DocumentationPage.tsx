@@ -2,12 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  Search, Play, RotateCcw, BookOpen, FolderGit2, ArrowRight,
-  Download, Copy, Check, FileText, Code2, Layers,
-  Database, Route, Cpu, File, FolderOpen, CheckSquare, Square,
-  FileStack,
-} from "lucide-react";
+import { Search, Play, BookOpen, FolderGit2, ArrowRight, Download, Copy, Check, FileText, Code2, Layers, Database, Route, Cpu, File, FolderOpen, CheckSquare, Square, FileStack } from "lucide-react";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import AIResult from "@/components/repository/AIResult";
@@ -15,6 +10,7 @@ import { getRepositories, getRepository } from "@/services/repository";
 import { askRepository } from "@/services/chat";
 import { useTheme } from "@/context/ThemeContext";
 import { getFileTypeInfo, getFileExtension, formatFileSize } from "@/utils/fileIcons";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 type DocScope = "single" | "multiple" | "repository";
 
@@ -220,7 +216,7 @@ export default function DocumentationPage() {
           <div className="p-5">
             {reposLoading ? (
               <div className="flex h-20 items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                <LoadingIndicator size="sm" />
               </div>
             ) : !repos || repos.length === 0 ? (
               <div className={`rounded-xl border border-dashed p-8 text-center ${isDark ? "border-white/10" : "border-slate-200"}`}>
@@ -312,7 +308,7 @@ export default function DocumentationPage() {
 
             {repoLoading ? (
               <div className="flex h-32 items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                <LoadingIndicator size="sm" />
               </div>
             ) : (
               <>
@@ -516,7 +512,7 @@ export default function DocumentationPage() {
                     >
                       {loading ? (
                         <>
-                          <RotateCcw size={14} className="animate-spin" />
+                          <LoadingIndicator size="sm" />
                           Generating...
                         </>
                       ) : (

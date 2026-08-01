@@ -1,12 +1,9 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, type ComponentType } from "react";
+import { motion } from "framer-motion";
 import {
   Webhook,
   CheckCircle,
-  XCircle,
-  Clock,
   ChevronRight,
-  ExternalLink,
   Filter,
   GitCommit,
   GitPullRequest,
@@ -25,7 +22,7 @@ interface GitHubWebhooksTabProps {
   refreshInterval?: number;
 }
 
-const EVENT_ICONS: Record<string, typeof Webhook> = {
+const EVENT_ICONS: Record<string, ComponentType<{ size?: number; className?: string }>> = {
   push: GitCommit,
   pull_request: GitPullRequest,
   issues: AlertCircle,

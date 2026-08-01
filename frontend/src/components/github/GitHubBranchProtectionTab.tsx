@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Loader2, Search, CheckCircle, XCircle, AlertCircle, Users, GitBranch, FileText } from "lucide-react";
+import { Shield, Search, CheckCircle, XCircle, AlertCircle, Users, GitBranch, FileText } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useQuery } from "@tanstack/react-query";
 import { getGitHubBranchProtection } from "@/services/github-integration";
-import type { GitHubBranchProtection } from "@/types/github-integration";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface GitHubBranchProtectionTabProps {
   integrationId: string;
@@ -54,7 +54,7 @@ function ListBadge({ label }: { label: string }) {
   );
 }
 
-export default function GitHubBranchProtectionTab({ integrationId, owner, repo: repoName, timeAgo }: GitHubBranchProtectionTabProps) {
+export default function GitHubBranchProtectionTab({ integrationId, owner, repo: repoName }: GitHubBranchProtectionTabProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [branch, setBranch] = useState("main");
@@ -107,7 +107,7 @@ export default function GitHubBranchProtectionTab({ integrationId, owner, repo: 
               : "bg-slate-900 text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           }`}
         >
-          {isLoading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+          {isLoading ? <LoadingIndicator size="sm" /> : <Search size={14} />}
           Load Protection Rules
         </button>
       </div>

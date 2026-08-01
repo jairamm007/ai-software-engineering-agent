@@ -1,8 +1,9 @@
 import { auth } from "./auth.config.js";
 import { prisma } from "../database/prisma.js";
 import type { Request, Response, NextFunction } from "express";
+import type { ParamsFlatDictionary } from "express-serve-static-core";
 
-export interface AuthRequest extends Request {
+export interface AuthRequest extends Request<ParamsFlatDictionary> {
   userId?: string;
   session?: Session;
 }

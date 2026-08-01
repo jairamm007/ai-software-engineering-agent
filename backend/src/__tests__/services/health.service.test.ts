@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("../../database/prisma.js", () => ({
   prisma: {
-    $queryRaw: vi.fn(),
+    $queryRawUnsafe: vi.fn(),
   },
 }));
 
@@ -17,7 +17,7 @@ describe("Health Service", () => {
   });
 
   it("should return healthy status when database is reachable", async () => {
-    mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
+    mockPrisma.$queryRawUnsafe.mockResolvedValue([{ "?column?": 1 }]);
 
     const health = await getHealthStatus();
 
@@ -31,7 +31,7 @@ describe("Health Service", () => {
   });
 
   it("should return unhealthy when database fails", async () => {
-    mockPrisma.$queryRaw.mockRejectedValue(new Error("Connection refused"));
+    mockPrisma.$queryRawUnsafe.mockRejectedValue(new Error("Connection refused"));
 
     const health = await getHealthStatus();
 
@@ -41,7 +41,7 @@ describe("Health Service", () => {
   });
 
   it("should include memory usage", async () => {
-    mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
+    mockPrisma.$queryRawUnsafe.mockResolvedValue([{ "?column?": 1 }]);
 
     const health = await getHealthStatus();
 
@@ -52,7 +52,7 @@ describe("Health Service", () => {
   });
 
   it("should calculate uptime", async () => {
-    mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
+    mockPrisma.$queryRawUnsafe.mockResolvedValue([{ "?column?": 1 }]);
 
     const health = await getHealthStatus();
 
@@ -61,7 +61,7 @@ describe("Health Service", () => {
   });
 
   it("should have valid timestamp format", async () => {
-    mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
+    mockPrisma.$queryRawUnsafe.mockResolvedValue([{ "?column?": 1 }]);
 
     const health = await getHealthStatus();
 

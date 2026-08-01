@@ -7,7 +7,7 @@ import {
   BookOpen,
   GitPullRequest,
   GitBranch,
-  Sparkles,
+  Workflow,
   Boxes,
   FlaskConical,
   BarChart3,
@@ -18,9 +18,6 @@ import {
   PanelLeft,
   PanelRightOpen,
   LogOut,
-  Bug,
-  Shield,
-  Gauge,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
@@ -58,10 +55,7 @@ const sections: NavSection[] = [
   {
     label: "AI Development",
     items: [
-      { icon: Sparkles, label: "Code Generation", path: "/code-generation" },
-      { icon: Bug, label: "AI Debugging", path: "/debugging" },
-      { icon: Shield, label: "Security", path: "/security" },
-      { icon: Gauge, label: "Performance", path: "/performance" },
+      { icon: Workflow, label: "Runs", path: "/runs" },
     ],
   },
   {

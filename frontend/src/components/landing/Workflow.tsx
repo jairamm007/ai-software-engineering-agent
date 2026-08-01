@@ -3,7 +3,6 @@ import { useRef } from "react";
 import {
   FolderOpen,
   FileCode2,
-  MessageSquareText,
   Sparkles,
   Eye,
   CheckCircle2,
@@ -78,9 +77,8 @@ function StepCard({ step, index, isDark }: { step: (typeof steps)[number]; index
       {index < steps.length - 1 && (
         <div className="absolute left-7 top-20 bottom-0 w-px z-0">
           <motion.div
-            style={{ scaleY: lineScale, originY: 0 }}
+            style={{ scaleY: lineScale, originY: 0, height: "100%" }}
             className={`w-full ${isDark ? "bg-gradient-to-b from-white/10 to-white/5" : "bg-gradient-to-b from-slate-200 to-slate-100"}`}
-            style={{ height: "100%" }}
           />
         </div>
       )}

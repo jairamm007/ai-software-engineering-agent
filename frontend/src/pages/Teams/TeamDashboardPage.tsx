@@ -3,14 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   Users, FolderGit2, MessageSquare, Activity, BarChart3,
-  Bell, Plus, Sparkles,
+  Bell, Sparkles,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
-import { getTeam, getSharedRepositories } from "@/services/team";
 import { getTeamAnalytics } from "@/services/teamAnalytics";
 import { getUnreadCount } from "@/services/teamNotification";
-import { getActivities } from "@/services/activity";
-import type { Team, TeamActivity, TeamRole } from "@/types/team";
+import type { Team, TeamRole } from "@/types/team";
 
 interface OutletContext {
   team: Team;
@@ -29,10 +27,9 @@ function timeAgo(date: string | Date) {
 }
 
 export default function TeamDashboardPage() {
-  const { team, myRole } = useOutletContext<OutletContext>();
+  const { team } = useOutletContext<OutletContext>();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const isAdmin = myRole === "owner" || myRole === "admin";
 
   const { data: analytics } = useQuery({
     queryKey: ["team-analytics", team.id],
@@ -74,7 +71,7 @@ export default function TeamDashboardPage() {
           { label: "Members", value: analytics?.stats.members ?? team.members?.length ?? 0, icon: Users, color: "text-blue-400 bg-blue-500/10" },
           { label: "Repositories", value: analytics?.stats.repositories ?? 0, icon: FolderGit2, color: "text-emerald-400 bg-emerald-500/10" },
           { label: "AI Chats", value: analytics?.stats.chats ?? 0, icon: MessageSquare, color: "text-violet-400 bg-violet-500/10" },
-          { label: "Documents", value: analytics?.stats.documents ?? 0, icon: FolderGit2, color: "text-amber-400 bg-amber-500/10" },
+          { label: "Documents", value: analytics?.stats.documentation ?? 0, icon: FolderGit2, color: "text-amber-400 bg-amber-500/10" },
           { label: "Code Reviews", value: analytics?.stats.codeReviews ?? 0, icon: BarChart3, color: "text-rose-400 bg-rose-500/10" },
           { label: "Activities", value: analytics?.stats.recentActivityCount ?? 0, icon: Activity, color: "text-cyan-400 bg-cyan-500/10" },
         ].map((stat, i) => (
@@ -173,7 +170,7 @@ export default function TeamDashboardPage() {
             </h3>
           </div>
           <div className="max-h-64 overflow-y-auto">
-            {analytics.recentActivities.map((activity: TeamActivity, idx: number) => (
+            {analytics.recentActivities.map((activity, idx) => (
               <div
                 key={activity.id}
                 className={`px-6 py-3 ${idx > 0 ? `border-t ${isDark ? "border-white/[0.04]" : "border-slate-50"}` : ""}`}

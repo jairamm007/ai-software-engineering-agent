@@ -9,7 +9,6 @@ import {
   Users,
   UserCog,
   FolderGit2,
-  Bot,
   Activity,
   MessageSquare,
   FileCode2,
@@ -28,8 +27,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { getAdminStats, getSystemHealth, type AdminStats, type SystemHealth } from "@/services/admin";
 
 const container = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } };
-const item = { hidden: { opacity: 0, y: 20, scale: 0.97 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } } };
-const fadeUp = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } };
+const item = { hidden: { opacity: 0, y: 20, scale: 0.97 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } } };
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -269,7 +267,7 @@ export default function AdminDashboardPage() {
                         fontSize: "12px",
                         boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
                       }}
-                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      labelFormatter={(v) => new Date(String(v)).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                       cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)" }}
                     />
                     <Bar
@@ -311,7 +309,7 @@ export default function AdminDashboardPage() {
                         fontSize: "12px",
                         boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
                       }}
-                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      labelFormatter={(v) => new Date(String(v)).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                       cursor={{ stroke: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", strokeWidth: 1 }}
                     />
                     <Area
@@ -378,7 +376,7 @@ export default function AdminDashboardPage() {
                         fontSize: "12px",
                         boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
                       }}
-                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      labelFormatter={(v) => new Date(String(v)).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                       cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)" }}
                     />
                     <Bar dataKey="count" name="Repos" fill="url(#repoBarGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />
@@ -414,7 +412,7 @@ export default function AdminDashboardPage() {
                         fontSize: "12px",
                         boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
                       }}
-                      labelFormatter={(v: string) => new Date(v).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      labelFormatter={(v) => new Date(String(v)).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                       cursor={{ stroke: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", strokeWidth: 1 }}
                     />
                     <Area

@@ -118,8 +118,8 @@ export default function GitHubIssueList({
                   <span className={isDark ? "text-slate-500" : "text-slate-400"}>{issue.author}</span>
                   <span className={isDark ? "text-slate-600" : "text-slate-400"}>{timeAgo(issue.createdAt)}</span>
                   {issue.labels.filter(Boolean).slice(0, 3).map((label) => (
-                    <span key={label} className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${isDark ? "bg-white/5 text-slate-500" : "bg-slate-100 text-slate-400"}`}>
-                      {label}
+                    <span key={label.name} className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${isDark ? "bg-white/5 text-slate-500" : "bg-slate-100 text-slate-400"}`}>
+                      {label.name}
                     </span>
                   ))}
                   {issue.comments > 0 && (
@@ -179,8 +179,8 @@ function IssueDetail({ detail, loading, onBack, isDark, timeAgo, onAddComment }:
         {detail.labels.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {detail.labels.filter(Boolean).map((label) => (
-              <span key={label} className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${isDark ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
-                {label}
+              <span key={label.name} className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${isDark ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
+                {label.name}
               </span>
             ))}
           </div>

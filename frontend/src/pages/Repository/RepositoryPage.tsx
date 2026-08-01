@@ -6,6 +6,7 @@ import RepositoryForm from "@/components/repository/RepositoryForm";
 import RepositoryTable from "@/components/repository/RepositoryTable";
 import { analyzeRepository, getRepositories } from "@/services/repository";
 import { useTheme } from "@/context/ThemeContext";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 import type { RepositoryListItem } from "@/types/repository";
 
 const SORT_OPTIONS = [
@@ -68,7 +69,7 @@ export default function RepositoryPage() {
         <div className={`mb-4 flex items-center gap-3 rounded-xl border p-4 ${
           isDark ? "border-violet-500/20 bg-violet-500/5" : "border-violet-200 bg-violet-50"
         }`}>
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+          <LoadingIndicator size="sm" />
           <div>
             <p className={`text-sm font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
               Cloning & indexing repository...
@@ -114,7 +115,7 @@ export default function RepositoryPage() {
         </div>
       </div>
       {isLoading ? (
-        <p className={isDark ? "text-slate-400" : "text-slate-500"}>Loading repositories...</p>
+        <LoadingIndicator size="md" label="Loading repositories" />
       ) : (
         <RepositoryTable repositories={data} />
       )}

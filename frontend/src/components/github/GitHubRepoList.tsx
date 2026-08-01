@@ -1,18 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  Search,
-  GitBranch,
-  Star,
-  GitFork,
-  ExternalLink,
-  Download,
-  RefreshCw,
-  FolderGit2,
-  Loader2,
-} from "lucide-react";
+import { Search, GitBranch, Star, GitFork, ExternalLink, Download, RefreshCw, FolderGit2 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import type { GitHubRepoListItem } from "@/types/github-integration";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface GitHubRepoListProps {
   repos: GitHubRepoListItem[];
@@ -156,7 +147,7 @@ export default function GitHubRepoList({
                         isDark ? "border-white/10 text-slate-400 hover:bg-white/5" : "border-slate-200 text-slate-500 hover:bg-slate-50"
                       }`}
                     >
-                      {syncPending ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+                      {syncPending ? <LoadingIndicator size="sm" /> : <RefreshCw size={10} />}
                       Sync
                     </button>
                   ) : (
@@ -166,7 +157,7 @@ export default function GitHubRepoList({
                       disabled={importingRepo?.owner === repo.owner && importingRepo?.name === repo.name}
                       className="flex items-center gap-1 rounded-lg bg-[var(--accent)] px-2.5 py-1.5 text-[11px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                      {importingRepo?.owner === repo.owner && importingRepo?.name === repo.name ? <Loader2 size={10} className="animate-spin" /> : <Download size={10} />}
+                      {importingRepo?.owner === repo.owner && importingRepo?.name === repo.name ? <LoadingIndicator size="sm" /> : <Download size={10} />}
                       Import
                     </button>
                   )}

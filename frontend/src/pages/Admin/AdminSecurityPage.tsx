@@ -6,7 +6,6 @@ import {
   Activity,
   User,
   Clock,
-  AlertTriangle,
   CheckCircle,
   LogOut,
   Ban,
@@ -21,9 +20,10 @@ import {
   forceLogoutSession,
   type SecurityData,
 } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const container = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
-const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] } } };
+const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } } };
 
 export default function AdminSecurityPage() {
   const { theme } = useTheme();
@@ -203,7 +203,7 @@ export default function AdminSecurityPage() {
             <div className="divide-y">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="h-7 w-7 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                  <LoadingIndicator size="md" />
                 </div>
               ) : data?.activeSessions?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12">
@@ -295,7 +295,7 @@ export default function AdminSecurityPage() {
             <div className="max-h-[32rem] overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="h-7 w-7 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                  <LoadingIndicator size="md" />
                 </div>
               ) : filteredAuditLogs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12">
@@ -358,7 +358,7 @@ export default function AdminSecurityPage() {
             <div className="divide-y">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="h-7 w-7 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                  <LoadingIndicator size="md" />
                 </div>
               ) : data?.suspendedUsers?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12">

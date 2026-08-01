@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { MessageSquare, Send, Check, Loader2 } from "lucide-react";
+import { MessageSquare, Send, Check } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { getComments, createComment, deleteComment, resolveComment } from "@/services/comment";
 import type { Team, Comment, TeamRole } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface OutletContext {
   team: Team;
@@ -89,7 +90,7 @@ export default function TeamDiscussionsPage() {
               disabled={!commentText.trim() || postCommentMutation.isPending}
               className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
-              {postCommentMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+              {postCommentMutation.isPending ? <LoadingIndicator size="sm" /> : <Send size={13} />}
               Post
             </button>
           </div>
@@ -100,7 +101,7 @@ export default function TeamDiscussionsPage() {
       <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
         {isLoading ? (
           <div className="py-12 flex justify-center">
-            <Loader2 size={20} className="animate-spin accent-text" />
+            <LoadingIndicator size="md" />
           </div>
         ) : comments.length === 0 ? (
           <div className="py-12 text-center">

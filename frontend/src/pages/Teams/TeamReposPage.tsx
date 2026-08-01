@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { FolderGit2, GitBranch, Trash2, Loader2 } from "lucide-react";
+import { FolderGit2, GitBranch, Trash2 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { getSharedRepositories, shareRepository, unshareRepository } from "@/services/team";
 import { getRepositories } from "@/services/repository";
@@ -39,7 +39,7 @@ export default function TeamReposPage() {
 
   const { data: userRepos = [] } = useQuery({
     queryKey: ["repositories"],
-    queryFn: getRepositories,
+    queryFn: () => getRepositories(),
     enabled: isAdmin,
   });
 

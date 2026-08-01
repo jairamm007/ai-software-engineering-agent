@@ -332,3 +332,12 @@ html {
 .stagger-item:nth-child(6) { animation-delay: 0.3s; }
 .stagger-item:nth-child(7) { animation-delay: 0.35s; }
 .stagger-item:nth-child(8) { animation-delay: 0.4s; }
+
+/* Sparkling pulse loading animation */
+@keyframes sparklePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.9); }
+}
+.animate-sparkle-pulse {
+  animation: sparklePulse 1.3s ease-in-out infinite;
+}

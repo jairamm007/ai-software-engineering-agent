@@ -2,7 +2,7 @@ import type { User, LoginCredentials, RegisterData } from "@/types/auth";
 import { authClient } from "@/lib/auth-client";
 
 const FRONTEND_URL = window.location.origin;
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const BACKEND_URL = import.meta.env.VITE_API_URL || "";
 
 function mapUser(data: Record<string, unknown>): User {
   return {

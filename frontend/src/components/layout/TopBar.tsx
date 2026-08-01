@@ -11,7 +11,7 @@ const routeLabels: Record<string, string> = {
   "/repositories": "Repositories",
   "/chat": "AI Chat",
   "/code-review": "Code Review",
-  "/code-generation": "Code Generation",
+  "/runs": "Runs",
   "/architecture": "Architecture",
   "/documentation": "Documentation",
   "/testing": "Testing",
@@ -41,7 +41,9 @@ export default function TopBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const pageTitle = routeLabels[location.pathname] || "Dashboard";
+  const pageTitle =
+    routeLabels[location.pathname] ||
+    (location.pathname.startsWith("/runs") ? "Runs" : "Dashboard");
 
   return (
     <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b px-4 sm:px-6 ${

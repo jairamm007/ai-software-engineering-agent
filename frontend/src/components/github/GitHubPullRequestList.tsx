@@ -25,7 +25,6 @@ interface GitHubPullRequestListProps {
   onBack: () => void;
   timeAgo: (d: string | Date) => string;
   onCreatePR?: () => void;
-  onAddComment?: (pullNumber: number) => void;
   onReview?: (pullNumber: number) => void;
   onMerge?: (pullNumber: number) => void;
 }
@@ -42,7 +41,6 @@ export default function GitHubPullRequestList({
   onBack,
   timeAgo,
   onCreatePR,
-  onAddComment,
   onReview,
   onMerge,
 }: GitHubPullRequestListProps) {
@@ -50,7 +48,7 @@ export default function GitHubPullRequestList({
   const isDark = theme === "dark";
 
   if (selectedPR && detail) {
-    return <PRDetail detail={detail} loading={detailLoading} onBack={onBack} isDark={isDark} timeAgo={timeAgo} onAddComment={onAddComment} onReview={onReview} onMerge={onMerge} />;
+    return <PRDetail detail={detail} loading={detailLoading} onBack={onBack} isDark={isDark} timeAgo={timeAgo} onReview={onReview} onMerge={onMerge} />;
   }
 
   return (
@@ -145,13 +143,12 @@ export default function GitHubPullRequestList({
 }
 
 // ── PR Detail sub-component ──
-function PRDetail({ detail, loading, onBack, isDark, timeAgo, onAddComment, onReview, onMerge }: {
+function PRDetail({ detail, loading, onBack, isDark, timeAgo, onReview, onMerge }: {
   detail: GitHubPullRequestDetail;
   loading: boolean;
   onBack: () => void;
   isDark: boolean;
   timeAgo: (d: string | Date) => string;
-  onAddComment?: (pullNumber: number) => void;
   onReview?: (pullNumber: number) => void;
   onMerge?: (pullNumber: number) => void;
 }) {

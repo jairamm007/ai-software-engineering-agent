@@ -9,7 +9,6 @@ import {
   ChevronRight,
   ExternalLink,
   RotateCw,
-  GitCommit,
   Box,
   Filter,
 } from "lucide-react";
@@ -20,7 +19,7 @@ import {
   getGitHubWorkflowRunDetail,
   listGitHubDeployments,
 } from "@/services/github-integration";
-import type { GitHubWorkflowRun, GitHubWorkflowRunDetail, GitHubDeployment } from "@/types/github-integration";
+import type { GitHubWorkflowRunDetail } from "@/types/github-integration";
 
 interface GitHubCICDTabProps {
   integrationId: string;

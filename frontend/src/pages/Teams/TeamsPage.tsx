@@ -2,25 +2,12 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  Users,
-  Plus,
-  FolderGit2,
-  Crown,
-  Loader2,
-  X,
-  Search,
-  LogIn,
-  KeyRound,
-  Copy,
-  Check,
-  MailQuestion,
-  Mail,
-} from "lucide-react";
+import { Users, Plus, FolderGit2, Crown, X, Search, LogIn, KeyRound, Copy, Check, MailQuestion, Mail } from "lucide-react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useTheme } from "@/context/ThemeContext";
 import { getTeams, createTeam, searchTeamsByCode, searchUsers, joinTeamByCode, getPendingInvitations, acceptInvitationById, rejectInvitationById, inviteByUserCode } from "@/services/team";
-import type { Team, TeamInvitation, SearchedUser } from "@/types/team";
+import type { Team, SearchedUser } from "@/types/team";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function TeamsPage() {
   const { theme } = useTheme();
@@ -109,9 +96,6 @@ export default function TeamsPage() {
     queryFn: () => searchUsers(userSearchQuery.trim()),
     enabled: userSearchQuery.trim().length > 0,
   });
-
-  const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
     <DashboardLayout>
@@ -245,7 +229,7 @@ export default function TeamsPage() {
                       disabled={!newName.trim() || createMutation.isPending}
                       className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                      {createMutation.isPending && <Loader2 size={13} className="animate-spin" />}
+                      {createMutation.isPending && <LoadingIndicator size="sm" />}
                       Create
                     </button>
                   </div>
@@ -319,7 +303,7 @@ export default function TeamsPage() {
                         disabled={joinCode.trim().length !== 8 || joinMutation.isPending}
                         className="flex items-center gap-2 rounded-xl accent-gradient px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                       >
-                        {joinMutation.isPending && <Loader2 size={13} className="animate-spin" />}
+                        {joinMutation.isPending && <LoadingIndicator size="sm" />}
                         <LogIn size={13} />
                         Join Team
                       </button>
@@ -495,7 +479,7 @@ export default function TeamsPage() {
                       disabled={acceptMutation.isPending}
                       className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                      {acceptMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : "Accept"}
+                      {acceptMutation.isPending ? <LoadingIndicator size="sm" /> : "Accept"}
                     </button>
                     <button
                       type="button"
@@ -517,7 +501,7 @@ export default function TeamsPage() {
         {/* Team List */}
         {isLoading ? (
           <div className="flex h-64 items-center justify-center">
-            <Loader2 size={24} className="animate-spin accent-text" />
+            <LoadingIndicator size="md" />
           </div>
         ) : teams.length === 0 ? (
           <motion.div
@@ -784,7 +768,7 @@ export default function TeamsPage() {
                       }}
                       className="w-full flex items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                      {inviteLoading ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+                      {inviteLoading ? <LoadingIndicator size="sm" /> : <Mail size={14} />}
                       {inviteLoading ? "Sending..." : "Invite to Team"}
                     </button>
                   </div>

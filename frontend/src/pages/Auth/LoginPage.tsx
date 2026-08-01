@@ -15,6 +15,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const features = [
   { icon: Bot, text: "AI-powered code analysis" },
@@ -389,7 +390,7 @@ export default function LoginPage() {
               }`}
             >
               {oauthLoading === "google" ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                <LoadingIndicator size="sm" />
               ) : (
                 <svg width="16" height="16" viewBox="0 0 24 24">
                   <path
@@ -425,7 +426,7 @@ export default function LoginPage() {
               }`}
             >
               {oauthLoading === "github" ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+                <LoadingIndicator size="sm" />
               ) : (
                 <svg
                   width="16"
@@ -599,7 +600,7 @@ export default function LoginPage() {
                 className={`shimmer-btn flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100`}
               >
                 {loading ? (
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <LoadingIndicator size="sm" />
                 ) : (
                   <>
                     Sign In

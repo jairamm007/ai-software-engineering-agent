@@ -10,9 +10,8 @@ import AgentPipeline from "@/components/repository/multi-agent/AgentPipeline";
 import AgentExecutionTimeline from "@/components/repository/multi-agent/AgentExecutionTimeline";
 import { orchestrateMultiAgent } from "@/services/multiAgent";
 import type { MultiAgentResult } from "@/services/multiAgent";
-import {
-  Play, Loader2, Sparkles, Zap, Clock, CheckCircle, RotateCcw,
-} from "lucide-react";
+import { Play, Sparkles, Zap, Clock, CheckCircle, RotateCcw } from "lucide-react";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const QUICK_PROMPTS = [
   { label: "Code Review", question: "Review this codebase for bugs and improvements" },
@@ -105,7 +104,7 @@ export default function MultiAgentPage() {
               className="flex items-center gap-2 rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {orchestrateMutation.isPending ? (
-                <Loader2 size={16} className="animate-spin" />
+                <LoadingIndicator size="sm" />
               ) : (
                 <Play size={16} />
               )}

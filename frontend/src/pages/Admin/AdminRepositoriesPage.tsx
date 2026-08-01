@@ -8,9 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileCode2,
-  MessageSquare,
   User,
-  X,
   HardDrive,
   Database,
   BarChart3,
@@ -25,6 +23,7 @@ import {
   type AdminRepository,
   type RepositoryStats,
 } from "@/services/admin";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 export default function AdminRepositoriesPage() {
   const { theme } = useTheme();
@@ -132,7 +131,7 @@ export default function AdminRepositoriesPage() {
               value: `${repoStats.totalStorageMB} MB`,
               gradient: "from-amber-500 to-orange-600",
             },
-          ].map((s, i) => (
+          ].map((s) => (
             <motion.div
               key={s.label}
               variants={fadeUp}
@@ -271,7 +270,7 @@ export default function AdminRepositoriesPage() {
                 <tr>
                   <td colSpan={5} className="px-5 py-16 text-center">
                     <div className="flex items-center justify-center gap-3">
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                      <LoadingIndicator size="sm" />
                       <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                         Loading repositories...
                       </span>
