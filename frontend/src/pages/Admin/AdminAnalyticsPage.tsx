@@ -50,7 +50,14 @@ function formatShortDate(dateStr: string) {
   });
 }
 
-function ChartTooltip({ active, payload, label, isDark }: any) {
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: Array<{ color?: string; name?: string; value?: number | string }>;
+  label?: string | number;
+  isDark: boolean;
+}
+
+function ChartTooltip({ active, payload, label, isDark }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div
@@ -63,7 +70,7 @@ function ChartTooltip({ active, payload, label, isDark }: any) {
       <p className={`font-semibold mb-1 ${isDark ? "text-white" : "text-slate-900"}`}>
         {typeof label === "string" && label.includes("-") ? formatShortDate(label) : label}
       </p>
-      {payload.map((p: any, i: number) => (
+      {payload.map((p, i: number) => (
         <p key={i} style={{ color: p.color }} className="font-medium">
           {p.name}: {typeof p.value === "number" ? p.value.toLocaleString() : p.value}
         </p>
@@ -72,10 +79,10 @@ function ChartTooltip({ active, payload, label, isDark }: any) {
   );
 }
 
-function CustomLegend({ payload, isDark }: any) {
+function CustomLegend({ payload, isDark }: { payload?: Array<{ color?: string; value?: string | number }>; isDark: boolean }) {
   return (
     <div className="flex flex-wrap gap-4 justify-center mt-2">
-      {payload?.map((entry: any, i: number) => (
+      {payload?.map((entry, i: number) => (
         <div key={i} className="flex items-center gap-1.5 text-[11px]">
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className={isDark ? "text-slate-400" : "text-slate-500"}>{entry.value}</span>
@@ -207,7 +214,7 @@ export default function AdminAnalyticsPage() {
     </motion.div>
   );
 
-  const renderBarArea = (chartData: any[], dataKey: string, color: string, chartType: "bar" | "area", gradId: string, height = 260) => (
+  const renderBarArea = (chartData: Array<Record<string, string | number>>, dataKey: string, color: string, chartType: "bar" | "area", gradId: string, height = 260) => (
     <ResponsiveContainer width="100%" height={height}>
       {chartType === "bar" ? (
         <BarChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>

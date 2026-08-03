@@ -46,7 +46,9 @@ export default function AdminSecurityPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    void (async () => {
+      await fetchData();
+    })();
   }, []);
 
   const handleForceLogout = async (sessionId: string) => {

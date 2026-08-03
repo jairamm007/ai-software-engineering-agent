@@ -36,6 +36,51 @@ const defaults: Record<string, string> = {
   maxUploadSize: "50",
 };
 
+function Toggle({ value, onChange, accentClass, isDark }: { value: boolean; onChange: () => void; accentClass?: string; isDark: boolean }) {
+  const onColor = accentClass || "bg-gradient-to-r from-rose-500 to-orange-500";
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${
+        value ? onColor : isDark ? "bg-white/[0.1]" : "bg-slate-200"
+      }`}
+    >
+      <span
+        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ${
+          value ? "translate-x-[22px]" : "translate-x-[2px]"
+        }`}
+      />
+    </button>
+  );
+}
+
+function SettingRow({
+  title,
+  description,
+  children,
+  className,
+  isDark,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  className?: string;
+  isDark: boolean;
+}) {
+  const textPrimary = isDark ? "text-white" : "text-slate-900";
+  const textMuted = isDark ? "text-slate-500" : "text-slate-400";
+  return (
+    <div className={`flex items-center justify-between rounded-xl border p-4 ${isDark ? "border-white/[0.06] bg-[#0a0a0f]" : "border-slate-200 bg-slate-50"} ${className || ""}`}>
+      <div className="mr-4">
+        <p className={`text-[13px] font-medium ${textPrimary}`}>{title}</p>
+        <p className={`mt-0.5 text-[12px] ${textMuted}`}>{description}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export default function AdminSettingsPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -79,47 +124,6 @@ export default function AdminSettingsPage() {
       : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-rose-500/50 focus:ring-1 focus:ring-rose-500/20"
   }`;
   const labelClass = `mb-2 block text-[13px] font-medium ${textSecondary}`;
-
-  function Toggle({ value, onChange, accentClass }: { value: boolean; onChange: () => void; accentClass?: string }) {
-    const onColor = accentClass || "bg-gradient-to-r from-rose-500 to-orange-500";
-    return (
-      <button
-        type="button"
-        onClick={onChange}
-        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${
-          value ? onColor : isDark ? "bg-white/[0.1]" : "bg-slate-200"
-        }`}
-      >
-        <span
-          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ${
-            value ? "translate-x-[22px]" : "translate-x-[2px]"
-          }`}
-        />
-      </button>
-    );
-  }
-
-  function SettingRow({
-    title,
-    description,
-    children,
-    className,
-  }: {
-    title: string;
-    description: string;
-    children: React.ReactNode;
-    className?: string;
-  }) {
-    return (
-      <div className={`flex items-center justify-between rounded-xl border p-4 ${isDark ? "border-white/[0.06] bg-[#0a0a0f]" : "border-slate-200 bg-slate-50"} ${className || ""}`}>
-        <div className="mr-4">
-          <p className={`text-[13px] font-medium ${textPrimary}`}>{title}</p>
-          <p className={`mt-0.5 text-[12px] ${textMuted}`}>{description}</p>
-        </div>
-        {children}
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8">
@@ -227,14 +231,16 @@ export default function AdminSettingsPage() {
                       <SettingRow
                         title="Allow New Signups"
                         description="Allow new users to register accounts"
+                        isDark={isDark}
                       >
-                        <Toggle value={settings.allowSignups === "true"} onChange={() => updateSetting("allowSignups", settings.allowSignups !== "true")} />
+                        <Toggle value={settings.allowSignups === "true"} onChange={() => updateSetting("allowSignups", settings.allowSignups !== "true")} isDark={isDark} />
                       </SettingRow>
                       <SettingRow
                         title="Require Email Verification"
                         description="Users must verify email before accessing the platform"
+                        isDark={isDark}
                       >
-                        <Toggle value={settings.requireEmailVerification === "true"} onChange={() => updateSetting("requireEmailVerification", settings.requireEmailVerification !== "true")} />
+                        <Toggle value={settings.requireEmailVerification === "true"} onChange={() => updateSetting("requireEmailVerification", settings.requireEmailVerification !== "true")} isDark={isDark} />
                       </SettingRow>
                     </div>
                   </div>
@@ -314,8 +320,9 @@ export default function AdminSettingsPage() {
                     <SettingRow
                       title="Email Notifications"
                       description="Send email notifications for important events"
+                      isDark={isDark}
                     >
-                      <Toggle value={settings.emailNotifications === "true"} onChange={() => updateSetting("emailNotifications", settings.emailNotifications !== "true")} />
+                      <Toggle value={settings.emailNotifications === "true"} onChange={() => updateSetting("emailNotifications", settings.emailNotifications !== "true")} isDark={isDark} />
                     </SettingRow>
                     <div className={`rounded-xl border p-5 ${isDark ? "border-white/[0.06] bg-[#0a0a0f]" : "border-slate-200 bg-slate-50"}`}>
                       <div className="mb-4 flex items-center gap-2.5">
@@ -420,6 +427,7 @@ export default function AdminSettingsPage() {
                           value={settings.maintenanceMode === "true"}
                           onChange={() => updateSetting("maintenanceMode", settings.maintenanceMode !== "true")}
                           accentClass="bg-amber-500"
+                          isDark={isDark}
                         />
                       </div>
                     </div>

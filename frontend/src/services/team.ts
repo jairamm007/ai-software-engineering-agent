@@ -148,7 +148,7 @@ export const searchUsers = async (q: string): Promise<SearchedUser[]> => {
 };
 
 export const lookupUserByCode = async (code: string): Promise<{ id: string; name: string; email: string; image?: string | null; userCode: string }> => {
-  const response = await api.get<ApiResponse<any>>(`/users/lookup/code/${code}`);
+  const response = await api.get<ApiResponse<{ id: string; name: string; email: string; image?: string | null; userCode: string }>>(`/users/lookup/code/${code}`);
   return response.data.data;
 };
 
@@ -156,8 +156,8 @@ export const inviteByUserCode = async (
   teamId: string,
   userCode: string,
   role?: string
-): Promise<any> => {
-  const response = await api.post<ApiResponse<any>>(`/teams/${teamId}/invite-code`, { userCode, role });
+): Promise<{ invitation: TeamInvitation }> => {
+  const response = await api.post<ApiResponse<{ invitation: TeamInvitation }>>(`/teams/${teamId}/invite-code`, { userCode, role });
   return response.data.data;
 };
 

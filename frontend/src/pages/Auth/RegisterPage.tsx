@@ -73,6 +73,13 @@ export default function RegisterPage() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [particles] = useState(() =>
+    Array.from({ length: 20 }, () => ({
+      left: Math.random() * 100,
+      duration: 8 + Math.random() * 12,
+      delay: Math.random() * 10,
+    }))
+  );
 
   const passwordStrength = useMemo(() => {
     if (!password) return { level: 0, label: "", color: "" };
@@ -263,15 +270,15 @@ export default function RegisterPage() {
         >
           {/* Particles */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {Array.from({ length: 20 }).map((_, i) => (
+            {particles.map((p, i) => (
               <div
                 key={i}
                 className={`absolute w-1 h-1 rounded-full ${isDark ? "accent-bg-light" : "accent-bg-light"}`}
                 style={{
-                  left: `${Math.random() * 100}%`,
+                  left: `${p.left}%`,
                   bottom: "-10px",
-                  animation: `particleDrift ${8 + Math.random() * 12}s linear infinite`,
-                  animationDelay: `${Math.random() * 10}s`,
+                  animation: `particleDrift ${p.duration}s linear infinite`,
+                  animationDelay: `${p.delay}s`,
                 }}
               />
             ))}

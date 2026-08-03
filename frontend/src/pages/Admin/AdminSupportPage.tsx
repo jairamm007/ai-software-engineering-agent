@@ -89,7 +89,9 @@ export default function AdminSupportPage() {
   }, [page, statusFilter]);
 
   useEffect(() => {
-    void fetchMessages();
+    void (async () => {
+      await fetchMessages();
+    })();
   }, [fetchMessages]);
 
   const handleReply = async (messageId: string) => {

@@ -33,6 +33,7 @@ import webhookRoutes from "./routes/webhook.routes.js";
 import aiPRRoutes from "./routes/ai-pr-assistant.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import pipelineRoutes from "./pipeline/routes.js";
+import insightsRoutes from "./modules/insights/insights.routes.js";
 
 const app = express();
 
@@ -84,6 +85,7 @@ app.use("/api", webhookRoutes);
 app.use("/api", aiPRRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", pipelineRoutes);
+app.use("/api", insightsRoutes);
 
 // Catch Better Auth /error requests and redirect to frontend login
 app.get("/error", (req, res) => {

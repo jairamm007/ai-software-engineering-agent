@@ -35,10 +35,11 @@ export default function RepositoryForm({
     try {
       await onSubmit(url);
       setUrl("");
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string } | undefined;
       const msg =
-        err?.response?.data?.message ||
-        err?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
         "Analysis failed. Check that git is installed and the URL is valid.";
       setError(msg);
     } finally {

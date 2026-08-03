@@ -74,6 +74,7 @@ export default function ProfilePage() {
   const [bannerLoading, setBannerLoading] = useState(false);
   const [bannerError, setBannerError] = useState("");
   const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [now] = useState(() => Date.now());
 
   const { data: repos } = useQuery({
     queryKey: ["repositories"],
@@ -104,7 +105,7 @@ export default function ProfilePage() {
   const totalFiles = repos?.reduce((sum, r) => sum + r.files.length, 0) ?? 0;
 
   const timeAgo = (date: string | Date) => {
-    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+    const seconds = Math.floor((now - new Date(date).getTime()) / 1000);
     if (seconds < 60) return "just now";
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes}m ago`;

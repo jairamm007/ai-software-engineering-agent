@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -305,16 +305,14 @@ export default function SettingsPage() {
     },
   });
 
-  useEffect(() => {
-    if (prefs) {
-      if (prefs.defaultModel) setDefaultModel(prefs.defaultModel);
-      if (prefs.temperature != null) setTemperature(prefs.temperature);
-      if (prefs.theme && prefs.theme !== theme) toggleTheme();
-      if (prefs.accentColor && prefs.accentColor !== accent) {
-        setAccent(prefs.accentColor as typeof accent);
-      }
+  if (prefs) {
+    if (prefs.defaultModel && prefs.defaultModel !== defaultModel) setDefaultModel(prefs.defaultModel);
+    if (prefs.temperature != null && prefs.temperature !== temperature) setTemperature(prefs.temperature);
+    if (prefs.theme && prefs.theme !== theme) toggleTheme();
+    if (prefs.accentColor && prefs.accentColor !== accent) {
+      setAccent(prefs.accentColor as typeof accent);
     }
-  }, [prefs]);
+  }
 
   const handleModelChange = (modelId: string) => {
     setDefaultModel(modelId);

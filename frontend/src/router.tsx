@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- this module is a pure route table: it defines lazy() page components and exports the router and prefetchRoutes, none of which can be split out without breaking fast refresh for every page */
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute, { GuestRoute } from "@/components/auth/ProtectedRoute";
@@ -44,6 +45,7 @@ const RepositoryDocGeneratorPage = lazy(() => import("@/pages/Repository/Documen
 const RepositorySemanticSearchPage = lazy(() => import("@/pages/Repository/SemanticSearch/RepositorySemanticSearchPage"));
 const MultiAgentPage = lazy(() => import("@/pages/Repository/MultiAgent/MultiAgentPage"));
 const RepositorySettingsPage = lazy(() => import("@/pages/Repository/RepositorySettingsPage"));
+const InsightsPage = lazy(() => import("@/pages/Insights/InsightsPage"));
 const GitHubIntegrationPage = lazy(() => import("@/pages/GitHub/GitHubIntegrationPage"));
 const TeamsPage = lazy(() => import("@/pages/Teams/TeamsPage"));
 const TeamDashboardPage = lazy(() => import("@/pages/Teams/TeamDashboardPage"));
@@ -203,6 +205,8 @@ export const router = createBrowserRouter([
   { path: "/repositories/:id/semantic-search", element: <LazyPage><ProtectedRoute><RepositorySemanticSearchPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/multi-agent", element: <LazyPage><ProtectedRoute><MultiAgentPage /></ProtectedRoute></LazyPage> },
   { path: "/repositories/:id/settings", element: <LazyPage><ProtectedRoute><RepositorySettingsPage /></ProtectedRoute></LazyPage> },
+  { path: "/insights", element: <LazyPage><ProtectedRoute><InsightsPage /></ProtectedRoute></LazyPage> },
+  { path: "/insights/:repositoryId", element: <LazyPage><ProtectedRoute><InsightsPage /></ProtectedRoute></LazyPage> },
 
   { path: "/admin/login", element: <LazyPage><AdminLoginPage /></LazyPage> },
   { path: "/admin/access-denied", element: <LazyPage><AdminAccessDeniedPage /></LazyPage> },

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import BackButton from "@/components/common/BackButton";
@@ -22,16 +22,13 @@ export default function RepositoryFilesPage() {
     enabled: Boolean(id),
   });
 
-  useEffect(() => {
-    const requestedFileId = searchParams.get("file");
-    const files = repositoryQuery.data?.files;
-    if (!files?.length) return;
-    setSelectedFile(files.find((file) => file.id === requestedFileId) ?? files[0]);
-  }, [repositoryQuery.data?.files, searchParams]);
-
   if (!id) return null;
   if (repositoryQuery.isLoading) return <DashboardLayout><div className={`h-64 animate-pulse rounded-2xl ${isDark ? "bg-white/5" : "bg-slate-100"}`} /></DashboardLayout>;
   if (repositoryQuery.isError || !repositoryQuery.data) return <DashboardLayout><p className="text-red-600">Failed to load repository files.</p></DashboardLayout>;
+
+  const files = repositoryQuery.data.files;
+  const requestedFileId = searchParams.get("file");
+  const effectiveSelectedFile = selectedFile ?? files.find((file) => file.id === requestedFileId) ?? files[0] ?? null;
 
   return (
     <DashboardLayout>
@@ -44,10 +41,10 @@ export default function RepositoryFilesPage() {
         <RepositoryTabs repositoryId={id} />
         <div className="grid min-w-0 gap-6 overflow-hidden lg:grid-cols-12">
           <aside className="min-w-0 lg:col-span-4">
-            <FileExplorer files={repositoryQuery.data.files} selectedFileId={selectedFile?.id} onSelect={setSelectedFile} />
+            <FileExplorer files={repositoryQuery.data.files} selectedFileId={effectiveSelectedFile?.id} onSelect={setSelectedFile} />
           </aside>
           <section className="min-w-0 overflow-hidden lg:col-span-8">
-            <FileViewer filePath={selectedFile?.path} content={selectedFile?.chunks.map((chunk) => chunk.content).join("\n")} />
+            <FileViewer filePath={effectiveSelectedFile?.path} content={effectiveSelectedFile?.chunks.map((chunk) => chunk.content).join("\n")} />
           </section>
         </div>
       </div>

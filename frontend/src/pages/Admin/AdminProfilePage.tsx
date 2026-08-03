@@ -57,7 +57,9 @@ export default function AdminProfilePage() {
   };
 
   useEffect(() => {
-    void fetchProfile();
+    void (async () => {
+      await fetchProfile();
+    })();
   }, []);
 
   const handleSave = async () => {

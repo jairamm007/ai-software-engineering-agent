@@ -28,7 +28,11 @@ export default function AdminSearchPage() {
     }
   };
 
-  useEffect(() => { fetchStats(); }, []);
+  useEffect(() => {
+    void (async () => {
+      await fetchStats();
+    })();
+  }, []);
 
   const handleRebuild = async () => {
     setRebuilding(true);

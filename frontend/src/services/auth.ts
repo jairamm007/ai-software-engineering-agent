@@ -119,7 +119,7 @@ export async function apiLogout(): Promise<void> {
 }
 
 export async function apiForgotPassword(email: string): Promise<void> {
-  const res = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/request-password-reset`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

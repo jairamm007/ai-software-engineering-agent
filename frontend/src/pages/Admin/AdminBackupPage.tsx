@@ -52,7 +52,9 @@ export default function AdminBackupPage() {
   };
 
   useEffect(() => {
-    void fetchBackups();
+    void (async () => {
+      await fetchBackups();
+    })();
   }, []);
 
   const handleCreate = async () => {

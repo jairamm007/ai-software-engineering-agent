@@ -112,15 +112,19 @@ export const importGitHubRepository = async (
   owner: string,
   name: string
 ): Promise<{
-  integrationRepo: any;
+  integrationRepo: unknown;
   repository: { id: string; name: string; githubUrl: string } | null;
-  indexResult: any;
-  fileTree: any;
+  indexResult: unknown;
+  fileTree: unknown;
 }> => {
-  const { data } = await api.post<ApiResponse<any>>(
-    `/github-integrations/${integrationId}/repos/import`,
-    { owner, name }
-  );
+  const { data } = await api.post<
+    ApiResponse<{
+      integrationRepo: unknown;
+      repository: { id: string; name: string; githubUrl: string } | null;
+      indexResult: unknown;
+      fileTree: unknown;
+    }>
+  >(`/github-integrations/${integrationId}/repos/import`, { owner, name });
   return data.data;
 };
 

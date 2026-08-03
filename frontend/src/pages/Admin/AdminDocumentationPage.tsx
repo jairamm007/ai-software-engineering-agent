@@ -35,7 +35,11 @@ export default function AdminDocumentationPage() {
     }
   }, [page]);
 
-  useEffect(() => { fetchDocs(); }, [fetchDocs]);
+  useEffect(() => {
+    void (async () => {
+      await fetchDocs();
+    })();
+  }, [fetchDocs]);
 
   const handleCreate = async () => {
     if (!newTitle.trim()) { toast.error("Title required"); return; }

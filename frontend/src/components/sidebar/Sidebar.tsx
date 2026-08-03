@@ -18,6 +18,7 @@ import {
   PanelLeft,
   PanelRightOpen,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
@@ -56,6 +57,7 @@ const sections: NavSection[] = [
     label: "AI Development",
     items: [
       { icon: Workflow, label: "Runs", path: "/runs" },
+      { icon: Sparkles, label: "Insights", path: "/insights" },
     ],
   },
   {
@@ -119,13 +121,13 @@ export default function Sidebar() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [mode, toggle]);
 
   useEffect(() => {
     if (window.innerWidth < 1024 && mode === "expanded") {
       toggle();
     }
-  }, [location.pathname]);
+  }, [location.pathname, mode, toggle]);
 
   const isActive = (path: string) => {
     if (path === "/dashboard") return location.pathname === "/dashboard";

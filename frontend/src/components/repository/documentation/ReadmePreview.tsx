@@ -52,7 +52,7 @@ export default function ReadmePreview({ data }: Props) {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                code: ({ className, children }: any) => {
+                code: ({ className, children }) => {
                   const match = /language-(\w+)/.exec(className ?? "");
                   if (match) return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>;
                   return <code className={`rounded px-1.5 py-0.5 font-mono text-[0.875em] ${isDark ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-900"}`}>{children}</code>;

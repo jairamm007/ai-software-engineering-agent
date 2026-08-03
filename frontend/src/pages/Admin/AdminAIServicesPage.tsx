@@ -24,7 +24,14 @@ function formatShortDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function ChartTooltip({ active, payload, label, isDark }: any) {
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: Array<{ color?: string; name?: string; value?: number | string }>;
+  label?: string | number;
+  isDark: boolean;
+}
+
+function ChartTooltip({ active, payload, label, isDark }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div
@@ -33,9 +40,9 @@ function ChartTooltip({ active, payload, label, isDark }: any) {
       }`}
     >
       <p className={`font-semibold mb-1 ${isDark ? "text-white" : "text-slate-900"}`}>
-        {formatShortDate(label)}
+        {typeof label === "string" ? formatShortDate(label) : ""}
       </p>
-      {payload.map((p: any, i: number) => (
+      {payload.map((p, i) => (
         <p key={i} style={{ color: p.color }} className="font-medium">
           {p.name}: {p.value}
         </p>

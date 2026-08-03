@@ -57,7 +57,7 @@ export interface StreamChatInput {
   filePath?: string;
   conversationId?: string;
   onToken: (token: string) => void;
-  onDone: (data: { conversationId: string; messageType: string; source: any }) => void;
+  onDone: (data: { conversationId: string; messageType: string; source: StreamEvent["source"] }) => void;
   onError: (message: string) => void;
   signal?: AbortSignal;
 }
@@ -83,7 +83,7 @@ export const streamChat = async ({
       body: JSON.stringify({ question, repositoryId, filePath, conversationId }),
       signal,
     });
-  } catch (err) {
+  } catch {
     if (signal?.aborted) return;
     onError("Failed to connect to chat service");
     return;

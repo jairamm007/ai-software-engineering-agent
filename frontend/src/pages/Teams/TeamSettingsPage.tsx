@@ -83,7 +83,7 @@ export default function TeamSettingsPage() {
           <button
             type="button"
             onClick={() => {
-              try { navigator.clipboard.writeText(team.teamCode); } catch {}
+              try { navigator.clipboard.writeText(team.teamCode); } catch { /* clipboard unavailable */ }
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}

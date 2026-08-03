@@ -47,8 +47,9 @@ export default function TeamsPage() {
         setLastCreatedCode(null);
       }, 4000);
     },
-    onError: (error: any) => {
-      setCreateError(error?.response?.data?.message || error?.message || "Failed to create team. Please try again.");
+    onError: (error) => {
+      const apiError = error as { response?: { data?: { message?: string } }; message?: string } | undefined;
+      setCreateError(apiError?.response?.data?.message || apiError?.message || "Failed to create team. Please try again.");
     },
   });
 
@@ -200,7 +201,7 @@ export default function TeamsPage() {
                       </code>
                       <button
                         type="button"
-                        onClick={() => { try { navigator.clipboard.writeText(lastCreatedCode!); } catch {} setCopiedCode(lastCreatedCode); setTimeout(() => setCopiedCode(null), 2000); }}
+                        onClick={() => { try { navigator.clipboard.writeText(lastCreatedCode!); } catch { /* clipboard unavailable */ } setCopiedCode(lastCreatedCode); setTimeout(() => setCopiedCode(null), 2000); }}
                         className="rounded-lg accent-bg-light p-2"
                       >
                         {copiedCode === lastCreatedCode ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="accent-text" />}
@@ -564,7 +565,7 @@ export default function TeamsPage() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        try { navigator.clipboard.writeText(team.teamCode!); } catch {}
+                        try { navigator.clipboard.writeText(team.teamCode!); } catch { /* clipboard unavailable */ }
                         setCopiedCode(team.teamCode!);
                         setTimeout(() => setCopiedCode(null), 2000);
                       }}
@@ -674,7 +675,7 @@ export default function TeamsPage() {
                         setShowJoin(false);
                         setJoinSuccess(null);
                       }, 4000);
-                    } catch {}
+                    } catch { /* join failed; keep dialog open */ }
                   }}
                   className="w-full flex items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
                 >

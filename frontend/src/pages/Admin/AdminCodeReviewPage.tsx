@@ -31,7 +31,11 @@ export default function AdminCodeReviewPage() {
     }
   }, [page]);
 
-  useEffect(() => { fetchReviews(); }, [fetchReviews]);
+  useEffect(() => {
+    void (async () => {
+      await fetchReviews();
+    })();
+  }, [fetchReviews]);
 
   const handleCreate = async () => {
     try {

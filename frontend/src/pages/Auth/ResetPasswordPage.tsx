@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Lock, ArrowLeft, ArrowRight, Check, Shield, RefreshCw, Clock } from "lucide-react";
@@ -21,18 +21,22 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
 
   const token = searchParams.get("token");
+  const expired = !token;
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [expired, setExpired] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) setExpired(true);
-  }, [token]);
+  const [particles] = useState(() =>
+    Array.from({ length: 12 }, () => ({
+      left: 10 + Math.random() * 80,
+      top: 10 + Math.random() * 80,
+      duration: 3 + Math.random() * 4,
+      delay: Math.random() * 3,
+    }))
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +67,7 @@ export default function ResetPasswordPage() {
     }
   };
 
-  const LeftPanel = ({ heading, subheading }: { heading: string; subheading: string }) => (
+  const renderLeftPanel = ({ heading, subheading }: { heading: string; subheading: string }) => (
     <div
       className={`relative hidden w-1/2 items-center justify-center overflow-hidden lg:flex ${
         isDark ? "bg-slate-900/50" : "bg-slate-100/80"
@@ -195,7 +199,7 @@ export default function ResetPasswordPage() {
           ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
       }`}>
-        <LeftPanel heading="Link expired" subheading="Don't worry, we can fix this" />
+        {renderLeftPanel({ heading: "Link expired", subheading: "Don't worry, we can fix this" })}
 
         <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
           <motion.div
@@ -257,7 +261,7 @@ export default function ResetPasswordPage() {
         ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
         : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
     }`}>
-      <LeftPanel heading="Set new password" subheading="Choose a strong password for your account" />
+      {renderLeftPanel({ heading: "Set new password", subheading: "Choose a strong password for your account" })}
 
       <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
         <style>{`
@@ -270,15 +274,15 @@ export default function ResetPasswordPage() {
         `}</style>
 
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {particles.map((p, i) => (
             <div
               key={i}
               className={`absolute h-1 w-1 rounded-full ${isDark ? "accent-bg-light" : "accent-bg-light"}`}
               style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-                animation: `particle-float ${3 + Math.random() * 4}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 3}s`,
+                left: `${p.left}%`,
+                top: `${p.top}%`,
+                animation: `particle-float ${p.duration}s ease-in-out infinite`,
+                animationDelay: `${p.delay}s`,
               }}
             />
           ))}

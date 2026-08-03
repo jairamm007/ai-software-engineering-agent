@@ -31,7 +31,11 @@ export default function AdminTestingPage() {
     }
   }, [page]);
 
-  useEffect(() => { fetchReports(); }, [fetchReports]);
+  useEffect(() => {
+    void (async () => {
+      await fetchReports();
+    })();
+  }, [fetchReports]);
 
   const handleCreate = async () => {
     try {

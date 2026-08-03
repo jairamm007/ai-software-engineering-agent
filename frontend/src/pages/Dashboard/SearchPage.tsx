@@ -21,7 +21,7 @@ export default function SearchPage() {
   const isDark = theme === "dark";
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<{ answer: string; files?: unknown[] } | null>(null);
   const [loading, setLoading] = useState(false);
 
   const { data: repos } = useQuery({

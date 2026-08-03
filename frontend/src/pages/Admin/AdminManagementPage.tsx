@@ -16,7 +16,6 @@ export default function AdminManagementPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchAdmins = async () => {
-    setLoading(true);
     try {
       const data = await listAdmins();
       setAdmins(data);
@@ -27,7 +26,11 @@ export default function AdminManagementPage() {
     }
   };
 
-  useEffect(() => { fetchAdmins(); }, []);
+  useEffect(() => {
+    void (async () => {
+      await fetchAdmins();
+    })();
+  }, []);
 
   const activeAdmins = admins.filter((a) => !a.suspended).length;
   const suspendedAdmins = admins.filter((a) => a.suspended).length;

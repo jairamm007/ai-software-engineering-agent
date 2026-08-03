@@ -14,13 +14,12 @@ export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
-  const [status, setStatus] = useState<"verifying" | "success" | "error" | "no-token">("verifying");
+  const [status, setStatus] = useState<"verifying" | "success" | "error" | "no-token">(() =>
+    token ? "verifying" : "no-token"
+  );
 
   useEffect(() => {
-    if (!token) {
-      setStatus("no-token");
-      return;
-    }
+    if (!token) return;
     let cancelled = false;
     verifyEmail(token)
       .then(() => { if (!cancelled) setStatus("success"); })

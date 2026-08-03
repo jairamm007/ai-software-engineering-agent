@@ -103,6 +103,7 @@ model Repository {
   docs Documentation[]
   codeReviews CodeReview[]
   testReports TestReport[]
+  insights ProjectInsights?
 
   @@unique([githubUrl, userId])
   @@index([userId])
@@ -727,4 +728,45 @@ model BackupRecord {
   createdAt DateTime @default(now())
 
   @@index([createdAt(sort: Desc)])
+}
+
+// ─── Project Insights ─────────────────────────────────────────────
+
+model ProjectInsights {
+  id        String   @id @default(cuid())
+  repositoryId String @unique
+  summary         Json
+  overview        String
+  architecture    Json
+  modules         Json
+  dependencies    Json
+  techStack       Json
+  timeline        Json
+  recommendations Json
+  docHealth           Float?
+  securityHealth      Float?
+  performanceHealth   Float?
+  maintainabilityHealth Float?
+  overallHealth       Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  reports   InsightReport[]
+
+  @@index([repositoryId])
+}
+
+model InsightReport {
+  id               String   @id @default(cuid())
+  projectInsightsId String
+  format           String   // pdf | markdown
+  filename         String
+  reportPath       String
+  size             BigInt   @default(0)
+  createdAt        DateTime @default(now())
+
+  projectInsights ProjectInsights @relation(fields: [projectInsightsId], references: [id], onDelete: Cascade)
+
+  @@index([projectInsightsId])
 }

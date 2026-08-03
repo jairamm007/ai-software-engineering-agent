@@ -77,7 +77,9 @@ export default function AdminUsersPage() {
   }, [search, roleFilter, statusFilter, page]);
 
   useEffect(() => {
-    fetchUsers();
+    void (async () => {
+      await fetchUsers();
+    })();
   }, [fetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {

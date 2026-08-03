@@ -42,7 +42,9 @@ export default function AdminNotificationsPage() {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    void (async () => {
+      await fetchNotifications();
+    })();
   }, []);
 
   const handleCreate = async () => {

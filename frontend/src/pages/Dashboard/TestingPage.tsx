@@ -57,7 +57,11 @@ export default function TestingPage() {
 
   const toggleSelectedFile = (path: string) => setSelectedFiles((previous) => {
     const next = new Set(previous);
-    next.has(path) ? next.delete(path) : next.add(path);
+    if (next.has(path)) {
+      next.delete(path);
+    } else {
+      next.add(path);
+    }
     return next;
   });
   const canGenerate = !!repoData && (scope === "repository" || (scope === "single" ? !!selectedFile : selectedFiles.size > 0));

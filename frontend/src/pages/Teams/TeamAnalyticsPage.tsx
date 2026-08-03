@@ -3,10 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Users, FolderGit2, MessageSquare, Activity, FileText, Code2, FlaskConical, BarChart3 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
-import { getTeamAnalytics } from "@/services/teamAnalytics";
+import { getTeamAnalytics, type TeamAnalyticsData } from "@/services/teamAnalytics";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
-const STAT_CARDS = [
+const STAT_CARDS: { key: keyof TeamAnalyticsData["stats"]; label: string; icon: typeof Users; color: string }[] = [
   { key: "members", label: "Members", icon: Users, color: "text-blue-400 bg-blue-500/10" },
   { key: "repositories", label: "Repositories", icon: FolderGit2, color: "text-emerald-400 bg-emerald-500/10" },
   { key: "chats", label: "AI Chats", icon: MessageSquare, color: "text-violet-400 bg-violet-500/10" },
@@ -90,7 +90,7 @@ export default function TeamAnalyticsPage() {
                 </div>
               </div>
               <p className={`text-2xl font-bold font-[Inter] ${isDark ? "text-white" : "text-slate-900"}`}>
-                {(analytics?.stats as any)?.[card.key] ?? 0}
+                {(analytics?.stats[card.key] ?? 0)}
               </p>
               <p className={`text-[10px] font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                 {card.label}

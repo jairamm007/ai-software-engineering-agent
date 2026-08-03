@@ -164,14 +164,7 @@ export default function AIChatPage() {
 
   // ── Thinking stages ──
   useEffect(() => {
-    if (!streaming) {
-      setThinkingStage(null);
-      return;
-    }
-    if (streamingContent) {
-      setThinkingStage(null);
-      return;
-    }
+    if (!streaming || streamingContent) return;
     const stages = [
       { delay: 400, text: "Searching codebase..." },
       { delay: 2000, text: "Analyzing relevant code..." },
@@ -766,7 +759,6 @@ function MessageBubble({
   onRegenerate,
   streaming = false,
   isLastAssistant = false,
-  isHovered: _isHovered,
   onHover,
 }: {
   message: ChatMessage;

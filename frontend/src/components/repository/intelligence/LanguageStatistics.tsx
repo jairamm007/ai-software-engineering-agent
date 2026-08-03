@@ -45,17 +45,20 @@ function BarChart({ stats, isDark }: { stats: LanguageStat[]; isDark: boolean })
 
 function DonutChart({ stats }: { stats: LanguageStat[] }) {
   const total = stats.reduce((sum, s) => sum + s.bytes, 0);
-  let cumulative = 0;
   const radius = 60;
   const strokeWidth = 24;
   const circumference = 2 * Math.PI * radius;
 
-  const segments = stats.slice(0, 10).map((stat) => {
-    const pct = total > 0 ? stat.bytes / total : 0;
-    const offset = cumulative;
-    cumulative += pct;
-    return { ...stat, offset, pct };
-  });
+  const segments = stats.slice(0, 10).reduce<Array<LanguageStat & { offset: number; pct: number }>>(
+    (acc, stat) => {
+      const prev = acc.length > 0 ? acc[acc.length - 1] : undefined;
+      const offset = prev ? prev.offset + prev.pct : 0;
+      const pct = total > 0 ? stat.bytes / total : 0;
+      acc.push({ ...stat, offset, pct });
+      return acc;
+    },
+    []
+  );
 
   return (
     <div className="flex items-center gap-6">

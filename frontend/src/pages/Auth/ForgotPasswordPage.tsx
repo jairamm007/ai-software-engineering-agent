@@ -23,6 +23,14 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [particles] = useState(() =>
+    Array.from({ length: 12 }, () => ({
+      left: 10 + Math.random() * 80,
+      top: 10 + Math.random() * 80,
+      duration: 3 + Math.random() * 4,
+      delay: Math.random() * 3,
+    }))
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,15 +189,15 @@ export default function ForgotPasswordPage() {
       {/* Right Panel */}
       <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {particles.map((p, i) => (
             <div
               key={i}
               className={`absolute h-1 w-1 rounded-full ${isDark ? "accent-bg-light" : "accent-bg-light"}`}
               style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-                animation: `particle-float ${3 + Math.random() * 4}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 3}s`,
+                left: `${p.left}%`,
+                top: `${p.top}%`,
+                animation: `particle-float ${p.duration}s ease-in-out infinite`,
+                animationDelay: `${p.delay}s`,
               }}
             />
           ))}

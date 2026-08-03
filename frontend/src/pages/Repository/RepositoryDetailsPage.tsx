@@ -42,7 +42,16 @@ export default function RepositoryDetailsPage() {
   const isDark = theme === "dark";
   const [selectedFile, setSelectedFile] =
     useState<RepositoryFile | null>(null);
-  const [conversation, setConversation] = useState<AIMessage[]>([]);
+  const [savedWorkspace] = useState<{ selectedFileId?: string; conversation?: AIMessage[] } | null>(() => {
+    if (!id) return null;
+    try {
+      const saved = localStorage.getItem(`workspace:${id}`);
+      return saved ? (JSON.parse(saved) as { selectedFileId?: string; conversation?: AIMessage[] }) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [conversation, setConversation] = useState<AIMessage[]>(() => savedWorkspace?.conversation ?? []);
   const [aiResult, setAiResult] = useState("");
   const [history, setHistory] = useState<AIHistoryItem[]>([]);
   const [selectedHistoryItemId, setSelectedHistoryItemId] = useState<string | null>(null);
@@ -69,31 +78,25 @@ export default function RepositoryDetailsPage() {
     enabled: !!id,
   });
 
-  useEffect(() => {
-    if (!data || data.files.length === 0) return;
-
-    const selectedFilePath = (location.state as { selectedFilePath?: string } | null)
-      ?.selectedFilePath;
-    const requestedFile = data.files.find(
-      (file) => file.path.replaceAll("\\", "/") === selectedFilePath?.replaceAll("\\", "/")
-    );
-
-    if (requestedFile) {
-      setSelectedFile(requestedFile);
-    } else if (!selectedFile) {
-      setSelectedFile(data.files[0]);
+  if (data && data.files.length > 0) {
+    const savedFile = savedWorkspace?.selectedFileId
+      ? data.files.find((item) => item.id === savedWorkspace.selectedFileId)
+      : undefined;
+    if (savedFile) {
+      if (selectedFile?.id !== savedFile.id) setSelectedFile(savedFile);
+    } else {
+      const selectedFilePath = (location.state as { selectedFilePath?: string } | null)
+        ?.selectedFilePath;
+      const requestedFile = data.files.find(
+        (file) => file.path.replaceAll("\\", "/") === selectedFilePath?.replaceAll("\\", "/")
+      );
+      if (requestedFile) {
+        if (selectedFile?.id !== requestedFile.id) setSelectedFile(requestedFile);
+      } else if (!selectedFile) {
+        setSelectedFile(data.files[0]);
+      }
     }
-  }, [data, location.state, selectedFile]);
-
-  useEffect(() => {
-    if (!id) return;
-    const saved = localStorage.getItem(`workspace:${id}`);
-    if (!saved) return;
-    const state = JSON.parse(saved) as { selectedFileId?: string; conversation?: AIMessage[] };
-    const file = data?.files.find((item) => item.id === state.selectedFileId);
-    if (file) setSelectedFile(file);
-    if (state.conversation?.length) setConversation(state.conversation);
-  }, [data?.files, id]);
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -430,7 +433,9 @@ export default function RepositoryDetailsPage() {
   };
 
   const actionsRef = useRef({ runSelectionAction, reviewFile, generateTests, securityScan });
-  actionsRef.current = { runSelectionAction, reviewFile, generateTests, securityScan };
+  useEffect(() => {
+    actionsRef.current = { runSelectionAction, reviewFile, generateTests, securityScan };
+  });
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

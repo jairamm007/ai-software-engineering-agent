@@ -38,6 +38,14 @@ export default function AdminLoginPage() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [shakeError, setShakeError] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [particles] = useState(() =>
+    Array.from({ length: 12 }, () => ({
+      left: 10 + Math.random() * 80,
+      top: 10 + Math.random() * 80,
+      duration: 3 + Math.random() * 4,
+      delay: Math.random() * 3,
+    }))
+  );
 
   useEffect(() => {
     if (isAuthenticated && user?.role === "admin") {
@@ -45,13 +53,9 @@ export default function AdminLoginPage() {
     }
   }, [isAuthenticated, user, navigate]);
 
-  useEffect(() => {
-    if (isAuthenticated && user && user.role !== "admin") {
-      setError("Access Denied: You do not have administrator privileges.");
-      setShakeError(true);
-      setTimeout(() => setShakeError(false), 500);
-    }
-  }, [isAuthenticated, user]);
+  const isAccessDenied = isAuthenticated && !!user && user.role !== "admin";
+  const displayError = isAccessDenied ? "Access Denied: You do not have administrator privileges." : error;
+  const displayShakeError = isAccessDenied || shakeError;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -258,15 +262,15 @@ export default function AdminLoginPage() {
       <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
         {/* Particles */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {particles.map((p, i) => (
             <div
               key={i}
               className="absolute h-1 w-1 rounded-full bg-rose-500/30"
               style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-                animation: `particle-float ${3 + Math.random() * 4}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 3}s`,
+                left: `${p.left}%`,
+                top: `${p.top}%`,
+                animation: `particle-float ${p.duration}s ease-in-out infinite`,
+                animationDelay: `${p.delay}s`,
               }}
             />
           ))}
@@ -319,14 +323,14 @@ export default function AdminLoginPage() {
 
           {/* Error */}
           <AnimatePresence mode="wait">
-            {error && (
+            {displayError && (
               <motion.div
                 key="error"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className={`shake-animation rounded-xl border px-4 py-3 text-sm ${
-                  shakeError ? "shake-animation" : ""
+                  displayShakeError ? "shake-animation" : ""
                 } ${
                   isDark
                     ? "border-rose-500/20 bg-rose-500/10 text-rose-400"
@@ -335,7 +339,7 @@ export default function AdminLoginPage() {
               >
                 <div className="flex items-start gap-2.5">
                   <AlertTriangle size={15} className="mt-0.5 shrink-0" />
-                  <span>{error}</span>
+                  <span>{displayError}</span>
                 </div>
               </motion.div>
             )}

@@ -43,7 +43,7 @@ export default function ConversationHistory({ messages }: Props) {
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      code: ({ className, children }: any) => {
+                      code: ({ className, children }) => {
                         const match = /language-(\w+)/.exec(className ?? "");
                         if (match) {
                           return <CodeBlock language={match[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>;

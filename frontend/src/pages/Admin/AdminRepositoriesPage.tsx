@@ -54,7 +54,9 @@ export default function AdminRepositoriesPage() {
   }, [search, page]);
 
   useEffect(() => {
-    fetchRepos();
+    void (async () => {
+      await fetchRepos();
+    })();
     getRepositoryStats()
       .then(setRepoStats)
       .catch(() => {});

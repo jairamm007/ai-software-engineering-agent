@@ -53,10 +53,11 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
+    const path = (req.originalUrl || req.url || req.path).split("?")[0];
     const meta = {
       requestId,
       method: req.method,
-      path: req.path,
+      path,
       statusCode: res.statusCode,
       durationMs: duration,
       ip: req.ip,
@@ -64,11 +65,11 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
     };
 
     if (res.statusCode >= 500) {
-      logger.error(`${req.method} ${req.path} ${res.statusCode}`, meta);
+      logger.error(`${req.method} ${path} ${res.statusCode}`, meta);
     } else if (res.statusCode >= 400) {
-      logger.warn(`${req.method} ${req.path} ${res.statusCode}`, meta);
+      logger.warn(`${req.method} ${path} ${res.statusCode}`, meta);
     } else {
-      logger.info(`${req.method} ${req.path} ${res.statusCode}`, meta);
+      logger.info(`${req.method} ${path} ${res.statusCode}`, meta);
     }
   });
 

@@ -49,7 +49,11 @@ export default function AdminActivityLogsPage() {
     }
   }, [page, actionFilter]);
 
-  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+  useEffect(() => {
+    void (async () => {
+      await fetchLogs();
+    })();
+  }, [fetchLogs]);
 
   const todayLogs = logs.filter((l) => new Date(l.createdAt).toDateString() === new Date().toDateString()).length;
 

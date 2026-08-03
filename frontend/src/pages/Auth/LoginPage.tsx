@@ -39,6 +39,14 @@ export default function LoginPage() {
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [particles] = useState(() =>
+    Array.from({ length: 12 }, () => ({
+      left: 10 + Math.random() * 80,
+      top: 10 + Math.random() * 80,
+      duration: 3 + Math.random() * 4,
+      delay: Math.random() * 3,
+    }))
+  );
 
   const from =
     (location.state as { from?: { pathname: string } })?.from?.pathname ||
@@ -286,15 +294,15 @@ export default function LoginPage() {
       <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
         {/* Particles behind card */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {particles.map((p, i) => (
             <div
               key={i}
               className="absolute h-1 w-1 rounded-full accent-bg-light"
               style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-                animation: `particle-float ${3 + Math.random() * 4}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 3}s`,
+                left: `${p.left}%`,
+                top: `${p.top}%`,
+                animation: `particle-float ${p.duration}s ease-in-out infinite`,
+                animationDelay: `${p.delay}s`,
               }}
             />
           ))}
