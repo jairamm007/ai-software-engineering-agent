@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
 import {
   Eye,
   EyeOff,
@@ -12,11 +12,13 @@ import {
   Bot,
   Shield,
   Zap,
+  Sparkles,
   Check,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
+import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const float1 = `
@@ -49,6 +51,16 @@ const particleDrift = `
   90% { opacity: 1; }
   100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
 }`;
+const borderSpin = `
+@keyframes border-spin {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}`;
+const pulseGlow = `
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}`;
 
 const features = [
   { icon: Zap, text: "Free to start, no credit card", color: "text-amber-400" },
@@ -60,7 +72,7 @@ export default function RegisterPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const navigate = useNavigate();
-  const { register, loginWithGoogle, loginWithGithub } = useAuth();
+  const { register, loginWithGoogle, loginWithGithub, resendVerificationEmail } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -70,9 +82,11 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [hoveredOauth, setHoveredOauth] = useState<"google" | "github" | null>(null);
   const [particles] = useState(() =>
     Array.from({ length: 20 }, () => ({
       left: Math.random() * 100,
@@ -80,6 +94,16 @@ export default function RegisterPage() {
       delay: Math.random() * 10,
     }))
   );
+
+  // Mouse-driven card spotlight + tilt
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(50);
+  const my = useMotionValue(50);
+  const springMx = useSpring(mx, { stiffness: 120, damping: 18 });
+  const springMy = useSpring(my, { stiffness: 120, damping: 18 });
+  const spotlight = useMotionTemplate`radial-gradient(480px circle at ${springMx}% ${springMy}%, ${isDark ? "rgba(139,92,246,0.14)" : "rgba(139,92,246,0.12)"}, transparent 65%)`;
+  const rotateX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18 });
+  const rotateY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18 });
 
   const passwordStrength = useMemo(() => {
     if (!password) return { level: 0, label: "", color: "" };
@@ -94,12 +118,14 @@ export default function RegisterPage() {
     return { level: 3, label: "Strong", color: "from-emerald-500 to-green-500" };
   }, [password]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: ((e.clientX - rect.left) / rect.width - 0.5) * 10,
-      y: ((e.clientY - rect.top) / rect.height - 0.5) * 10,
-    });
+    const px = ((e.clientX - rect.left) / rect.width) * 100;
+    const py = ((e.clientY - rect.top) / rect.height) * 100;
+    mx.set(px);
+    my.set(py);
+    rotateX.set((py - 50) / 50);
+    rotateY.set((50 - px) / 50);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -158,6 +184,21 @@ export default function RegisterPage() {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!email.trim()) return;
+    setError("");
+    setResendLoading(true);
+    setResendSent(false);
+    try {
+      await resendVerificationEmail(email);
+      setResendSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend verification email");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const staggerItem = {
     hidden: { opacity: 0, y: 20 },
     visible: (i: number) => ({
@@ -169,12 +210,14 @@ export default function RegisterPage() {
 
   return (
     <>
-      <style>{float1 + float2 + float3 + shimmer + particleDrift}</style>
-      <div className={`flex min-h-screen overflow-hidden transition-colors duration-300 ${
+      <style>{float1 + float2 + float3 + shimmer + particleDrift + borderSpin + pulseGlow}</style>
+      <div className={`relative flex min-h-screen overflow-hidden transition-colors duration-300 ${
         isDark
           ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
       }`}>
+
+        <PlexusTerrainBackground />
 
         {/* Left Panel */}
         <div className="relative hidden w-1/2 lg:flex items-center justify-center overflow-hidden">
@@ -197,16 +240,22 @@ export default function RegisterPage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
+              whileHover={{ scale: 1.08 }}
               className="mb-8 flex justify-center"
             >
-              <Logo size="lg" />
+              <div className="relative inline-flex items-center justify-center">
+                <div className="absolute inset-0 rounded-2xl accent-gradient blur-xl opacity-50 animate-[pulse-glow_3s_ease-in-out_infinite]" />
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl shadow-2xl accent-shadow-lg">
+                  <Logo size="lg" />
+                </div>
+              </div>
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className={`text-4xl font-bold leading-tight ${isDark ? "text-white" : "text-slate-900"}`}
+              className={`text-center text-4xl font-bold leading-tight ${isDark ? "text-white" : "text-slate-900"}`}
             >
               Start building{" "}
               <span className="accent-gradient-text">
@@ -217,7 +266,7 @@ export default function RegisterPage() {
               initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className={`mt-3 text-lg ${isDark ? "text-slate-400" : "text-slate-500"}`}
+              className={`mt-3 text-center text-lg ${isDark ? "text-slate-400" : "text-slate-500"}`}
             >
               Create your account and unlock AI-powered code analysis
             </motion.p>
@@ -230,15 +279,20 @@ export default function RegisterPage() {
                   initial="hidden"
                   animate="visible"
                   variants={staggerItem}
+                  whileHover={{ x: 4, scale: 1.02 }}
                   className={`flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-medium ${
                     isDark
                       ? "bg-white/5 border border-white/5 text-slate-200 backdrop-blur-sm"
                       : "bg-white/80 border border-slate-200/60 text-slate-700 shadow-sm"
                   }`}
                 >
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${isDark ? "bg-white/10" : "accent-bg-light"}`}>
+                  <motion.div
+                    whileHover={{ rotate: [0, -10, 10, 0] }}
+                    transition={{ duration: 0.5 }}
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${isDark ? "bg-white/10" : "accent-bg-light"}`}
+                  >
                     <Check size={14} className="text-emerald-400" />
-                  </div>
+                  </motion.div>
                   <span>{f.text}</span>
                 </motion.div>
               ))}
@@ -247,8 +301,8 @@ export default function RegisterPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="mt-10"
+              transition={{ delay: 1.1 }}
+              className="mt-8 text-center"
             >
               <Link
                 to="/"
@@ -264,10 +318,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Panel — Form */}
-        <div
-          className="relative flex w-full items-center justify-center px-4 py-8 sm:px-6 lg:w-1/2"
-          onMouseMove={handleMouseMove}
-        >
+        <div className="relative flex w-full items-center justify-center px-4 py-10 sm:px-6 lg:w-1/2">
           {/* Particles */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {particles.map((p, i) => (
@@ -284,22 +335,40 @@ export default function RegisterPage() {
             ))}
           </div>
 
+          {/* Animated gradient border frame */}
+          <div className="absolute top-1/2 left-1/2 z-0 h-[calc(100%-40px)] w-[min(100%-24px,460px)] -translate-x-1/2 -translate-y-1/2 rounded-[26px] p-px opacity-20 blur-[2px]"
+            style={{ background: "linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6)", backgroundSize: "200% auto", animation: "border-spin 4s linear infinite" }} />
+
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
+            ref={cardRef}
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as const }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => { mx.set(50); my.set(50); rotateX.set(0); rotateY.set(0); }}
             style={{
-              perspective: "1000px",
-              transform: `rotateX(${-mousePos.y * 0.15}deg) rotateY(${mousePos.x * 0.15}deg)`,
+              rotateX,
+              rotateY,
+              transformStyle: "preserve-3d",
             }}
-            className={`relative w-full max-w-md rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out ${
+            className={`relative w-full max-w-md overflow-hidden rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl ${
               isDark
                 ? "border-white/10 bg-white/[0.07] shadow-black/40"
-                : "border-slate-200/50 bg-white/60 shadow-slate-300/40"
+                : "border-slate-200/50 bg-white/70 shadow-slate-300/40"
             }`}
           >
+            {/* Cursor spotlight */}
+            <motion.div
+              style={{ background: spotlight }}
+              className="pointer-events-none absolute inset-0"
+            />
+
             {/* Mobile Logo */}
-            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="mb-6 flex justify-center lg:hidden">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative mb-6 flex justify-center lg:hidden"
+            >
               <Logo size="md" />
             </motion.div>
 
@@ -312,7 +381,14 @@ export default function RegisterPage() {
               <ArrowLeft size={14} /> Home
             </Link>
 
-            <div className="mt-6">
+            <div className="relative mt-6">
+              <motion.div
+                animate={{ rotate: [0, 8, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300"
+              >
+                <Sparkles size={12} /> Get Started Free
+              </motion.div>
               <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
                 Create Account
               </h2>
@@ -321,86 +397,132 @@ export default function RegisterPage() {
               </p>
             </div>
 
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, x: 0 }}
-                  animate={{ opacity: 1, x: [-10, 10, -10, 10, 0] }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="mt-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400"
-                >
-                  {error}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="relative">
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 0 }}
+                    animate={{ opacity: 1, x: [-10, 10, -10, 10, 0] }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="mt-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400"
+                  >
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-            <AnimatePresence>
-              {needsVerification && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4 text-center"
-                >
-                  <Mail size={24} className="mx-auto mb-2 text-emerald-400" />
-                  <p className="text-sm font-medium text-emerald-400">
-                    Verification email sent!
-                  </p>
-                  <p className={`mt-1 text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                    Check your inbox and click the verification link to activate your account.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="relative">
+              <AnimatePresence>
+                {needsVerification && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4 text-center"
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                    >
+                      <Mail size={24} className="mx-auto mb-2 text-emerald-400" />
+                    </motion.div>
+                    <p className="text-sm font-medium text-emerald-400">
+                      Verification email sent!
+                    </p>
+                    <p className={`mt-1 text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                      Check your inbox and click the verification link to activate your account.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => void handleResendVerification()}
+                      disabled={resendLoading}
+                      className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-medium text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:opacity-50"
+                    >
+                      {resendLoading ? (
+                        <LoadingIndicator size="sm" />
+                      ) : resendSent ? (
+                        <Check size={14} className="text-emerald-400" />
+                      ) : (
+                        <Mail size={14} />
+                      )}
+                      {resendLoading ? "Sending..." : resendSent ? "Verification email resent" : "Resend verification email"}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {!needsVerification && (
               <>
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="relative mt-6 grid grid-cols-2 gap-3">
               <motion.button
                 whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(167,139,250,0.2)" }}
                 whileTap={{ scale: 0.98 }}
+                onMouseEnter={() => setHoveredOauth("google")}
+                onMouseLeave={() => setHoveredOauth(null)}
                 type="button"
                 onClick={() => void handleGoogle()}
                 disabled={!!oauthLoading}
-                className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all disabled:opacity-50 ${
+                className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-3 text-sm font-medium transition-all disabled:opacity-50 ${
                   isDark
                     ? "border-white/15 text-slate-200 hover:bg-white/5 hover:border-white/25"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
                 }`}
               >
-                {oauthLoading === "google" ? (
-                  <LoadingIndicator size="sm" />
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                  </svg>
+                {hoveredOauth === "google" && (
+                  <motion.span
+                    layoutId="google-glow"
+                    className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10"
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  />
                 )}
-                Google
+                <span className="relative flex items-center gap-2">
+                  {oauthLoading === "google" ? (
+                    <LoadingIndicator size="sm" />
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                  )}
+                  Google
+                </span>
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(167,139,250,0.2)" }}
                 whileTap={{ scale: 0.98 }}
+                onMouseEnter={() => setHoveredOauth("github")}
+                onMouseLeave={() => setHoveredOauth(null)}
                 type="button"
                 onClick={() => void handleGithub()}
                 disabled={!!oauthLoading}
-                className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all disabled:opacity-50 ${
+                className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-3 text-sm font-medium transition-all disabled:opacity-50 ${
                   isDark
                     ? "border-white/15 text-slate-200 hover:bg-white/5 hover:border-white/25"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
                 }`}
               >
-                {oauthLoading === "github" ? (
-                  <LoadingIndicator size="sm" />
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
+                {hoveredOauth === "github" && (
+                  <motion.span
+                    layoutId="github-glow"
+                    className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10"
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  />
                 )}
-                GitHub
+                <span className="relative flex items-center gap-2">
+                  {oauthLoading === "github" ? (
+                    <LoadingIndicator size="sm" />
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                  )}
+                  GitHub
+                </span>
               </motion.button>
             </div>
 
@@ -409,11 +531,11 @@ export default function RegisterPage() {
                 <div className={`w-full border-t ${isDark ? "border-white/10" : "border-slate-200"}`} />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className={`px-3 ${isDark ? "bg-white/5 text-slate-500" : "bg-white/60 text-slate-400"}`}>or</span>
+                <span className={`px-3 ${isDark ? "bg-white/[0.07] text-slate-500" : "bg-white/70 text-slate-400"}`}>or</span>
               </div>
             </div>
 
-            <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+            <form onSubmit={(e) => void handleSubmit(e)} className="relative space-y-4">
               {[
                 { key: "name", label: "Full Name", type: "text", icon: User, placeholder: "John Doe", value: name, setter: setName },
                 { key: "email", label: "Email", type: "email", icon: Mail, placeholder: "you@example.com", value: email, setter: setEmail },
@@ -446,6 +568,16 @@ export default function RegisterPage() {
                             : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
                       }`}
                     />
+                    {field.key === "email" && email.trim().length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.6 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                      >
+                        <Check size={14} className="text-emerald-400" />
+                      </motion.div>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -494,9 +626,12 @@ export default function RegisterPage() {
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex gap-1 flex-1">
                         {[1, 2, 3].map((level) => (
-                          <div
+                          <motion.div
                             key={level}
-                            className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{ delay: 0.1 * level, duration: 0.3 }}
+                            className={`h-1 flex-1 origin-left rounded-full transition-all duration-500 ${
                               passwordStrength.level >= level
                                 ? `bg-gradient-to-r ${passwordStrength.color}`
                                 : isDark ? "bg-white/10" : "bg-slate-200"
@@ -545,6 +680,16 @@ export default function RegisterPage() {
                           : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
                     }`}
                   />
+                  {confirmPassword && confirmPassword === password && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.6 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                    >
+                      <Check size={16} className="text-emerald-400" />
+                    </motion.div>
+                  )}
                 </div>
               </motion.div>
 
@@ -557,6 +702,7 @@ export default function RegisterPage() {
                   className="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all disabled:opacity-50 disabled:shadow-none group"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] opacity-0 group-hover:opacity-100 group-hover:animate-[shimmer_1.5s_ease-in-out_infinite]" />
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                   {loading ? (
                     <LoadingIndicator size="sm" />
                   ) : (
@@ -574,7 +720,7 @@ export default function RegisterPage() {
               initial="hidden"
               animate="visible"
               variants={staggerItem}
-              className={`mt-6 text-center text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}
+              className={`relative mt-6 text-center text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}
             >
               Already have an account?{" "}
               <Link to="/login" className="font-medium accent-text-base hover:opacity-80 transition-colors">

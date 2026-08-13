@@ -7,6 +7,7 @@ const productLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Who It's For", href: "#use-cases" },
   { label: "Dashboard", to: "/dashboard" },
+  { label: "User Guide", to: "/user-guide" },
 ];
 
 const resources = [
@@ -70,11 +71,11 @@ export default function Footer() {
   const isDark = theme === "dark";
 
   return (
-    <footer className={`border-t px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20 ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+    <footer className={`relative z-10 border-t px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20 ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 md:grid-cols-4">
+        <div className="grid gap-5 md:grid-cols-4">
           {/* Brand */}
-          <div className="md:col-span-1">
+          <div className={`rounded-2xl border p-6 backdrop-blur-xl md:col-span-1 sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
             <button
               type="button"
               onClick={() => {
@@ -92,7 +93,7 @@ export default function Footer() {
           </div>
 
           {/* Product */}
-          <div>
+          <div className={`rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
             <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
               Product
             </h4>
@@ -106,7 +107,7 @@ export default function Footer() {
           </div>
 
           {/* Resources */}
-          <div>
+          <div className={`rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
             <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
               Resources
             </h4>
@@ -120,7 +121,7 @@ export default function Footer() {
           </div>
 
           {/* Company */}
-          <div>
+          <div className={`rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
             <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
               Company
             </h4>
@@ -134,7 +135,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className={`mt-14 flex flex-wrap items-center justify-between gap-4 border-t pt-8 ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+        <div className={`mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
           <p className={`text-sm font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
             &copy; {new Date().getFullYear()} Repo Verify. All rights reserved.
           </p>

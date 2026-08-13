@@ -146,15 +146,28 @@ export async function apiResetPassword(token: string, newPassword: string): Prom
 }
 
 export async function apiVerifyEmail(token: string): Promise<void> {
-    const res = await fetch(`${BACKEND_URL}/api/auth/verify-email`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token }),
+  const res = await fetch(`${BACKEND_URL}/api/auth/verify-email?token=${encodeURIComponent(token)}`, {
+    method: "GET",
+    credentials: "include",
   });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error((body as { error?: string }).error || "Verification failed");
+  }
+}
+
+export async function apiResendVerificationEmail(email: string): Promise<void> {
+  const res = await fetch(`${BACKEND_URL}/api/auth/send-verification-email`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error || "Failed to resend verification email");
   }
 }
 

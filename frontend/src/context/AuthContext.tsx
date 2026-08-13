@@ -9,6 +9,7 @@ import {
   apiForgotPassword,
   apiResetPassword,
   apiVerifyEmail,
+  apiResendVerificationEmail,
   apiGetSession,
   apiLogout,
   apiDeleteAccount,
@@ -69,6 +70,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const verifyEmail = useCallback(async (verifyToken: string) => {
     await apiVerifyEmail(verifyToken);
+    const session = await apiGetSession();
+    if (session) {
+      setUser(session.user);
+      setToken(session.token);
+    }
+  }, []);
+
+  const resendVerificationEmail = useCallback(async (email: string) => {
+    await apiResendVerificationEmail(email);
   }, []);
 
   const loginWithGoogle = useCallback(async (callbackURL?: string) => {
@@ -129,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     forgotPassword,
     resetPassword,
     verifyEmail,
+    resendVerificationEmail,
     loginWithGoogle,
     loginWithGithub,
     updateProfile,
@@ -136,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     removeBanner,
     deleteAccount,
     changePassword,
-  }), [user, token, isLoading, login, register, logout, forgotPassword, resetPassword, verifyEmail, loginWithGoogle, loginWithGithub, updateProfile, uploadBanner, removeBanner, deleteAccount, changePassword]);
+  }), [user, token, isLoading, login, register, logout, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail, loginWithGoogle, loginWithGithub, updateProfile, uploadBanner, removeBanner, deleteAccount, changePassword]);
 
   return (
     <AuthContext.Provider value={value}>

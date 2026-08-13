@@ -1,28 +1,25 @@
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
-import { ArrowLeft, Rss, Calendar, Tag, Clock, ArrowRight } from "lucide-react";
-
-const pageVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4, staggerChildren: 0.1 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
-};
-
-const badgeVariants = {
-  hidden: { opacity: 0, scale: 0.7 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
-};
+import { cn } from "@/lib/utils";
+import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
+import GradientOrbs from "@/components/motion/GradientOrbs";
+import Reveal from "@/components/motion/Reveal";
+import SpotlightCard from "@/components/motion/SpotlightCard";
+import PageHero from "@/components/motion/PageHero";
+import ScrollProgress from "@/components/motion/ScrollProgress";
+import BackToTop from "@/components/motion/BackToTop";
+import CTACard from "@/components/motion/CTACard";
+import Magnetic from "@/components/motion/Magnetic";
+import { glassCard } from "@/components/motion/styles";
+import { Rss, Calendar, Tag, Clock, ArrowRight, Newspaper, Link2 } from "lucide-react";
 
 const posts = [
   {
     date: "June 28, 2026",
     tag: "Engineering",
     tagColor: "text-violet-500 bg-violet-500/10",
+    chipBorder: "border-violet-500/25",
     title: "Building a Test-Fix Loop with LLM-Powered Agents",
     excerpt: "How we implemented an autonomous cycle where our AI agent identifies bugs, generates patches, runs tests, and iterates — all without human intervention.",
     readTime: "8 min read",
@@ -40,6 +37,7 @@ We built this using a combination of LangChain chains and custom tool-calling ag
     date: "May 12, 2026",
     tag: "Product",
     tagColor: "text-fuchsia-500 bg-fuchsia-500/10",
+    chipBorder: "border-fuchsia-500/25",
     title: "How We Index 50,000 Files in Under 3 Minutes",
     excerpt: "A deep dive into our parallelized indexing pipeline that parses, chunks, embeds, and stores entire repositories at remarkable speed.",
     readTime: "6 min read",
@@ -56,6 +54,7 @@ The result: a 50,000-file monorepo indexes in under 3 minutes on our infrastruct
     date: "April 3, 2026",
     tag: "Launch",
     tagColor: "text-emerald-500 bg-emerald-500/10",
+    chipBorder: "border-emerald-500/25",
     title: "Introducing Repo Verify: AI-Powered Repository Intelligence",
     excerpt: "Today we're launching Repo Verify — an AI agent that reads your entire codebase and helps you understand, review, and document it.",
     readTime: "4 min read",
@@ -71,95 +70,161 @@ We're launching with support for 50+ programming languages and all major framewo
   },
 ];
 
+const tagFilters = ["All", "Engineering", "Product", "Launch"];
+
 export default function BlogPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [activeTag, setActiveTag] = useState("All");
+
+  const filtered = activeTag === "All" ? posts : posts.filter((p) => p.tag === activeTag);
 
   return (
     <motion.main
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
-      className={`min-h-screen font-[Inter] transition-colors duration-300 ${isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900"}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className={cn("min-h-screen font-[Inter] transition-colors duration-300", isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900")}
     >
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-fuchsia-600/5 rounded-full blur-[150px]" />
-        <motion.div
-          animate={{ y: [0, -25, 0], x: [0, -12, 0] }}
-          transition={{ repeat: Infinity, duration: 9, ease: "easeInOut" }}
-          className="absolute top-32 left-[12%] h-56 w-56 rounded-full bg-fuchsia-500/[0.04] blur-[90px]"
-        />
-        <motion.div
-          animate={{ y: [0, 18, 0], x: [0, 20, 0] }}
-          transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
-          className="absolute bottom-24 right-[18%] h-40 w-40 rounded-full bg-violet-500/[0.04] blur-[70px]"
-        />
-      </div>
+      <PlexusTerrainBackground />
+      <GradientOrbs className="[&>*]:opacity-90" />
+      <ScrollProgress className="bg-gradient-to-r from-fuchsia-500 via-violet-500 to-pink-500" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 md:py-20">
-        <motion.div variants={itemVariants} className="mb-10">
-          <Link to="/" className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
-            <ArrowLeft size={16} /> Back to Home
-          </Link>
-        </motion.div>
+        <PageHero
+          icon={Rss}
+          label="Blog"
+          badgeClass={isDark ? "border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-300" : "border-fuchsia-200 bg-fuchsia-100 text-fuchsia-700"}
+          titleBefore={["Dev", "Logs", "&"]}
+          gradientWord="Updates"
+          subtitle="Insights from the team building the future of AI-powered code analysis."
+          gradientClass="from-fuchsia-400 via-violet-400 to-pink-400"
+          glowClass="rgba(217, 70, 239, 0.12)"
+        />
 
-        <motion.div variants={itemVariants} className="mb-14 text-center">
-          <motion.div variants={badgeVariants} className={`mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium ${isDark ? "border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-300" : "border-fuchsia-200 bg-fuchsia-100 text-fuchsia-700"}`}>
-            <Rss size={14} className="text-fuchsia-400" /> Blog
-          </motion.div>
-          <h1 className="font-[Outfit] text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
-            Dev Logs &{" "}
-            <span className="bg-gradient-to-r from-fuchsia-400 via-violet-400 to-pink-400 bg-clip-text text-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_auto]">Updates</span>
-          </h1>
-          <p className={`mx-auto mt-5 max-w-xl text-lg ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-            Insights from the team building the future of AI-powered code analysis.
-          </p>
-        </motion.div>
-
-        <motion.div variants={pageVariants} className="space-y-8">
-          {posts.map((post) => (
-            <motion.article
-              key={post.title}
-              variants={itemVariants}
-              whileHover={{ y: -4, scale: 1.005 }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
-              className={`group rounded-2xl border p-6 sm:p-8 transition-shadow duration-300 ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:shadow-xl hover:shadow-fuchsia-500/5" : "border-slate-200 bg-white hover:shadow-xl hover:shadow-slate-200/60"}`}
+        <Reveal className="mb-10 flex flex-wrap items-center justify-center gap-2.5">
+          {tagFilters.map((tag) => (
+            <motion.button
+              key={tag}
+              type="button"
+              onClick={() => setActiveTag(tag)}
+              whileHover={{ y: -2, scale: 1.05 }}
+              whileTap={{ scale: 0.96 }}
+              animate={activeTag === tag ? { scale: [1, 1.06, 1] } : {}}
+              transition={{ duration: 0.3 }}
+              className={cn(
+                "relative rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-300",
+                activeTag === tag
+                  ? isDark
+                    ? "border-violet-500/40 bg-violet-500/15 text-violet-200 shadow-lg shadow-violet-500/10"
+                    : "border-violet-300 bg-violet-100 text-violet-800 shadow-md"
+                  : isDark
+                    ? "border-white/[0.08] bg-white/[0.04] text-slate-400 hover:border-white/15 hover:text-white"
+                    : "border-slate-200/70 bg-white/60 text-slate-500 hover:border-slate-300 hover:text-slate-900"
+              )}
             >
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <motion.span
-                  whileHover={{ scale: 1.08 }}
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${post.tagColor}`}
-                >
-                  <Tag size={10} /> {post.tag}
-                </motion.span>
-                <span className={`flex items-center gap-1 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  <Calendar size={11} /> {post.date}
-                </span>
-                <span className={`flex items-center gap-1 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  <Clock size={11} /> {post.readTime}
-                </span>
-              </div>
-              <h2 className={`font-[Outfit] text-xl font-bold mb-3 ${isDark ? "text-white" : "text-slate-900"}`}>{post.title}</h2>
-              <p className={`text-sm leading-relaxed mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{post.excerpt}</p>
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className={`rounded-xl border p-5 text-sm leading-relaxed whitespace-pre-line ${isDark ? "border-white/[0.04] bg-white/[0.02] text-slate-400" : "border-slate-100 bg-slate-50 text-slate-500"}`}
-              >
-                {post.content}
-              </motion.div>
-              <motion.div
-                whileHover={{ x: 6 }}
-                transition={{ type: "spring" as const, stiffness: 400, damping: 20 }}
-                className="mt-4 flex items-center gap-1 text-sm font-medium text-violet-500 hover:text-violet-400 transition-colors cursor-pointer"
-              >
-                Read full post <ArrowRight size={14} />
-              </motion.div>
-            </motion.article>
+              {tag}
+            </motion.button>
           ))}
+        </Reveal>
+
+        <motion.div layout className="space-y-8">
+          <AnimatePresence mode="popLayout">
+            {filtered.map((post) => (
+              <motion.article
+                key={post.title}
+                layout
+                initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.98 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <SpotlightCard
+                  spotlightColor={isDark ? "rgba(217, 70, 239, 0.12)" : "rgba(217, 70, 239, 0.1)"}
+                  className={cn("rounded-2xl border transition-all duration-300", glassCard(isDark), "hover:-translate-y-1")}
+                  innerClassName="p-6 sm:p-8"
+                >
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.9, ease: "easeOut" }}
+                    className="absolute inset-x-6 top-0 h-[2px] origin-left rounded-full bg-gradient-to-r from-fuchsia-500 via-violet-500 to-pink-500"
+                  />
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <motion.span
+                      whileHover={{ scale: 1.08 }}
+                      className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium", post.tagColor, post.chipBorder)}
+                    >
+                      <Tag size={10} /> {post.tag}
+                    </motion.span>
+                    <span className={cn("flex items-center gap-1 text-xs", isDark ? "text-slate-500" : "text-slate-400")}>
+                      <Calendar size={11} /> {post.date}
+                    </span>
+                    <span className={cn("flex items-center gap-1 text-xs", isDark ? "text-slate-500" : "text-slate-400")}>
+                      <Clock size={11} /> {post.readTime}
+                    </span>
+                  </div>
+
+                  <motion.h2
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1, duration: 0.5 }}
+                    className="mt-4 font-[Outfit] text-xl font-bold sm:text-2xl"
+                  >
+                    {post.title}
+                  </motion.h2>
+
+                  <p className={cn("mt-2 text-sm leading-relaxed", isDark ? "text-slate-400" : "text-slate-500")}>{post.excerpt}</p>
+
+                  <div
+                    className={cn(
+                      "mt-5 rounded-xl border p-5 text-sm leading-relaxed whitespace-pre-line",
+                      isDark ? "border-white/[0.06] bg-[#0a0614]/60 text-slate-400" : "border-slate-200/70 bg-slate-50 text-slate-500"
+                    )}
+                  >
+                    {post.content}
+                  </div>
+
+                  <motion.div
+                    whileHover={{ x: 6 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="mt-5 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-fuchsia-500 transition-colors hover:text-fuchsia-400"
+                  >
+                    Read full post <ArrowRight size={14} />
+                  </motion.div>
+                </SpotlightCard>
+              </motion.article>
+            ))}
+          </AnimatePresence>
         </motion.div>
+
+        <CTACard
+          title="Never miss an update"
+          subtitle="Follow the engineering journey behind Repo Verify — new posts land here regularly."
+          from="#d946ef"
+          to="#8b5cf6"
+          icon={<Newspaper size={24} />}
+          action={
+            <Magnetic>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
+                <a
+                  href="https://github.com/anomalyco/opencode"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-600 to-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/25 transition-shadow hover:shadow-xl hover:shadow-fuchsia-500/40"
+                >
+                  <Link2 size={16} /> Follow on GitHub
+                </a>
+              </motion.div>
+            </Magnetic>
+          }
+        />
       </div>
+
+      <BackToTop />
     </motion.main>
   );
 }

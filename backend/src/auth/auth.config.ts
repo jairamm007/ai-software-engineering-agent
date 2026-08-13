@@ -63,13 +63,14 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: process.env.NODE_ENV === "production",
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, token }) => {
       await sendPasswordResetEmail(user.email, token);
     },
   },
   emailVerification: {
-    sendOnSignUp: process.env.NODE_ENV === "production",
+    sendOnSignUp: true,
+    sendOnSignIn: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, token }) => {
       await sendVerificationEmail(user.email, token);

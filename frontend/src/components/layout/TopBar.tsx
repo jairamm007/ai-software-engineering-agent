@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Sun, Moon, Settings, User, LogOut, ChevronDown } from "lucide-react";
+import { Sun, Moon, Settings, User, LogOut, ChevronDown, BookOpen } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -153,7 +153,7 @@ export default function TopBar() {
                       }`}
                     >
                       <User size={14} />
-                      Profile
+                      My Profile
                     </button>
                     <button
                       type="button"
@@ -165,7 +165,19 @@ export default function TopBar() {
                       }`}
                     >
                       <Settings size={14} />
-                      Settings
+                      Account Settings
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { navigate("/user-guide"); setProfileOpen(false); }}
+                      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium font-[Inter] transition-colors ${
+                        isDark
+                          ? "text-slate-300 hover:bg-white/5"
+                          : "text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      <BookOpen size={14} />
+                      User Guide
                     </button>
                   </div>
 

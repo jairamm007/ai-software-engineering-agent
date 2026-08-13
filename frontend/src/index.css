@@ -27,6 +27,10 @@ body,
   --accent-hover: #7c3aed;
   --accent-light: rgba(139, 92, 246, 0.1);
   --accent-text: #7c3aed;
+  /* Mesh terrain background */
+  --mesh-primary: #7c3aed;
+  --mesh-accent: #ec4899;
+  --mesh-bg: #ffffff;
 }
 
 /* Dark theme */
@@ -46,6 +50,10 @@ body,
   --accent-hover: #a78bfa;
   --accent-light: rgba(139, 92, 246, 0.15);
   --accent-text: #a78bfa;
+  /* Mesh terrain background */
+  --mesh-primary: #7c3aed;
+  --mesh-accent: #ec4899;
+  --mesh-bg: #07030f;
 }
 
 /* Accent color overrides */

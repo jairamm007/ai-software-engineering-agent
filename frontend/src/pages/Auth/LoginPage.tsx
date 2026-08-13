@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
 import {
   Eye,
   EyeOff,
@@ -11,10 +11,13 @@ import {
   Bot,
   Shield,
   Zap,
+  Sparkles,
+  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
+import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const features = [
@@ -28,7 +31,7 @@ export default function LoginPage() {
   const isDark = theme === "dark";
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginWithGoogle, loginWithGithub } = useAuth();
+  const { login, loginWithGoogle, loginWithGithub, resendVerificationEmail } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,8 +40,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [hoveredOauth, setHoveredOauth] = useState<"google" | "github" | null>(null);
   const [particles] = useState(() =>
     Array.from({ length: 12 }, () => ({
       left: 10 + Math.random() * 80,
@@ -48,6 +53,16 @@ export default function LoginPage() {
     }))
   );
 
+  // Mouse-driven card spotlight + tilt
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(50);
+  const my = useMotionValue(50);
+  const springMx = useSpring(mx, { stiffness: 120, damping: 18 });
+  const springMy = useSpring(my, { stiffness: 120, damping: 18 });
+  const spotlight = useMotionTemplate`radial-gradient(480px circle at ${springMx}% ${springMy}%, ${isDark ? "rgba(139,92,246,0.14)" : "rgba(139,92,246,0.12)"}, transparent 65%)`;
+  const rotateX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18 });
+  const rotateY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18 });
+
   const from =
     (location.state as { from?: { pathname: string } })?.from?.pathname ||
     "/dashboard";
@@ -55,6 +70,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setResendSent(false);
     if (!email.trim() || !password.trim()) {
       setError("Please fill in all fields");
       return;
@@ -69,6 +85,23 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const handleResendVerification = async () => {
+    if (!email.trim()) return;
+    setError("");
+    setResendLoading(true);
+    setResendSent(false);
+    try {
+      await resendVerificationEmail(email);
+      setResendSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend verification email");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const isEmailNotVerified = error.toLowerCase().includes("not verified");
 
   const handleGoogle = async () => {
     setError("");
@@ -98,14 +131,17 @@ export default function LoginPage() {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) / 40;
-    const y = (e.clientY - rect.top - rect.height / 2) / 40;
-    setMousePos({ x, y });
+    const px = ((e.clientX - rect.left) / rect.width) * 100;
+    const py = ((e.clientY - rect.top) / rect.height) * 100;
+    mx.set(px);
+    my.set(py);
+    rotateX.set((py - 50) / 40);
+    rotateY.set((50 - px) / 40);
   };
 
   return (
     <div
-      className={`flex min-h-screen overflow-hidden transition-colors duration-300 ${
+      className={`relative flex min-h-screen overflow-hidden transition-colors duration-300 ${
         isDark
           ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
@@ -145,12 +181,23 @@ export default function LoginPage() {
           50% { transform: translateY(-10px) translateX(-5px); opacity: 0.4; }
           75% { transform: translateY(-30px) translateX(15px); opacity: 0.5; }
         }
+        @keyframes border-spin {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
         .shake-animation { animation: shake 0.5s ease-in-out; }
         .shimmer-btn:hover {
           background-size: 200% auto;
           animation: shimmer 2s linear infinite;
         }
-      `}</style>
+        .gradient-border {
+          background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6);
+          background-size: 200% auto;
+          animation: border-spin 4s linear infinite;
+        }
+      `}      </style>
+
+      <PlexusTerrainBackground />
 
       {/* Left Panel */}
       <div
@@ -162,27 +209,19 @@ export default function LoginPage() {
         <div className="absolute inset-0 overflow-hidden">
           <div
             className="absolute top-[10%] left-[15%] h-72 w-72 rounded-full opacity-40 blur-[80px] accent-gradient"
-            style={{
-              animation: "float1 8s ease-in-out infinite",
-            }}
+            style={{ animation: "float1 8s ease-in-out infinite" }}
           />
           <div
             className="absolute top-[50%] right-[10%] h-80 w-80 rounded-full opacity-30 blur-[100px] accent-gradient"
-            style={{
-              animation: "float2 10s ease-in-out infinite",
-            }}
+            style={{ animation: "float2 10s ease-in-out infinite" }}
           />
           <div
             className="absolute bottom-[10%] left-[30%] h-64 w-64 rounded-full opacity-35 blur-[70px] accent-gradient"
-            style={{
-              animation: "float3 12s ease-in-out infinite",
-            }}
+            style={{ animation: "float3 12s ease-in-out infinite" }}
           />
           <div
             className="absolute top-[30%] left-[50%] h-48 w-48 rounded-full opacity-25 blur-[60px] accent-gradient"
-            style={{
-              animation: "float1 14s ease-in-out infinite reverse",
-            }}
+            style={{ animation: "float1 14s ease-in-out infinite reverse" }}
           />
         </div>
 
@@ -193,6 +232,7 @@ export default function LoginPage() {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, type: "spring" }}
+            whileHover={{ scale: 1.08 }}
             className="mx-auto mb-8"
           >
             <div className="relative inline-flex items-center justify-center">
@@ -231,15 +271,20 @@ export default function LoginPage() {
                 initial={{ opacity: 0, x: -40 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 + i * 0.15 }}
-                className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left backdrop-blur-sm ${
+                whileHover={{ x: 4, scale: 1.02 }}
+                className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left backdrop-blur-sm transition-colors ${
                   isDark
                     ? "border-white/5 bg-white/5"
                     : "border-slate-200/60 bg-white/60 shadow-sm"
                 }`}
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg accent-bg-light">
+                <motion.div
+                  whileHover={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 0.5 }}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg accent-bg-light"
+                >
                   <feat.icon size={18} className="accent-text-base" />
-                </div>
+                </motion.div>
                 <span className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}>
                   {feat.text}
                 </span>
@@ -275,8 +320,8 @@ export default function LoginPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="mt-10"
+            transition={{ delay: 1.4 }}
+            className="mt-8"
           >
             <Link
               to="/"
@@ -291,7 +336,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Panel */}
-      <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
+      <div className="relative flex w-full items-center justify-center px-6 py-10 lg:w-1/2">
         {/* Particles behind card */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {particles.map((p, i) => (
@@ -308,24 +353,35 @@ export default function LoginPage() {
           ))}
         </div>
 
+        {/* Animated gradient border frame */}
+        <div className="gradient-border absolute top-1/2 left-1/2 z-0 h-[calc(100%-40px)] w-[min(100%-24px,460px)] -translate-x-1/2 -translate-y-1/2 rounded-[26px] p-px opacity-20 blur-[2px]" />
+
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          ref={cardRef}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           onMouseMove={handleMouseMove}
-          onMouseLeave={() => setMousePos({ x: 0, y: 0 })}
+          onMouseLeave={() => { mx.set(50); my.set(50); rotateX.set(0); rotateY.set(0); }}
           style={{
-            transform: `perspective(1000px) rotateY(${mousePos.x * 0.3}deg) rotateX(${-mousePos.y * 0.3}deg)`,
-            transition: "transform 0.15s ease-out",
+            rotateX,
+            rotateY,
+            transformStyle: "preserve-3d",
           }}
-          className={`relative z-10 w-full max-w-md space-y-6 rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl ${
+          className={`relative z-10 w-full max-w-md overflow-hidden rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl ${
             isDark
               ? "border-white/10 bg-white/[0.07] shadow-black/20"
-              : "border-slate-200/50 bg-white/60 shadow-slate-200/50"
+              : "border-slate-200/50 bg-white/70 shadow-slate-200/50"
           }`}
         >
+          {/* Cursor spotlight */}
+          <motion.div
+            style={{ background: spotlight }}
+            className="pointer-events-none absolute inset-0"
+          />
+
           {/* Mobile logo */}
-          <div className="text-center lg:hidden">
+          <div className="relative text-center lg:hidden">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl shadow-lg accent-shadow">
               <Logo size="md" />
             </div>
@@ -346,7 +402,15 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
+            className="relative"
           >
+            <motion.div
+              animate={{ rotate: [0, 8, -8, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+              className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300"
+            >
+              <Sparkles size={12} /> AI Workspace
+            </motion.div>
             <h2
               className={`text-2xl font-bold ${
                 isDark ? "text-white" : "text-slate-900"
@@ -364,88 +428,126 @@ export default function LoginPage() {
           </motion.div>
 
           {/* Error */}
-          <AnimatePresence mode="wait">
-            {error && (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="shake-animation rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
-              >
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="relative">
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="shake-animation mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+                >
+                  {error}
+                  {isEmailNotVerified && (
+                    <button
+                      type="button"
+                      onClick={() => void handleResendVerification()}
+                      disabled={resendLoading}
+                      className="mt-2 block w-full rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-400 transition-all hover:bg-red-500/20 disabled:opacity-50"
+                    >
+                      {resendLoading
+                        ? "Sending..."
+                        : resendSent
+                          ? "Verification email resent"
+                          : "Resend verification email"}
+                    </button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* OAuth */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
-            className="grid grid-cols-2 gap-3"
+            className="relative mt-4 grid grid-cols-2 gap-3"
           >
             <motion.button
               whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(139,92,246,0.15)" }}
               whileTap={{ scale: 0.98 }}
+              onMouseEnter={() => setHoveredOauth("google")}
+              onMouseLeave={() => setHoveredOauth(null)}
               type="button"
               onClick={() => void handleGoogle()}
               disabled={!!oauthLoading}
-              className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 ${
+              className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 ${
                 isDark
                   ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
                   : "border-slate-200 bg-white/80 text-slate-700 hover:bg-white"
               }`}
             >
-              {oauthLoading === "google" ? (
-                <LoadingIndicator size="sm" />
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
+              {hoveredOauth === "google" && (
+                <motion.span
+                  layoutId="google-glow"
+                  className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10"
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                />
               )}
-              Google
+              <span className="relative flex items-center gap-2">
+                {oauthLoading === "google" ? (
+                  <LoadingIndicator size="sm" />
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      fill="#EA4335"
+                    />
+                  </svg>
+                )}
+                Google
+              </span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(139,92,246,0.15)" }}
               whileTap={{ scale: 0.98 }}
+              onMouseEnter={() => setHoveredOauth("github")}
+              onMouseLeave={() => setHoveredOauth(null)}
               type="button"
               onClick={() => void handleGithub()}
               disabled={!!oauthLoading}
-              className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 ${
+              className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 ${
                 isDark
                   ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
                   : "border-slate-200 bg-white/80 text-slate-700 hover:bg-white"
               }`}
             >
-              {oauthLoading === "github" ? (
-                <LoadingIndicator size="sm" />
-              ) : (
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                </svg>
+              {hoveredOauth === "github" && (
+                <motion.span
+                  layoutId="github-glow"
+                  className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10"
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                />
               )}
-              GitHub
+              <span className="relative flex items-center gap-2">
+                {oauthLoading === "github" ? (
+                  <LoadingIndicator size="sm" />
+                ) : (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                )}
+                GitHub
+              </span>
             </motion.button>
           </motion.div>
 
@@ -454,25 +556,13 @@ export default function LoginPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="relative"
+            className="relative mt-4"
           >
-            <div
-              className={`absolute inset-0 flex items-center`}
-            >
-              <div
-                className={`w-full border-t ${
-                  isDark ? "border-white/10" : "border-slate-200"
-                }`}
-              />
+            <div className="absolute inset-0 flex items-center">
+              <div className={`w-full border-t ${isDark ? "border-white/10" : "border-slate-200"}`} />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span
-                className={`px-2 ${
-                  isDark
-                    ? "bg-white/[0.07] text-slate-500"
-                    : "bg-white/60 text-slate-400"
-                }`}
-              >
+              <span className={`px-2 ${isDark ? "bg-white/[0.07] text-slate-500" : "bg-white/70 text-slate-400"}`}>
                 or continue with email
               </span>
             </div>
@@ -481,7 +571,7 @@ export default function LoginPage() {
           {/* Form */}
           <form
             onSubmit={(e) => void handleSubmit(e)}
-            className="space-y-4"
+            className="relative mt-4 space-y-4"
           >
             {/* Email */}
             <motion.div
@@ -516,6 +606,16 @@ export default function LoginPage() {
                         : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
                   }`}
                 />
+                {email.trim().length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    <CheckCircle2 size={16} className="text-emerald-400" />
+                  </motion.div>
+                )}
               </div>
             </motion.div>
 
@@ -572,17 +672,14 @@ export default function LoginPage() {
               className="flex items-center justify-between"
             >
               <label className="flex cursor-pointer items-center gap-2">
-                <input
+                <motion.input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300 accent-[var(--accent)]"
+                  whileTap={{ scale: 1.2 }}
+                  className="h-4 w-4 cursor-pointer rounded border-slate-300 accent-[var(--accent)]"
                 />
-                <span
-                  className={`text-xs ${
-                    isDark ? "text-slate-400" : "text-slate-500"
-                  }`}
-                >
+                <span className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   Remember me
                 </span>
               </label>
@@ -605,8 +702,9 @@ export default function LoginPage() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className={`shimmer-btn flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100`}
+                className={`shimmer-btn group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100`}
               >
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 {loading ? (
                   <LoadingIndicator size="sm" />
                 ) : (
@@ -624,11 +722,11 @@ export default function LoginPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.85 }}
-            className={`text-center text-sm ${
-              isDark ? "text-slate-400" : "text-slate-500"
-            }`}
+            className="relative mt-4 text-center text-sm"
           >
-            Don&apos;t have an account?{" "}
+            <span className={isDark ? "text-slate-400" : "text-slate-500"}>
+              Don&apos;t have an account?{" "}
+            </span>
             <Link
               to="/register"
               className="font-medium accent-text-base hover:opacity-80"

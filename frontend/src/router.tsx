@@ -11,6 +11,7 @@ import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const LandingPage = lazy(() => import("@/pages/Landing/LandingPage"));
 const FAQPage = lazy(() => import("@/pages/FAQ/FAQPage"));
+const UserGuidePage = lazy(() => import("@/pages/Info/UserGuidePage"));
 const LoginPage = lazy(() => import("@/pages/Auth/LoginPage"));
 const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage"));
 const ForgotPasswordPage = lazy(() => import("@/pages/Auth/ForgotPasswordPage"));
@@ -90,6 +91,7 @@ const AboutPage = lazy(() => import("@/pages/Info/AboutPage"));
 const CareersPage = lazy(() => import("@/pages/Info/CareersPage"));
 const PrivacyPage = lazy(() => import("@/pages/Info/PrivacyPage"));
 const TermsPage = lazy(() => import("@/pages/Info/TermsPage"));
+const NotFoundPage = lazy(() => import("@/pages/NotFound/NotFoundPage"));
 
 const pageModules = import.meta.glob("/src/pages/**/*.tsx");
 
@@ -115,23 +117,6 @@ function LazyPage({ children }: { children: React.ReactNode }) {
   );
 }
 
-function NotFoundPage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md text-center">
-        <h1 className="mb-2 text-6xl font-bold text-slate-900">404</h1>
-        <p className="mb-6 text-lg text-slate-500">Page not found</p>
-        <a
-          href="/"
-          className="inline-block rounded-lg accent-gradient px-5 py-2.5 text-sm font-medium text-white transition-colors"
-        >
-          Go Home
-        </a>
-      </div>
-    </div>
-  );
-}
-
 export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
@@ -139,6 +124,7 @@ export const router = createBrowserRouter([
       { path: "/", element: <LazyPage><LandingPage /></LazyPage> },
       { path: "/landing", element: <LazyPage><LandingPage /></LazyPage> },
       { path: "/faq", element: <LazyPage><FAQPage /></LazyPage> },
+      { path: "/user-guide", element: <LazyPage><UserGuidePage /></LazyPage> },
       { path: "/docs", element: <LazyPage><DocsPage /></LazyPage> },
       { path: "/blog", element: <LazyPage><BlogPage /></LazyPage> },
       { path: "/changelog", element: <LazyPage><ChangelogPage /></LazyPage> },
