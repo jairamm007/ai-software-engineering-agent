@@ -1,8 +1,6 @@
 import { motion } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
-import GradientOrbs from "@/components/motion/GradientOrbs";
 import Reveal from "@/components/motion/Reveal";
 import SpotlightCard from "@/components/motion/SpotlightCard";
 import Magnetic from "@/components/motion/Magnetic";
@@ -80,8 +78,6 @@ export default function ChangelogPage() {
       transition={{ duration: 0.4 }}
       className={cn("min-h-screen font-[Inter] transition-colors duration-300", isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900")}
     >
-      <PlexusTerrainBackground />
-      <GradientOrbs />
       <ScrollProgress className="bg-gradient-to-r from-emerald-500 via-violet-500 to-fuchsia-500" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 md:py-20">
@@ -145,6 +141,16 @@ export default function ChangelogPage() {
                       >
                         <Icon size={14} /> {release.version}
                       </motion.div>
+                      {ri === 0 && (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0.7 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 14 }}
+                          className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-500"
+                        >
+                          <Sparkles size={10} /> Latest
+                        </motion.span>
+                      )}
                       <span className={cn("text-xs font-medium", isDark ? "text-slate-500" : "text-slate-400")}>{release.date}</span>
                       <motion.span
                         animate={{ scale: [1, 1.15, 1] }}

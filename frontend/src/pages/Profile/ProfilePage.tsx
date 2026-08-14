@@ -255,7 +255,7 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className={`rounded-2xl border shadow-sm overflow-hidden ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           {/* Banner Area */}
@@ -458,7 +458,7 @@ export default function ProfilePage() {
               key={stat.label}
               variants={item}
               className={`relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-colors ${
-                isDark ? "border-white/10 bg-white/5 hover:bg-white/[0.07]" : "border-slate-200 bg-white hover:bg-slate-50/80"
+                isDark ? "border-white/10 bg-[var(--card-bg)] hover:bg-white/[0.07]" : "border-slate-200 bg-white hover:bg-slate-50/80"
               }`}
             >
               <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${stat.color}`} />
@@ -477,7 +477,7 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className={`rounded-2xl border shadow-sm ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           <div className={`flex items-center justify-between border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
@@ -630,7 +630,7 @@ export default function ProfilePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className={`rounded-2xl border shadow-sm ${
-              isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+              isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
             }`}
           >
             <div className={`flex items-center justify-between border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
@@ -694,7 +694,7 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           className={`rounded-2xl border shadow-sm ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
@@ -732,14 +732,14 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className={`rounded-2xl border shadow-sm ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
             <h3 className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Account</h3>
           </div>
           <div className="space-y-3 p-5">
-            <div className={`rounded-xl border p-4 transition-colors ${isDark ? "border-white/10 bg-white/[0.03] hover:bg-white/[0.05]" : "border-slate-100 bg-slate-50/80 hover:bg-slate-50"}`}>
+            <div className={`rounded-xl border p-4 transition-colors ${isDark ? "border-white/10 bg-[var(--bg-secondary)] hover:bg-white/[0.05]" : "border-slate-100 bg-slate-50/80 hover:bg-slate-50"}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Lock size={16} className="text-amber-500" />

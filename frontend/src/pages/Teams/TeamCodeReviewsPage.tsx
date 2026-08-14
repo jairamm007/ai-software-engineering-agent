@@ -49,7 +49,7 @@ export default function TeamCodeReviewsPage() {
           <LoadingIndicator size="md" />
         </div>
       ) : reviews.length === 0 ? (
-        <div className={`rounded-2xl border py-16 text-center ${isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"}`}>
+        <div className={`rounded-2xl border py-16 text-center ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-slate-50"}`}>
           <Code2 size={40} className={`mx-auto mb-4 ${isDark ? "text-slate-700" : "text-slate-300"}`} />
           <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>No code reviews yet</p>
         </div>
@@ -61,7 +61,7 @@ export default function TeamCodeReviewsPage() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+              className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
             >
               <div className="flex items-center gap-2 mb-2">
                 <Code2 size={14} className="accent-text" />

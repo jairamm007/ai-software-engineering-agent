@@ -143,7 +143,7 @@ export default function AdminAccessDeniedPage() {
             to="/"
             className={`inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-all duration-200 ${
               isDark
-                ? "border-white/[0.06] bg-[#111118] text-slate-300 hover:bg-white/[0.06] hover:border-white/[0.1]"
+                ? "border-white/[0.06] bg-[var(--card-bg)] text-slate-300 hover:bg-white/[0.06] hover:border-white/[0.1]"
                 : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 shadow-md shadow-slate-200/40"
             }`}
           >

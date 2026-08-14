@@ -48,11 +48,17 @@ export default function TopBar() {
   return (
     <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b px-4 sm:px-6 ${
       isDark
-        ? "border-white/[0.06] bg-[#0B0614]/80 backdrop-blur-xl"
+        ? "border-white/[0.06] bg-[var(--bg-secondary)]/80 backdrop-blur-xl"
         : "border-slate-200/80 bg-white/80 backdrop-blur-xl"
     }`}>
       {/* Left: Page title / breadcrumb */}
       <div className="flex items-center gap-2">
+        <motion.span
+          aria-hidden
+          animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
+          transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut" }}
+          className="h-2 w-2 rounded-full accent-bg shadow-[0_0_8px_color-mix(in_srgb,var(--accent)_70%,transparent)]"
+        />
         <h1 className={`font-[Outfit] text-sm font-semibold sm:text-base ${
           isDark ? "text-white" : "text-slate-900"
         }`}>
@@ -125,7 +131,7 @@ export default function TopBar() {
                   transition={{ duration: 0.15 }}
                   className={`absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border shadow-xl ${
                     isDark
-                      ? "border-white/[0.06] bg-[#110C1D]"
+                      ? "border-white/[0.06] bg-[var(--bg-secondary)]"
                       : "border-slate-200 bg-white"
                   }`}
                 >

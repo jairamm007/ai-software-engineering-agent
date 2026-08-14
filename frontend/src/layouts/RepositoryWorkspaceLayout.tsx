@@ -20,7 +20,7 @@ export default function RepositoryWorkspaceLayout({
       </aside>
 
       <section className={`col-span-9 space-y-6 rounded-2xl border p-6 shadow-sm ${
-        isDark ? "border-white/5 bg-white/[0.02]" : "border-slate-200/60 bg-white/60"
+        isDark ? "border-white/[0.06] surface-card" : "border-slate-200/60 bg-white"
       }`}>
         {content}
       </section>

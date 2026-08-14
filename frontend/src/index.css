@@ -1,5 +1,212 @@
 @import "tailwindcss";
 
+/* App theme is driven by the `.dark` class on <html> (see ThemeContext) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Theme-aware palette remap.
+  Tailwind's slate + shadow utilities are re-pointed at theme-scoped
+  custom properties so both themes share the same hue layout and only
+  surface/text/elevation values differ per theme.
+*/
+@theme inline {
+  --color-slate-50: var(--ts-slate-50);
+  --color-slate-100: var(--ts-slate-100);
+  --color-slate-200: var(--ts-slate-200);
+  --color-slate-300: var(--ts-slate-300);
+  --color-slate-400: var(--ts-slate-400);
+  --color-slate-500: var(--ts-slate-500);
+  --color-slate-600: var(--ts-slate-600);
+  --color-slate-700: var(--ts-slate-700);
+  --color-slate-800: var(--ts-slate-800);
+  --color-slate-900: var(--ts-slate-900);
+  --color-slate-950: var(--ts-slate-950);
+
+  --shadow-sm: var(--ts-shadow-sm);
+  --shadow-md: var(--ts-shadow-md);
+  --shadow-lg: var(--ts-shadow-lg);
+  --shadow-xl: var(--ts-shadow-xl);
+  --shadow-2xl: var(--ts-shadow-2xl);
+}
+
+/* ── Theme tokens ── */
+
+/* Light theme (default) — cool gray-lavender, not pure white */
+:root {
+  /* Page background */
+  --bg-primary: #f6f5fb;
+  --bg-page-a: #f6f5fb;
+  --bg-page-b: #eef0fb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #efedf7;
+  --text-primary: #14141f;
+  --text-secondary: #5a5a6e;
+  --text-muted: #8a8a9c;
+  --border-color: #e4e2f0;
+  --border-hover: #d3d0e6;
+  --shadow-color: rgba(20, 20, 40, 0.08);
+  --card-bg: #ffffff;
+  --card-border: #e4e2f0;
+  /* Default accent (violet) — darker/saturated for contrast on light */
+  --accent: #6d4de0;
+  --accent-hover: #5b3cc4;
+  --accent-light: rgba(109, 77, 224, 0.12);
+  --accent-text: #5b3cc4;
+  /* Mesh terrain background */
+  --mesh-primary: #6d4de0;
+  --mesh-accent: #e04d8f;
+  --mesh-bg: #f6f5fb;
+}
+
+/* Dark theme — flat near-black, no gradient or color cast */
+.dark {
+  --bg-primary: #0a0a0f;
+  --bg-page-a: #0a0a0f;
+  --bg-page-b: #0a0a0f;
+  --bg-secondary: #131313;
+  --bg-tertiary: #0e0e0e;
+  --text-primary: #f2f1f8;
+  --text-secondary: #a8a7bd;
+  --text-muted: #6b6a80;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.16);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --card-bg: #151515;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --accent: #8b5cf6;
+  --accent-hover: #a78bfa;
+  --accent-light: rgba(139, 92, 246, 0.16);
+  --accent-text: #a78bfa;
+  /* Mesh terrain background */
+  --mesh-primary: #8b5cf6;
+  --mesh-accent: #ec4899;
+  --mesh-bg: #0a0a0f;
+}
+
+/* ── Theme-scoped palette values for slate utilities ── */
+:root {
+  --ts-slate-50: #f6f5fb;
+  --ts-slate-100: #efedf7;
+  --ts-slate-200: #e4e2f0;
+  --ts-slate-300: #d3d0e6;
+  --ts-slate-400: #8a8a9c;
+  --ts-slate-500: #5a5a6e;
+  --ts-slate-600: #4a4a5c;
+  --ts-slate-700: #3a3a4a;
+  --ts-slate-800: #272738;
+  --ts-slate-900: #14141f;
+  --ts-slate-950: #0a0b16;
+}
+.dark {
+  --ts-slate-50: #131313;
+  --ts-slate-100: #151515;
+  --ts-slate-200: #1a1a1a;
+  --ts-slate-300: #242424;
+  --ts-slate-400: #a6a6b0;
+  --ts-slate-500: #787885;
+  --ts-slate-600: #6c6c78;
+  --ts-slate-700: #2a2a2a;
+  --ts-slate-800: #151515;
+  --ts-slate-900: #101010;
+  --ts-slate-950: #0a0a0f;
+}
+
+/*
+  Dark-theme TEXT overrides.
+  The palette remap above re-scopes slate-100/200/300 to dark surface tones,
+  which is correct for bg-/border- utilities. But components also use
+  text-slate-100/200/300 for light-on-dark TEXT; the remap made those
+  near-black and invisible. Pin the color of those text utilities to light
+  shades so text stays readable in dark mode (bg-/border- utilities are
+  separate and unaffected).
+*/
+.dark .text-slate-100 { color: #efedf7; }
+.dark .text-slate-200 { color: #e4e2f0; }
+.dark .text-slate-300 { color: #d3d0e6; }
+
+/* ── Elevation: soft shadows on light, glow on dark ── */
+:root {
+  --ts-shadow-sm: 0 1px 2px rgba(20, 20, 40, 0.05);
+  --ts-shadow-md: 0 4px 20px rgba(20, 20, 40, 0.06);
+  --ts-shadow-lg: 0 8px 30px rgba(20, 20, 40, 0.09);
+  --ts-shadow-xl: 0 12px 40px rgba(20, 20, 40, 0.12);
+  --ts-shadow-2xl: 0 20px 50px rgba(20, 20, 40, 0.16);
+}
+.dark {
+  --ts-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --ts-shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 18px color-mix(in srgb, var(--accent) 8%, transparent);
+  --ts-shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 8px 30px rgba(0, 0, 0, 0.55), 0 0 28px color-mix(in srgb, var(--accent) 12%, transparent);
+  --ts-shadow-xl: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 40px color-mix(in srgb, var(--accent) 16%, transparent);
+  --ts-shadow-2xl: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 56px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* Accent color overrides — same hues, darker/saturated on light, glowing on dark */
+:root[data-accent="violet"] {
+  --accent: #6d4de0;
+  --accent-hover: #5b3cc4;
+  --accent-light: rgba(109, 77, 224, 0.12);
+  --accent-text: #5b3cc4;
+}
+.dark[data-accent="violet"] {
+  --accent: #8b5cf6;
+  --accent-hover: #a78bfa;
+  --accent-light: rgba(139, 92, 246, 0.16);
+  --accent-text: #a78bfa;
+}
+
+:root[data-accent="blue"] {
+  --accent: #2f63d8;
+  --accent-hover: #2754b8;
+  --accent-light: rgba(47, 99, 216, 0.12);
+  --accent-text: #2754b8;
+}
+.dark[data-accent="blue"] {
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-light: rgba(59, 130, 246, 0.16);
+  --accent-text: #60a5fa;
+}
+
+:root[data-accent="emerald"] {
+  --accent: #0d9a6e;
+  --accent-hover: #0b7a58;
+  --accent-light: rgba(13, 154, 110, 0.12);
+  --accent-text: #0b7a58;
+}
+.dark[data-accent="emerald"] {
+  --accent: #10b981;
+  --accent-hover: #34d399;
+  --accent-light: rgba(16, 185, 129, 0.16);
+  --accent-text: #34d399;
+}
+
+:root[data-accent="amber"] {
+  --accent: #d97706;
+  --accent-hover: #b45309;
+  --accent-light: rgba(217, 119, 6, 0.14);
+  --accent-text: #b45309;
+}
+.dark[data-accent="amber"] {
+  --accent: #f5a623;
+  --accent-hover: #fbbf24;
+  --accent-light: rgba(245, 166, 35, 0.16);
+  --accent-text: #fbbf24;
+}
+
+:root[data-accent="rose"] {
+  --accent: #e11d48;
+  --accent-hover: #be123c;
+  --accent-light: rgba(225, 29, 72, 0.12);
+  --accent-text: #be123c;
+}
+.dark[data-accent="rose"] {
+  --accent: #f43f5e;
+  --accent-hover: #fb7185;
+  --accent-light: rgba(244, 63, 94, 0.16);
+  --accent-text: #fb7185;
+}
+
+/* ── Page / surface backgrounds ── */
 html,
 body,
 #root {
@@ -9,114 +216,27 @@ body,
   overflow-x: hidden;
 }
 
-/* Light theme (default) */
-:root {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
-  --border-hover: #cbd5e1;
-  --shadow-color: rgba(0, 0, 0, 0.08);
-  --card-bg: #ffffff;
-  --card-border: #e2e8f0;
-  /* Default accent */
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
-  --accent-light: rgba(139, 92, 246, 0.1);
-  --accent-text: #7c3aed;
-  /* Mesh terrain background */
-  --mesh-primary: #7c3aed;
-  --mesh-accent: #ec4899;
-  --mesh-bg: #ffffff;
-}
-
-/* Dark theme */
-.dark {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #1e293b;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border-color: #334155;
-  --border-hover: #475569;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --card-bg: #1e293b;
-  --card-border: #334155;
-  --accent: #8b5cf6;
-  --accent-hover: #a78bfa;
-  --accent-light: rgba(139, 92, 246, 0.15);
-  --accent-text: #a78bfa;
-  /* Mesh terrain background */
-  --mesh-primary: #7c3aed;
-  --mesh-accent: #ec4899;
-  --mesh-bg: #07030f;
-}
-
-/* Accent color overrides */
-:root[data-accent="violet"] {
-  --accent: #8b5cf6;
-  --accent-light: rgba(139, 92, 246, 0.1);
-  --accent-text: #7c3aed;
-}
-.dark[data-accent="violet"] {
-  --accent: #8b5cf6;
-  --accent-light: rgba(139, 92, 246, 0.15);
-  --accent-text: #a78bfa;
-}
-
-:root[data-accent="blue"] {
-  --accent: #3b82f6;
-  --accent-light: rgba(59, 130, 246, 0.1);
-  --accent-text: #2563eb;
-}
-.dark[data-accent="blue"] {
-  --accent: #3b82f6;
-  --accent-light: rgba(59, 130, 246, 0.15);
-  --accent-text: #60a5fa;
-}
-
-:root[data-accent="emerald"] {
-  --accent: #10b981;
-  --accent-light: rgba(16, 185, 129, 0.1);
-  --accent-text: #059669;
-}
-.dark[data-accent="emerald"] {
-  --accent: #10b981;
-  --accent-light: rgba(16, 185, 129, 0.15);
-  --accent-text: #34d399;
-}
-
-:root[data-accent="amber"] {
-  --accent: #f59e0b;
-  --accent-light: rgba(245, 158, 11, 0.1);
-  --accent-text: #d97706;
-}
-.dark[data-accent="amber"] {
-  --accent: #f59e0b;
-  --accent-light: rgba(245, 158, 11, 0.15);
-  --accent-text: #fbbf24;
-}
-
-:root[data-accent="rose"] {
-  --accent: #f43f5e;
-  --accent-light: rgba(244, 63, 94, 0.1);
-  --accent-text: #e11d48;
-}
-.dark[data-accent="rose"] {
-  --accent: #f43f5e;
-  --accent-light: rgba(244, 63, 94, 0.15);
-  --accent-text: #fb7185;
-}
-
 body {
   font-family: "Inter", system-ui, sans-serif;
-  background: var(--bg-primary);
+  background: var(--bg-page-a);
+  background-attachment: fixed;
   color: var(--text-primary);
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Full-page surface (layouts) — flat, no gradient */
+.app-bg {
+  background: var(--bg-page-a);
+}
+
+/* Opaque card surface — lifts off the page background */
+.surface-card {
+  background: var(--card-bg);
+}
+
+/* Elevated surface (sidebar, top bar, popovers) */
+.surface-elevated {
+  background: var(--bg-secondary);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -341,11 +461,291 @@ html {
 .stagger-item:nth-child(7) { animation-delay: 0.35s; }
 .stagger-item:nth-child(8) { animation-delay: 0.4s; }
 
-/* Sparkling pulse loading animation */
-@keyframes sparklePulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.9); }
+/* Twinkle loading animation — alternating opacity, no spin/scale/background */
+@keyframes blink1 {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
-.animate-sparkle-pulse {
-  animation: sparklePulse 1.3s ease-in-out infinite;
+@keyframes blink2 {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+.star-main { animation: blink1 1.4s ease-in-out infinite; }
+.star-accent { animation: blink2 1.4s ease-in-out infinite; }
+
+/* ══════════════════════════════════════════════════════
+   Hover text transitions — theme-aware, 0.2s ease
+   ══════════════════════════════════════════════════════ */
+
+/* Grey by default, highlights on hover (white in dark, near-black in light) */
+.hover-text {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+.hover-text:hover {
+  color: var(--text-primary);
+}
+.dark .hover-text:hover {
+  color: #ffffff;
+}
+
+/* Keeps its current color, shifts to the accent on hover */
+.hover-accent {
+  transition: color 0.2s ease;
+  cursor: default;
+}
+.hover-accent:hover {
+  color: var(--accent);
+}
+.dark .hover-accent:hover {
+  color: var(--accent-text);
+}
+
+/* ══════════════════════════════════════════════════════
+   Orbiting rings hero background (subtle, ambient)
+   ══════════════════════════════════════════════════════ */
+.orbit-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.orbit-bg svg {
+  width: 100%;
+  height: 100%;
+}
+.ring-a {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rotateA 20s linear infinite;
+}
+.ring-b {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rotateB 16s linear infinite;
+}
+.ring-c {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rotateC 12s linear infinite;
+}
+@keyframes rotateA {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes rotateB {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+@keyframes rotateC {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.pulse-dot {
+  animation: pulseDot 2s ease-in-out infinite;
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.2; r: 4; }
+  50% { opacity: 0.6; r: 7; }
+}
+
+/* ══════════════════════════════════════════════════════
+   Enhanced 3D / motion utilities
+   ══════════════════════════════════════════════════════ */
+
+/* 3D perspective + preserve-3d helpers */
+.perspective-400 { perspective: 400px; }
+.perspective-600 { perspective: 600px; }
+.perspective-800 { perspective: 800px; }
+.perspective-1000 { perspective: 1000px; }
+.perspective-1200 { perspective: 1200px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+.translate-z-0 { transform: translateZ(0); }
+
+/* Glassmorphism card (frosted) */
+.glass {
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  background: color-mix(in srgb, var(--card-bg) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+}
+
+.dark .glass {
+  background: color-mix(in srgb, var(--card-bg) 45%, transparent);
+  border-color: color-mix(in srgb, var(--border-color) 45%, transparent);
+}
+
+/* Gradient border via mask technique */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #ec4899), transparent 60%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Animated conic gradient border spin */
+@keyframes borderSpin {
+  to { --angle: 360deg; }
+}
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.animated-border {
+  position: relative;
+}
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0%,
+    var(--accent) 20%,
+    transparent 40%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderSpin 4s linear infinite;
+  pointer-events: none;
+}
+
+/* Aurora blobs */
+@keyframes auroraDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(6%, -4%, 0) scale(1.12); }
+  66% { transform: translate3d(-4%, 5%, 0) scale(0.94); }
+}
+.animate-aurora {
+  animation: auroraDrift 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Slow rotate for 3D rings / orbs */
+@keyframes spinSlow {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spinSlow 24s linear infinite;
+}
+.animate-spin-slower {
+  animation: spinSlow 42s linear infinite;
+}
+
+/* Floating cards / elements */
+@keyframes floatY {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -14px, 0); }
+}
+.animate-float-y {
+  animation: floatY 6s ease-in-out infinite;
+}
+
+/* Shine sweep on hover (used by cards / buttons) */
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+.shine::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  transform: rotate(25deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transition: left 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.shine:hover::after {
+  left: 130%;
+}
+
+/* 3D card hover lift */
+@keyframes cardLift {
+  0%, 100% { transform: translateY(0) translateZ(0); }
+  50% { transform: translateY(-6px) translateZ(12px); }
+}
+.animate-card-lift {
+  animation: cardLift 5s ease-in-out infinite;
+}
+
+/* Twinkling stars */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.9; }
+}
+.animate-twinkle {
+  animation: twinkle 3.5s ease-in-out infinite;
+}
+
+/* Scrolling marquee used in hero / feature strips */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* Gradient text shimmer (bg-size + background-position) */
+.animate-shimmer-text {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Scroll-reveal fallback for non-motion elements */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glow ring pulse */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 12px 0 color-mix(in srgb, var(--accent) 25%, transparent); }
+  50% { box-shadow: 0 0 32px 8px color-mix(in srgb, var(--accent) 40%, transparent); }
+}
+.animate-glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* Noise texture overlay (adds depth) */
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+/* ── Generic 3D hover lift (place inside a perspective context) ── */
+.hover-3d {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+  will-change: transform;
+}
+.hover-3d:hover {
+  transform: translateY(-5px) translateZ(14px) scale(1.015);
+}
+
+/* ── Theme-aware recharts tooltip container (fallback) ── */
+.chart-tooltip-glass {
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
 }

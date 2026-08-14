@@ -72,7 +72,7 @@ export default function TeamDiscussionsPage() {
 
       {/* Post Comment */}
       {isMember && (
-        <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+        <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           <textarea
             placeholder="Write a comment... Use @username to mention"
             value={commentText}
@@ -98,7 +98,7 @@ export default function TeamDiscussionsPage() {
       )}
 
       {/* Comment List */}
-      <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+      <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
         {isLoading ? (
           <div className="py-12 flex justify-center">
             <LoadingIndicator size="md" />

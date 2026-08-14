@@ -122,7 +122,7 @@ export default function AdminSecurityPage() {
             variants={item}
             className={`group relative overflow-hidden rounded-2xl border p-5 transition-all duration-200 ${
               isDark
-                ? "border-white/[0.06] bg-[#111118] hover:border-white/[0.1] hover:bg-[#13131b]"
+                ? "border-white/[0.06] bg-[var(--card-bg)] hover:border-white/[0.1] hover:bg-[#13131b]"
                 : "border-slate-200 bg-white shadow-sm hover:shadow-md"
             }`}
           >
@@ -149,7 +149,7 @@ export default function AdminSecurityPage() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className={`flex gap-1 rounded-2xl border p-1.5 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-slate-50"}`}
+        className={`flex gap-1 rounded-2xl border p-1.5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-slate-50"}`}
       >
         {tabs.map((tab) => (
           <button
@@ -189,7 +189,7 @@ export default function AdminSecurityPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white shadow-sm"}`}
+        className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white shadow-sm"}`}
       >
         {/* Sessions Tab */}
         {activeTab === "sessions" && (

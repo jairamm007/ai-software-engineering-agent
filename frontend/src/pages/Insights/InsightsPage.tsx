@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { RefreshCw, Download, ChevronDown, FileText, FileDown, ArrowLeft } from "lucide-react";
+import { Download, ChevronDown, FileText, FileDown, ArrowLeft } from "lucide-react";
+import { SparkleLoader } from "@/components/common/SparkleLoader";
 import { useTheme } from "@/context/ThemeContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Card from "@/components/ui/Card";
@@ -104,7 +105,7 @@ export default function InsightsPage() {
                   key={repo.id}
                   type="button"
                   onClick={() => navigate(`/insights/${repo.id}`)}
-                  className={`rounded-xl border p-4 text-left transition-colors ${isDark ? "border-white/10 bg-white/5 hover:border-[var(--accent)]/50" : "border-slate-200 bg-white hover:border-[var(--accent)]"}`}
+                  className={`rounded-xl border p-4 text-left transition-colors ${isDark ? "border-white/10 bg-[var(--card-bg)] hover:border-[var(--accent)]/50" : "border-slate-200 bg-white hover:border-[var(--accent)]"}`}
                 >
                   <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>{repo.name}</p>
                   <p className={`mt-1 truncate text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>{repo.githubUrl}</p>
@@ -176,7 +177,7 @@ export default function InsightsPage() {
               disabled={refreshMutation.isPending || isPending}
               className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10"
             >
-              <RefreshCw size={14} className={refreshMutation.isPending ? "animate-spin" : ""} />
+              <SparkleLoader size={14} />
               {refreshMutation.isPending ? "Refreshing…" : "Refresh Insights"}
             </button>
 

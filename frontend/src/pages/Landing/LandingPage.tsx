@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import Hero from "@/components/landing/Hero";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
 import SectionDivider from "@/components/landing/SectionDivider";
 import { ArrowUp, Sparkles } from "lucide-react";
 
@@ -39,9 +38,6 @@ export default function LandingPage() {
         style={{ scaleX: progress }}
         className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.6)]"
       />
-
-      {/* Plexus night-sky background throughout the page */}
-      <PlexusTerrainBackground />
 
       {/* Ambient grid glow at very top */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-violet-600/[0.06] to-transparent" />

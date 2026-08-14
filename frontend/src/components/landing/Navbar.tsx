@@ -72,9 +72,7 @@ export default function Navbar() {
                 e.preventDefault();
                 handleNavClick(link.href);
               }}
-              className={`text-sm font-medium transition-colors font-[Inter] cursor-pointer ${
-                isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"
-              }`}
+              className={`text-sm font-medium font-[Inter] cursor-pointer hover-text`}
             >
               {link.label}
             </a>

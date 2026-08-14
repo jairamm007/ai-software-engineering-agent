@@ -18,7 +18,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
+import OrbitingRingsBackground from "@/components/landing/OrbitingRingsBackground";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const float1 = `
@@ -44,13 +44,6 @@ const shimmer = `
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }`;
-const particleDrift = `
-@keyframes particleDrift {
-  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
-}`;
 const borderSpin = `
 @keyframes border-spin {
   0% { background-position: 0% 50%; }
@@ -63,9 +56,9 @@ const pulseGlow = `
 }`;
 
 const features = [
-  { icon: Zap, text: "Free to start, no credit card", color: "text-amber-400" },
-  { icon: Bot, text: "AI code review and documentation", color: "text-violet-400" },
-  { icon: Shield, text: "Security vulnerability scanning", color: "text-emerald-400" },
+  { icon: Zap, text: "Free to start, no credit card", color: "text-amber-400", hex: "245,166,35", featured: true },
+  { icon: Bot, text: "AI code review and documentation", color: "text-violet-400", hex: "139,92,246" },
+  { icon: Shield, text: "Security vulnerability scanning", color: "text-emerald-400", hex: "16,185,129" },
 ];
 
 export default function RegisterPage() {
@@ -87,13 +80,6 @@ export default function RegisterPage() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = useState(false);
   const [hoveredOauth, setHoveredOauth] = useState<"google" | "github" | null>(null);
-  const [particles] = useState(() =>
-    Array.from({ length: 20 }, () => ({
-      left: Math.random() * 100,
-      duration: 8 + Math.random() * 12,
-      delay: Math.random() * 10,
-    }))
-  );
 
   // Mouse-driven card spotlight + tilt
   const cardRef = useRef<HTMLDivElement>(null);
@@ -210,30 +196,41 @@ export default function RegisterPage() {
 
   return (
     <>
-      <style>{float1 + float2 + float3 + shimmer + particleDrift + borderSpin + pulseGlow}</style>
-      <div className={`relative flex min-h-screen overflow-hidden transition-colors duration-300 ${
+      <style>{float1 + float2 + float3 + shimmer + borderSpin + pulseGlow}</style>
+      <div className={`relative flex min-h-screen overflow-x-hidden transition-colors duration-300 ${
         isDark
           ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
       }`}>
 
-        <PlexusTerrainBackground />
-
-        {/* Left Panel */}
-        <div className="relative hidden w-1/2 lg:flex items-center justify-center overflow-hidden">
-          <div className={`absolute inset-0 ${isDark
-            ? "bg-gradient-to-br from-slate-900 via-[var(--accent)]/10 to-slate-950"
-            : "bg-gradient-to-br from-slate-50 via-[var(--accent-light)] to-slate-100"
+        <div className={`relative hidden w-1/2 lg:flex items-center justify-center overflow-hidden`}>
+          {/* Unified purple gradient panel (dot-free) */}
+          <div className={`absolute inset-0 ${
+            isDark
+              ? "bg-gradient-to-br from-slate-950 via-violet-950/40 to-slate-950"
+              : "bg-gradient-to-br from-violet-100 via-purple-50 to-slate-100"
           }`} />
+          {/* Subtle vignette for depth */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(20,10,60,0.16)_100%)]" />
 
-          <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-[var(--accent)]/20 blur-3xl"
-            style={{ animation: "float1 12s ease-in-out infinite" }} />
-          <div className="absolute bottom-32 right-16 w-96 h-96 rounded-full bg-[var(--accent)]/15 blur-3xl"
-            style={{ animation: "float2 15s ease-in-out infinite" }} />
-          <div className="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-cyan-500/10 blur-3xl"
-            style={{ animation: "float3 18s ease-in-out infinite" }} />
-          <div className="absolute bottom-16 left-1/4 w-48 h-48 rounded-full bg-pink-500/10 blur-3xl"
-            style={{ animation: "float1 20s ease-in-out infinite reverse" }} />
+          <div className="absolute inset-0 overflow-hidden">
+            <div
+              className="absolute top-[10%] left-[15%] h-72 w-72 rounded-full opacity-40 blur-[80px] accent-gradient"
+              style={{ animation: "float1 8s ease-in-out infinite" }}
+            />
+            <div
+              className="absolute top-[50%] right-[10%] h-80 w-80 rounded-full opacity-30 blur-[100px] accent-gradient"
+              style={{ animation: "float2 10s ease-in-out infinite" }}
+            />
+            <div
+              className="absolute bottom-[10%] left-[30%] h-64 w-64 rounded-full opacity-35 blur-[70px] accent-gradient"
+              style={{ animation: "float3 12s ease-in-out infinite" }}
+            />
+            <div
+              className="absolute top-[30%] left-[50%] h-48 w-48 rounded-full opacity-25 blur-[60px] accent-gradient"
+              style={{ animation: "float1 14s ease-in-out infinite reverse" }}
+            />
+          </div>
 
           <div className="relative z-10 max-w-md px-8">
             <motion.div
@@ -245,7 +242,7 @@ export default function RegisterPage() {
             >
               <div className="relative inline-flex items-center justify-center">
                 <div className="absolute inset-0 rounded-2xl accent-gradient blur-xl opacity-50 animate-[pulse-glow_3s_ease-in-out_infinite]" />
-                <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl shadow-2xl accent-shadow-lg">
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl shadow-2xl accent-shadow-lg" style={{ animation: "blink1 1.4s ease-in-out infinite" }}>
                   <Logo size="lg" />
                 </div>
               </div>
@@ -271,7 +268,7 @@ export default function RegisterPage() {
               Create your account and unlock AI-powered code analysis
             </motion.p>
 
-            <div className="mt-10 space-y-4">
+            <div className="mt-10 space-y-6">
               {features.map((f, i) => (
                 <motion.div
                   key={f.text}
@@ -280,20 +277,37 @@ export default function RegisterPage() {
                   animate="visible"
                   variants={staggerItem}
                   whileHover={{ x: 4, scale: 1.02 }}
-                  className={`flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-medium ${
-                    isDark
-                      ? "bg-white/5 border border-white/5 text-slate-200 backdrop-blur-sm"
-                      : "bg-white/80 border border-slate-200/60 text-slate-700 shadow-sm"
-                  }`}
+                  className="relative flex items-center gap-4 overflow-hidden rounded-2xl px-5 py-4 text-sm font-medium"
+                  style={{
+                    backgroundColor: isDark ? "#12131f" : "#ffffff",
+                    border: `1px solid ${f.featured ? `rgba(${f.hex},0.6)` : isDark ? "rgba(255,255,255,0.08)" : "#e4e2f0"}`,
+                    boxShadow: f.featured
+                      ? isDark
+                        ? `0 0 0 1px rgba(${f.hex},0.25), 0 0 22px rgba(${f.hex},0.18)`
+                        : `0 0 0 1px rgba(${f.hex},0.15), 0 4px 20px rgba(20,20,40,0.06)`
+                      : isDark
+                        ? "0 4px 14px rgba(0,0,0,0.25)"
+                        : "0 4px 20px rgba(20,20,40,0.06)",
+                  }}
                 >
+                  {f.featured && (
+                    <div
+                      className="absolute bottom-0 left-0 right-0 h-[2px]"
+                      style={{ background: `linear-gradient(90deg, transparent, rgba(${f.hex},0.9), transparent)` }}
+                    />
+                  )}
                   <motion.div
                     whileHover={{ rotate: [0, -10, 10, 0] }}
                     transition={{ duration: 0.5 }}
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${isDark ? "bg-white/10" : "accent-bg-light"}`}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+                    style={{
+                      backgroundColor: `rgba(${f.hex},0.14)`,
+                      color: `rgba(${f.hex},1)`,
+                    }}
                   >
-                    <Check size={14} className="text-emerald-400" />
+                    <f.icon size={15} />
                   </motion.div>
-                  <span>{f.text}</span>
+                  <span className={`hover-accent ${isDark ? "text-[#f2f1f8]" : "text-[#14141f]"}`}>{f.text}</span>
                 </motion.div>
               ))}
             </div>
@@ -306,9 +320,7 @@ export default function RegisterPage() {
             >
               <Link
                 to="/"
-                className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${
-                  isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"
-                }`}
+                className="inline-flex items-center gap-2 text-sm font-medium hover-text"
               >
                 <ArrowLeft size={14} />
                 Back to Home
@@ -318,28 +330,16 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Panel — Form */}
-        <div className="relative flex w-full items-center justify-center px-4 py-10 sm:px-6 lg:w-1/2">
-          {/* Particles */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {particles.map((p, i) => (
-              <div
-                key={i}
-                className={`absolute w-1 h-1 rounded-full ${isDark ? "accent-bg-light" : "accent-bg-light"}`}
-                style={{
-                  left: `${p.left}%`,
-                  bottom: "-10px",
-                  animation: `particleDrift ${p.duration}s linear infinite`,
-                  animationDelay: `${p.delay}s`,
-                }}
-              />
-            ))}
-          </div>
+        <div className="relative flex w-full items-center justify-center px-4 py-6 sm:px-6 lg:py-8 lg:w-1/2">
+          {/* Orbiting rings ambient detail */}
+          <OrbitingRingsBackground />
 
-          {/* Animated gradient border frame */}
-          <div className="absolute top-1/2 left-1/2 z-0 h-[calc(100%-40px)] w-[min(100%-24px,460px)] -translate-x-1/2 -translate-y-1/2 rounded-[26px] p-px opacity-20 blur-[2px]"
-            style={{ background: "linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6)", backgroundSize: "200% auto", animation: "border-spin 4s linear infinite" }} />
+          {/* Animated gradient border frame — hugs the card */}
+          <div className="relative">
+            <div className="absolute -inset-[3px] z-0 rounded-3xl p-px opacity-15 blur-[3px]"
+              style={{ background: "linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6)", backgroundSize: "200% auto", animation: "border-spin 4s linear infinite" }} />
 
-          <motion.div
+            <motion.div
             ref={cardRef}
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -351,10 +351,10 @@ export default function RegisterPage() {
               rotateY,
               transformStyle: "preserve-3d",
             }}
-            className={`relative w-full max-w-md overflow-hidden rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl ${
+            className={`relative z-10 mx-auto w-full max-w-lg overflow-hidden rounded-3xl border p-6 ${
               isDark
-                ? "border-white/10 bg-white/[0.07] shadow-black/40"
-                : "border-slate-200/50 bg-white/70 shadow-slate-300/40"
+                ? "border-white/10 bg-[var(--card-bg)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]"
+                : "border-slate-200/50 bg-white shadow-[0_30px_80px_-20px_rgba(90,60,180,0.3)]"
             }`}
           >
             {/* Cursor spotlight */}
@@ -381,14 +381,14 @@ export default function RegisterPage() {
               <ArrowLeft size={14} /> Home
             </Link>
 
-            <div className="relative mt-6">
-              <motion.div
-                animate={{ rotate: [0, 8, -8, 0] }}
-                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300"
+            <div className="relative mt-5">
+              <div
+                className={`mb-1 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium ${
+                isDark ? "text-violet-300" : "text-violet-700"
+              }`}
               >
                 <Sparkles size={12} /> Get Started Free
-              </motion.div>
+              </div>
               <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
                 Create Account
               </h2>
@@ -465,7 +465,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => void handleGoogle()}
                 disabled={!!oauthLoading}
-                className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-3 text-sm font-medium transition-all disabled:opacity-50 ${
+                className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 ${
                   isDark
                     ? "border-white/15 text-slate-200 hover:bg-white/5 hover:border-white/25"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
@@ -500,7 +500,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => void handleGithub()}
                 disabled={!!oauthLoading}
-                className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-3 text-sm font-medium transition-all disabled:opacity-50 ${
+                className={`relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 ${
                   isDark
                     ? "border-white/15 text-slate-200 hover:bg-white/5 hover:border-white/25"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
@@ -531,18 +531,18 @@ export default function RegisterPage() {
                 <div className={`w-full border-t ${isDark ? "border-white/10" : "border-slate-200"}`} />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className={`px-3 ${isDark ? "bg-white/[0.07] text-slate-500" : "bg-white/70 text-slate-400"}`}>or</span>
+                <span className={`px-3 ${isDark ? "bg-[var(--card-bg)] text-slate-500" : "bg-white text-slate-400"}`}>or</span>
               </div>
             </div>
 
-            <form onSubmit={(e) => void handleSubmit(e)} className="relative space-y-4">
+            <form onSubmit={(e) => void handleSubmit(e)} className="relative space-y-3">
               {[
                 { key: "name", label: "Full Name", type: "text", icon: User, placeholder: "John Doe", value: name, setter: setName },
                 { key: "email", label: "Email", type: "email", icon: Mail, placeholder: "you@example.com", value: email, setter: setEmail },
               ].map((field, i) => (
                 <motion.div key={field.key} custom={i + 2} initial="hidden" animate="visible" variants={staggerItem}>
                   <label className={`mb-1.5 block text-xs font-medium transition-colors ${
-                    focusedField === field.key ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+                    focusedField === field.key ? "text-[#a855f7]" : isDark ? "text-slate-400" : "text-slate-500"
                   }`}>
                     {field.label}
                   </label>
@@ -550,7 +550,7 @@ export default function RegisterPage() {
                     <field.icon
                       size={16}
                       className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                        focusedField === field.key ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
+                        focusedField === field.key ? "text-[#a855f7]" : isDark ? "text-slate-500" : "text-slate-400"
                       }`}
                     />
                     <input
@@ -560,9 +560,9 @@ export default function RegisterPage() {
                       onFocus={() => setFocusedField(field.key)}
                       onBlur={() => setFocusedField(null)}
                       placeholder={field.placeholder}
-                      className={`w-full rounded-xl border py-3 pl-11 pr-4 text-sm outline-none transition-all duration-300 ${
+                      className={`w-full rounded-xl border py-2.5 pl-11 pr-4 text-sm outline-none transition-all duration-300 ${
                         focusedField === field.key
-                          ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                          ? "border-[#a855f7] shadow-[0_0_0_1px_#a855f7,0_0_18px_rgba(168,85,247,0.35)]"
                           : isDark
                             ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
                             : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
@@ -584,7 +584,7 @@ export default function RegisterPage() {
 
               <motion.div custom={4} initial="hidden" animate="visible" variants={staggerItem}>
                 <label className={`mb-1.5 block text-xs font-medium transition-colors ${
-                  focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+                  focusedField === "password" ? "text-[#a855f7]" : isDark ? "text-slate-400" : "text-slate-500"
                 }`}>
                   Password
                 </label>
@@ -592,7 +592,7 @@ export default function RegisterPage() {
                   <Lock
                     size={16}
                     className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                      focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
+                      focusedField === "password" ? "text-[#a855f7]" : isDark ? "text-slate-500" : "text-slate-400"
                     }`}
                   />
                   <input
@@ -602,9 +602,9 @@ export default function RegisterPage() {
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
                     placeholder="At least 6 characters"
-                    className={`w-full rounded-xl border py-3 pl-11 pr-11 text-sm outline-none transition-all duration-300 ${
+                    className={`w-full rounded-xl border py-2.5 pl-11 pr-11 text-sm outline-none transition-all duration-300 ${
                       focusedField === "password"
-                        ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                        ? "border-[#a855f7] shadow-[0_0_0_1px_#a855f7,0_0_18px_rgba(168,85,247,0.35)]"
                         : isDark
                           ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
                           : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
@@ -654,7 +654,7 @@ export default function RegisterPage() {
 
               <motion.div custom={5} initial="hidden" animate="visible" variants={staggerItem}>
                 <label className={`mb-1.5 block text-xs font-medium transition-colors ${
-                  focusedField === "confirm" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+                  focusedField === "confirm" ? "text-[#a855f7]" : isDark ? "text-slate-400" : "text-slate-500"
                 }`}>
                   Confirm Password
                 </label>
@@ -662,7 +662,7 @@ export default function RegisterPage() {
                   <Lock
                     size={16}
                     className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                      focusedField === "confirm" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
+                      focusedField === "confirm" ? "text-[#a855f7]" : isDark ? "text-slate-500" : "text-slate-400"
                     }`}
                   />
                   <input
@@ -672,9 +672,9 @@ export default function RegisterPage() {
                     onFocus={() => setFocusedField("confirm")}
                     onBlur={() => setFocusedField(null)}
                     placeholder="Repeat your password"
-                    className={`w-full rounded-xl border py-3 pl-11 pr-4 text-sm outline-none transition-all duration-300 ${
+                    className={`w-full rounded-xl border py-2.5 pl-11 pr-4 text-sm outline-none transition-all duration-300 ${
                       focusedField === "confirm"
-                        ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                        ? "border-[#a855f7] shadow-[0_0_0_1px_#a855f7,0_0_18px_rgba(168,85,247,0.35)]"
                         : isDark
                           ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
                           : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
@@ -699,7 +699,7 @@ export default function RegisterPage() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all disabled:opacity-50 disabled:shadow-none group"
+                  className="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl accent-gradient px-4 py-2.5 text-sm font-semibold text-white accent-shadow transition-all disabled:opacity-50 disabled:shadow-none group"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] opacity-0 group-hover:opacity-100 group-hover:animate-[shimmer_1.5s_ease-in-out_infinite]" />
                   <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -730,6 +730,7 @@ export default function RegisterPage() {
               </>
             )}
           </motion.div>
+          </div>
         </div>
       </div>
     </>

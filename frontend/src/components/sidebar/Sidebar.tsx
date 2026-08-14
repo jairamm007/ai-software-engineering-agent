@@ -27,6 +27,7 @@ import type { SidebarMode } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import Logo from "@/components/common/Logo";
 import { getIntegrations } from "@/services/github-integration";
 
@@ -142,7 +143,7 @@ export default function Sidebar() {
         style={{ width, transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)" }}
         className={`relative flex h-screen shrink-0 flex-col border-r overflow-hidden ${
           isDark
-            ? "border-white/[0.06] bg-[#0B0614]"
+            ? "border-white/[0.06] surface-elevated"
             : "border-slate-200/80 bg-white"
         }`}
       >
@@ -156,10 +157,10 @@ export default function Sidebar() {
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+            className={`flex items-center gap-2.5 transition-opacity hover:opacity-80 ${iconsOnly ? "flex-1 justify-center" : ""}`}
             title="Go to Dashboard"
           >
-            <Logo size="md" showText />
+            <Logo size="md" showText={!iconsOnly} />
           </button>
           <button
             type="button"
@@ -196,22 +197,43 @@ export default function Sidebar() {
                       <Link
                         to={item.path}
                         title={iconsOnly ? item.label : undefined}
-                        className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 font-[Inter] ${
+                        className={`group relative flex items-center rounded-xl py-2.5 text-sm font-medium transition-all duration-200 font-[Inter] ${
+                          iconsOnly ? "justify-center px-0" : "gap-3 px-3"
+                        } ${
+                          item.path === "/github"
+                            ? isDark
+                              ? "border border-white/10 bg-white/[0.06] backdrop-blur-md shadow-sm"
+                              : "border border-slate-200/80 bg-white/70 backdrop-blur-md shadow-sm"
+                            : ""
+                        } ${
                           active
                             ? isDark
-                              ? "bg-[var(--accent)]/10 text-white"
-                              : "accent-bg-light accent-text-base"
+                              ? "text-white"
+                              : "accent-text-base"
                             : isDark
                               ? "text-slate-400 hover:bg-white/[0.04] hover:text-white"
                               : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >
                         {active && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full accent-gradient" />
+                          <motion.span
+                            layoutId="sidebar-active-pill"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                            className={`absolute inset-0 rounded-xl ${
+                              isDark ? "bg-[var(--accent)]/[0.12]" : "accent-bg-light"
+                            }`}
+                          />
+                        )}
+                        {active && (
+                          <motion.div
+                            layoutId="sidebar-active-bar"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full accent-gradient"
+                          />
                         )}
                         <Icon
                           size={17}
-                          className={`shrink-0 transition-colors duration-200 ${
+                          className={`relative z-10 shrink-0 transition-colors duration-200 ${
                             active
                               ? "accent-text"
                               : isDark
@@ -220,20 +242,24 @@ export default function Sidebar() {
                           }`}
                         />
                         <span
-                          className="overflow-hidden whitespace-nowrap transition-opacity duration-200"
+                          className="relative z-10 overflow-hidden whitespace-nowrap transition-opacity duration-200"
                           style={{ opacity: iconsOnly ? 0 : 1, width: iconsOnly ? 0 : "auto" }}
                         >
                           {item.label}
                         </span>
                         {item.path === "/github" && !githubConnected && !iconsOnly && (
-                          <span className={`ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
+                          <span className={`relative z-10 ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
                             isDark ? "bg-amber-500/15 text-amber-400" : "bg-amber-50 text-amber-600"
                           }`}>
                             Connect
                           </span>
                         )}
                         {active && !iconsOnly && item.path !== "/github" && (
-                          <div className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full accent-bg" />
+                          <motion.div
+                            layoutId="sidebar-active-dot"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                            className="relative z-10 ml-auto h-1.5 w-1.5 shrink-0 rounded-full accent-bg"
+                          />
                         )}
                       </Link>
                     </li>
@@ -316,7 +342,9 @@ export default function Sidebar() {
               type="button"
               onClick={() => logout()}
               title="Sign out"
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 font-[Inter] ${
+              className={`flex w-full items-center rounded-xl py-2.5 text-sm font-medium transition-all duration-200 font-[Inter] ${
+                iconsOnly ? "justify-center gap-0 px-0" : "gap-3 px-3"
+              } ${
                 isDark
                   ? "text-slate-500 hover:bg-red-500/10 hover:text-red-400"
                   : "text-slate-400 hover:bg-red-50 hover:text-red-500"
@@ -342,7 +370,7 @@ export default function Sidebar() {
           title="Expand sidebar"
           className={`fixed left-0 top-1/2 -translate-y-1/2 z-50 flex h-12 w-5 items-center justify-center rounded-r-lg border-l-0 transition-colors ${
             isDark
-              ? "border-white/[0.06] bg-[#0B0614] text-slate-400 hover:text-white"
+              ? "border-white/[0.06] surface-elevated text-slate-400 hover:text-white"
               : "border-slate-200/80 bg-white text-slate-400 hover:text-slate-900"
           }`}
           style={{

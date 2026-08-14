@@ -117,7 +117,7 @@ export default function TeamNotificationsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={`flex flex-col items-center justify-center rounded-2xl border py-20 ${
-              isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"
+              isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-slate-50"
             }`}
           >
             <BellOff size={40} className={`mb-4 ${isDark ? "text-slate-700" : "text-slate-300"}`} />
@@ -126,7 +126,7 @@ export default function TeamNotificationsPage() {
             </p>
           </motion.div>
         ) : (
-          <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+          <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             {notifications.map((notif: TeamNotification, idx: number) => (
               <div
                 key={notif.id}

@@ -2,10 +2,10 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import {
   FolderOpen,
-  FileCode2,
+  ScanSearch,
   Sparkles,
   Eye,
-  CheckCircle2,
+  ShieldCheck,
   ArrowRight,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
@@ -14,18 +14,18 @@ const steps = [
   {
     icon: FolderOpen,
     step: "01",
-    title: "Open Repository",
-    description: "Select any repository from your connected GitHub account or upload a local project. The AI indexes your code structure, language, and framework automatically.",
+    title: "Open & Index Repository",
+    description: "Connect any repository from your GitHub account or upload a local project. The AI indexes your code structure, language, and framework automatically — no manual setup.",
     iconColor: "text-violet-500",
     glowColor: "shadow-violet-500/30",
     bgAccent: "from-violet-500/10 to-transparent",
     slideFrom: "left" as const,
   },
   {
-    icon: FileCode2,
+    icon: ScanSearch,
     step: "02",
-    title: "Select File or Describe Task",
-    description: "Choose a specific file to modify or describe what you want to build. The AI understands your project context — framework, patterns, and conventions.",
+    title: "Deep Code Analysis",
+    description: "The AI analyzes your repository end-to-end — architecture, dependencies, complexity, and security vulnerabilities — surfacing what matters most before any change.",
     iconColor: "text-fuchsia-500",
     glowColor: "shadow-fuchsia-500/30",
     bgAccent: "from-fuchsia-500/10 to-transparent",
@@ -34,8 +34,8 @@ const steps = [
   {
     icon: Sparkles,
     step: "03",
-    title: "AI Generates Code",
-    description: "Enter your prompt in natural language. The AI generates production-ready code that fits your project — using the right language, framework, and coding style.",
+    title: "Generate Production Code",
+    description: "Prompt in natural language. The AI generates production-ready code that matches your project's framework, patterns, and conventions.",
     iconColor: "text-cyan-500",
     glowColor: "shadow-cyan-500/30",
     bgAccent: "from-cyan-500/10 to-transparent",
@@ -52,10 +52,10 @@ const steps = [
     slideFrom: "right" as const,
   },
   {
-    icon: CheckCircle2,
+    icon: ShieldCheck,
     step: "05",
-    title: "Accept, Reject, or Regenerate",
-    description: "Full control over AI output. Accept the change, reject it, or regenerate with refined instructions. Every generation is saved to history for review.",
+    title: "Verify & Control",
+    description: "Every change is verified and saved to history. Accept, reject, or regenerate with refined instructions — you stay in full control of the AI output.",
     iconColor: "text-amber-500",
     glowColor: "shadow-amber-500/30",
     bgAccent: "from-amber-500/10 to-transparent",
@@ -189,7 +189,7 @@ export default function Workflow() {
             in Seconds
           </h2>
           <p className={`mx-auto mt-6 max-w-2xl text-lg font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-            A simple five-step flow that gives you full control over AI-generated code.
+            A simple five-step flow — open, analyze, generate, preview, and verify your code.
           </p>
         </motion.div>
 

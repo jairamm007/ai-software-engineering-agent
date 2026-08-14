@@ -268,7 +268,7 @@ export default function ArchitecturePage() {
         {/* 1. Repo Select */}
         <motion.div
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"}`}
+          className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
             <h2 className={`text-lg font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>1. Select Repository</h2>
@@ -288,7 +288,7 @@ export default function ArchitecturePage() {
                     className={`group flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
                       selectedRepoId === repo.id
                         ? isDark ? "border-[var(--accent)]/30 accent-bg-light ring-1 ring-[var(--accent)]/20" : "border-[var(--accent)]/20 accent-bg-light ring-1 ring-[var(--accent)]/20"
-                        : isDark ? "border-white/10 bg-white/[0.02] hover:border-white/20" : "border-slate-200 bg-white hover:border-slate-300"
+                        : isDark ? "border-white/10 bg-[var(--card-bg)] hover:border-white/20" : "border-slate-200 bg-white hover:border-slate-300"
                     }`}
                   >
                     <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
@@ -313,7 +313,7 @@ export default function ArchitecturePage() {
             {/* Sidebar: File Tree */}
             <motion.div
               initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
-              className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"}`}
+              className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
             >
               <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
                 <h2 className={`text-base font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>File Structure</h2>
@@ -362,7 +362,7 @@ export default function ArchitecturePage() {
                       <motion.div
                         key={key} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.25 + i * 0.06 }} whileHover={{ y: -4 }}
-                        className={`rounded-2xl border p-5 transition-shadow ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:shadow-lg hover:accent-shadow" : "border-slate-200 bg-white hover:shadow-lg hover:shadow-slate-200/50"}`}
+                        className={`rounded-2xl border p-5 transition-shadow ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] hover:shadow-lg hover:accent-shadow" : "border-slate-200 bg-white hover:shadow-lg hover:shadow-slate-200/50"}`}
                       >
                         <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${style.bg}`}>
                           <Icon size={18} className={style.text} />
@@ -378,7 +378,7 @@ export default function ArchitecturePage() {
               {/* Module Connections */}
               <motion.div
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+                className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
               >
                 <div className={`border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
                   <h2 className={`font-[Outfit] text-sm font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Module Connections</h2>
@@ -410,7 +410,7 @@ export default function ArchitecturePage() {
               {/* Request Flow / API Routes */}
               <motion.div
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-                className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+                className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
               >
                 <div className={`border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
                   <h2 className={`font-[Outfit] text-sm font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Request Flow</h2>
@@ -443,7 +443,7 @@ export default function ArchitecturePage() {
 
               {/* Analyze Button + AI Result */}
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-4">
-                <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                   <p className={`mb-3 text-sm font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>Analysis Scope</p>
                   <div className="grid gap-2 sm:grid-cols-3">{[
                     ["single", "Single File", FileCode2],

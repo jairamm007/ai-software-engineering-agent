@@ -18,7 +18,7 @@ export default function ChatWindow({ messages }: Props) {
 
   return (
     <div className={`mb-6 h-[500px] overflow-y-auto rounded-xl border p-6 shadow ${
-      isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
+      isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
     }`}>
       {messages.length === 0 && (
         <p className={isDark ? "text-slate-400" : "text-slate-500"}>

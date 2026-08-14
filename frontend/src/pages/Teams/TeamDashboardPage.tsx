@@ -80,7 +80,7 @@ export default function TeamDashboardPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 + i * 0.03 }}
-            className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+            className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
           >
             <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${stat.color} mb-2`}>
               <stat.icon size={13} />
@@ -96,7 +96,7 @@ export default function TeamDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+      <div className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
         <h3 className={`text-sm font-semibold font-[Inter] mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>
           Quick Actions
         </h3>
@@ -163,7 +163,7 @@ export default function TeamDashboardPage() {
 
       {/* Recent Activity */}
       {analytics?.recentActivities && analytics.recentActivities.length > 0 && (
-        <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+        <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           <div className={`px-6 py-4 border-b ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <h3 className={`text-sm font-semibold font-[Inter] ${isDark ? "text-white" : "text-slate-900"}`}>
               Recent Activity

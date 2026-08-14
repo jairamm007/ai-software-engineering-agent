@@ -58,7 +58,7 @@ function SettingsSection({ title, icon, children, defaultOpen = true }: Settings
     <div
       className={`rounded-2xl border shadow-sm overflow-hidden transition-colors ${
         isDark
-          ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]"
+          ? "border-white/10 bg-[var(--card-bg)]"
           : "border-slate-200 bg-white"
       }`}
     >
@@ -502,10 +502,10 @@ export default function SettingsPage() {
                       className={`relative rounded-xl border p-4 text-left transition-all ${
                         defaultModel === p.id
                           ? isDark
-                            ? "border-white/20 bg-white/[0.08] shadow-lg"
+                            ? "border-white/20 bg-[var(--card-bg)] shadow-lg"
                             : "border-slate-200 bg-white shadow-md"
                           : isDark
-                            ? "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                            ? "border-white/10 bg-[var(--card-bg)] hover:bg-white/[0.05]"
                             : "border-slate-100 bg-slate-50/80 hover:bg-slate-50"
                       }`}
                     >
@@ -545,7 +545,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Temperature */}
-              <div className={`rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-100 bg-slate-50/80"}`}>
+              <div className={`rounded-xl border p-4 ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-100 bg-slate-50/80"}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Thermometer size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
@@ -584,7 +584,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Retry Strategy */}
-              <div className={`rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-100 bg-slate-50/80"}`}>
+              <div className={`rounded-xl border p-4 ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-100 bg-slate-50/80"}`}>
                 <div className="flex items-center gap-2">
                   <Palette size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
                   <label className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}>
@@ -666,7 +666,7 @@ export default function SettingsPage() {
               {/* Export */}
               <div
                 className={`rounded-xl border p-4 ${
-                  isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-100 bg-slate-50/80"
+                  isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-100 bg-slate-50/80"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -700,7 +700,7 @@ export default function SettingsPage() {
               {/* Clear Cache */}
               <div
                 className={`rounded-xl border p-4 ${
-                  isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-100 bg-slate-50/80"
+                  isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-100 bg-slate-50/80"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -775,7 +775,7 @@ export default function SettingsPage() {
           >
             <div
               className={`flex items-center justify-between rounded-xl border p-4 ${
-                isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-100 bg-slate-50/80"
+                isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-100 bg-slate-50/80"
               }`}
             >
               <div className="flex items-center gap-3">

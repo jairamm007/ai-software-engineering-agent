@@ -53,7 +53,7 @@ export default function AnalyticsPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const card = isDark ? "bg-white/[0.02] border-white/[0.06]" : "bg-white border-slate-200";
+  const card = isDark ? "bg-[var(--card-bg)] border-white/[0.06]" : "bg-white border-slate-200";
   const heading = `font-[Outfit] text-sm font-bold ${isDark ? "text-white" : "text-slate-900"}`;
   const muted = `text-xs font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`;
   const bigVal = `text-2xl font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`;

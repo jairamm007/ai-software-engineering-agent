@@ -1,5 +1,6 @@
 import { useTheme } from "@/context/ThemeContext";
-import { CheckCircle, XCircle, Clock, Loader2, SkipForward, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle, XCircle, Clock, SkipForward, ChevronDown, ChevronUp } from "lucide-react";
+import { SparkleLoader } from "@/components/common/SparkleLoader";
 import { useState } from "react";
 import type { AgentExecutionStep } from "@/services/multiAgent";
 
@@ -13,7 +14,7 @@ function StatusBadge({ status }: { status: AgentExecutionStep["status"] }) {
 
   const config = {
     completed: { icon: <CheckCircle size={12} />, label: "Done", cls: "text-emerald-400 bg-emerald-500/20" },
-    running: { icon: <Loader2 size={12} className="animate-spin text-[var(--accent)]" />, label: "Running", cls: "text-[var(--accent)] bg-[var(--accent)]/20" },
+    running: { icon: <SparkleLoader size={12} />, label: "Running", cls: "text-[var(--accent)] bg-[var(--accent)]/20" },
     error: { icon: <XCircle size={12} />, label: "Error", cls: "text-red-400 bg-red-500/20" },
     skipped: { icon: <SkipForward size={12} />, label: "Skipped", cls: "text-slate-400 bg-slate-500/20" },
     pending: { icon: <Clock size={12} />, label: "Pending", cls: isDark ? "text-slate-500 bg-white/5" : "text-slate-400 bg-slate-100" },

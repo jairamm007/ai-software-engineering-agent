@@ -6,7 +6,6 @@ const productLinks = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Who It's For", href: "#use-cases" },
-  { label: "Dashboard", to: "/dashboard" },
   { label: "User Guide", to: "/user-guide" },
 ];
 
@@ -25,7 +24,7 @@ const company = [
   { label: "Terms", to: "/terms" },
 ];
 
-function NavLink({ href, to, label, isDark }: { href?: string; to?: string; label: string; isDark: boolean }) {
+function NavLink({ href, to, label }: { href?: string; to?: string; label: string }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,7 +43,7 @@ function NavLink({ href, to, label, isDark }: { href?: string; to?: string; labe
             document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
           }
         }}
-        className={`text-sm transition-colors font-[Inter] cursor-pointer ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}
+        className="text-sm font-[Inter] cursor-pointer hover-text"
       >
         {label}
       </a>
@@ -58,7 +57,7 @@ function NavLink({ href, to, label, isDark }: { href?: string; to?: string; labe
         navigate(to!);
         window.scrollTo({ top: 0, behavior: "instant" });
       }}
-      className={`text-sm transition-colors font-[Inter] text-left cursor-pointer ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}
+      className="text-sm font-[Inter] text-left cursor-pointer hover-text"
     >
       {label}
     </button>
@@ -73,83 +72,86 @@ export default function Footer() {
   return (
     <footer className={`relative z-10 border-t px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20 ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-5 md:grid-cols-4">
-          {/* Brand */}
-          <div className={`rounded-2xl border p-6 backdrop-blur-xl md:col-span-1 sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
-            <button
-              type="button"
-              onClick={() => {
-                navigate("/");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="flex items-center gap-2 mb-4 transition-opacity hover:opacity-80"
-              title="Go to top"
-            >
-              <Logo size="sm" showText />
-            </button>
-            <p className={`text-sm leading-relaxed font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              AI-powered code generation, review, analysis, and documentation for modern development teams.
+        <div className={`overflow-hidden rounded-2xl border backdrop-blur-xl ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
+          <div className="grid gap-10 p-6 sm:p-8 md:grid-cols-4">
+            {/* Brand */}
+            <div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="flex items-center gap-2 mb-4 transition-opacity hover:opacity-80"
+                title="Go to top"
+              >
+                <Logo size="sm" showText />
+              </button>
+              <p className={`text-sm leading-relaxed font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                AI-powered code generation, review, analysis, and documentation for modern development teams.
+              </p>
+            </div>
+
+            {/* Product */}
+            <div>
+              <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                Product
+              </h4>
+              <ul className="space-y-2.5">
+                {productLinks.map((link) => (
+                  <li key={link.label}>
+                    <NavLink {...link} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                Resources
+              </h4>
+              <ul className="space-y-2.5">
+                {resources.map((link) => (
+                  <li key={link.label}>
+                    <NavLink {...link} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                Company
+              </h4>
+              <ul className="space-y-2.5">
+                {company.map((link) => (
+                  <li key={link.label}>
+                    <NavLink {...link} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom copyright bar */}
+          <div className={`flex flex-wrap items-center justify-between gap-4 border-t px-6 py-5 sm:px-8 ${isDark ? "border-white/[0.08]" : "border-slate-200/70"}`}>
+            <p className={`text-sm font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+              &copy; {new Date().getFullYear()} Repo Verify. All rights reserved.
             </p>
-          </div>
-
-          {/* Product */}
-          <div className={`rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
-            <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-              Product
-            </h4>
-            <ul className="space-y-2.5">
-              {productLinks.map((link) => (
-                <li key={link.label}>
-                  <NavLink {...link} isDark={isDark} />
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div className={`rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
-            <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-              Resources
-            </h4>
-            <ul className="space-y-2.5">
-              {resources.map((link) => (
-                <li key={link.label}>
-                  <NavLink {...link} isDark={isDark} />
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div className={`rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
-            <h4 className={`mb-4 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-              Company
-            </h4>
-            <ul className="space-y-2.5">
-              {company.map((link) => (
-                <li key={link.label}>
-                  <NavLink {...link} isDark={isDark} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <div className={`mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-6 backdrop-blur-xl sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 shadow-md shadow-slate-200/60"}`}>
-          <p className={`text-sm font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-            &copy; {new Date().getFullYear()} Repo Verify. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            <button
-              type="button"
-              onClick={() => { navigate("/dashboard"); window.scrollTo({ top: 0 }); }}
-              className={`text-sm transition-colors font-[Inter] cursor-pointer ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}
-            >
-              Dashboard
-            </button>
-            <a href="https://github.com/anomalyco/opencode" target="_blank" rel="noopener noreferrer" className={`text-sm transition-colors font-[Inter] ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
-              GitHub
-            </a>
+            <div className="flex gap-6">
+              <button
+                type="button"
+                onClick={() => { navigate("/dashboard"); window.scrollTo({ top: 0 }); }}
+                className="text-sm font-[Inter] cursor-pointer hover-text"
+              >
+                Dashboard
+              </button>
+              <a href="https://github.com/jairamm007/ai-software-engineering-agent" target="_blank" rel="noopener noreferrer" className="text-sm font-[Inter] hover-text">
+                GitHub
+              </a>
+            </div>
           </div>
         </div>
       </div>

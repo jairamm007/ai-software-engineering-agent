@@ -144,7 +144,7 @@ export default function AdminBackupPage() {
             variants={fadeUp}
             className={`group relative overflow-hidden rounded-2xl border p-5 transition-all duration-200 ${
               isDark
-                ? "border-white/[0.06] bg-[#111118] hover:border-white/[0.1] hover:bg-[#13131b]"
+                ? "border-white/[0.06] bg-[var(--card-bg)] hover:border-white/[0.1] hover:bg-[#13131b]"
                 : "border-slate-200 bg-white shadow-sm hover:shadow-md"
             }`}
           >
@@ -169,7 +169,7 @@ export default function AdminBackupPage() {
       <motion.div
         variants={fadeUp}
         className={`overflow-hidden rounded-2xl border shadow-sm ${
-          isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+          isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
         }`}
       >
         <div className="overflow-x-auto">
@@ -318,7 +318,7 @@ export default function AdminBackupPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className={`w-full max-w-sm rounded-2xl border p-6 shadow-2xl ${
-                isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10">

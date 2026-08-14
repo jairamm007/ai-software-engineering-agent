@@ -151,7 +151,7 @@ export default function TeamsPage() {
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              className={`rounded-2xl border p-6 ${isDark ? "border-white/10 bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+              className={`rounded-2xl border p-6 ${isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-white"}`}
             >
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-sm font-semibold font-[Inter] ${isDark ? "text-white" : "text-slate-900"}`}>
@@ -247,7 +247,7 @@ export default function TeamsPage() {
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              className={`rounded-2xl border p-6 ${isDark ? "border-white/10 bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+              className={`rounded-2xl border p-6 ${isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-white"}`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -334,7 +334,7 @@ export default function TeamsPage() {
 
         {/* Search Results */}
         {searchQuery.trim().length >= 2 && (
-          <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+          <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <p className={`text-xs font-medium font-[Inter] mb-3 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               Search results for &quot;{searchQuery}&quot;
             </p>
@@ -396,7 +396,7 @@ export default function TeamsPage() {
 
         {/* User Search Results */}
         {userSearchQuery.trim().length >= 2 && (
-          <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+          <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <p className={`text-xs font-medium font-[Inter] mb-3 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               Users found for &quot;{userSearchQuery}&quot;
             </p>
@@ -509,7 +509,7 @@ export default function TeamsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={`flex flex-col items-center justify-center rounded-2xl border py-20 ${
-              isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"
+              isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-slate-50"
             }`}
           >
             <Users size={40} className={`mb-4 ${isDark ? "text-slate-700" : "text-slate-300"}`} />
@@ -531,7 +531,7 @@ export default function TeamsPage() {
                 whileHover={{ y: -3 }}
                 className={`group relative rounded-2xl border p-5 transition-shadow ${
                   isDark
-                    ? "border-white/[0.06] bg-white/[0.02] hover:shadow-lg hover:shadow-[var(--accent)]/5"
+                    ? "border-white/[0.06] bg-[var(--card-bg)] hover:shadow-lg hover:shadow-[var(--accent)]/5"
                     : "border-slate-200 bg-white hover:shadow-lg hover:shadow-slate-200/50"
                 }`}
               >

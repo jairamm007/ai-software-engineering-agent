@@ -130,7 +130,7 @@ export default function RepositoryArchitecturePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={`rounded-2xl border shadow-sm ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>

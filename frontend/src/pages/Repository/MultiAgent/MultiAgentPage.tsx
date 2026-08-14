@@ -78,7 +78,7 @@ export default function MultiAgentPage() {
         <RepositoryTabs repositoryId={id!} />
 
         {/* Input Section */}
-        <div className={`rounded-xl border p-6 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+        <div className={`rounded-xl border p-6 ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           <div className="mb-4 flex items-center gap-2">
             <Sparkles size={18} className="text-purple-400" />
             <h2 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
@@ -134,7 +134,7 @@ export default function MultiAgentPage() {
         {result && (
           <div className="space-y-6">
             {/* Stats Bar */}
-            <div className={`flex flex-wrap gap-4 overflow-hidden rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+            <div className={`flex flex-wrap gap-4 overflow-hidden rounded-xl border p-4 ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
               <div className="flex items-center gap-2">
                 <Zap size={16} className="text-yellow-400" />
                 <span className={`text-sm ${isDark ? "text-slate-300" : "text-slate-600"}`}>
@@ -178,7 +178,7 @@ export default function MultiAgentPage() {
             <AgentExecutionTimeline steps={result.steps} />
 
             {/* Final Output */}
-            <div className={`rounded-xl border p-6 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+            <div className={`rounded-xl border p-6 ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
                   Final Output
@@ -202,7 +202,7 @@ export default function MultiAgentPage() {
 
         {/* Empty State */}
         {!result && !orchestrateMutation.isPending && (
-          <div className={`rounded-xl border p-12 text-center ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+          <div className={`rounded-xl border p-12 text-center ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <Sparkles size={64} className={`mx-auto mb-4 ${isDark ? "text-slate-700" : "text-slate-200"}`} />
             <h3 className={`mb-2 text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
               Multi-Agent Orchestration

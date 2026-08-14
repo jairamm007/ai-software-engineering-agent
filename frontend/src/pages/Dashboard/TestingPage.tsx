@@ -110,7 +110,7 @@ export default function TestingPage() {
         {/* Stats */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="grid gap-4 overflow-hidden sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.06 }} className={`rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+            <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.06 }} className={`rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
               <div className="flex items-center justify-between mb-3">
                 <p className={`text-xs font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>{s.label}</p>
                 <s.icon size={16} className={s.colorClass ?? `text-${s.color}-500`} />
@@ -126,7 +126,7 @@ export default function TestingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className={`rounded-2xl border shadow-sm ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
@@ -172,7 +172,7 @@ export default function TestingPage() {
                           ? "border-[var(--accent)]/30 accent-bg-light shadow-sm ring-1 ring-[var(--accent)]/20"
                           : "border-[var(--accent)]/20 accent-bg-light shadow-sm ring-1 ring-[var(--accent)]/20"
                         : isDark
-                          ? "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]"
+                          ? "border-white/10 bg-[var(--card-bg)] hover:border-white/20 hover:bg-white/[0.04]"
                           : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
@@ -213,7 +213,7 @@ export default function TestingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className={`rounded-2xl border shadow-sm ${
-              isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+              isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
             }`}
           >
             <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>

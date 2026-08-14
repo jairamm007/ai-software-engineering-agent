@@ -97,7 +97,7 @@ export default function RepositorySettingsPage() {
         <div
           className={`rounded-2xl border shadow-sm overflow-hidden ${
             isDark
-              ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]"
+              ? "border-white/10 bg-[var(--card-bg)]"
               : "border-slate-200 bg-white"
           }`}
         >
@@ -148,7 +148,7 @@ export default function RepositorySettingsPage() {
         <div
           className={`rounded-2xl border shadow-sm overflow-hidden ${
             isDark
-              ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]"
+              ? "border-white/10 bg-[var(--card-bg)]"
               : "border-slate-200 bg-white"
           }`}
         >
@@ -160,7 +160,7 @@ export default function RepositorySettingsPage() {
           <div className="space-y-3 p-5">
             <div
               className={`flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
-                isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-100 bg-slate-50/80"
+                isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-100 bg-slate-50/80"
               }`}
             >
               <div className="flex min-w-0 items-center gap-3">

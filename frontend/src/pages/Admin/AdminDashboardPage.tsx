@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
         transition={{ duration: 0.5 }}
         className={`relative mb-8 overflow-hidden rounded-2xl border p-6 sm:p-8 ${
           isDark
-            ? "border-white/[0.06] bg-[#111118]"
+            ? "border-white/[0.06] bg-[var(--card-bg)]"
             : "border-slate-200 bg-white shadow-lg shadow-slate-200/50"
         }`}
       >
@@ -170,7 +170,7 @@ export default function AdminDashboardPage() {
             variants={item}
             className={`group relative overflow-hidden rounded-2xl border p-5 transition-all duration-300 ${
               isDark
-                ? "border-white/[0.06] bg-[#111118] hover:bg-white/[0.04] shadow-lg shadow-black/20"
+                ? "border-white/[0.06] bg-[var(--card-bg)] hover:bg-white/[0.04] shadow-lg shadow-black/20"
                 : "border-slate-200 bg-white hover:shadow-xl hover:shadow-slate-200/60 shadow-md shadow-slate-200/40"
             }`}
           >
@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.45 }}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div>
@@ -340,7 +340,7 @@ export default function AdminDashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.45 }}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div>
@@ -443,7 +443,7 @@ export default function AdminDashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.45 }}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div>
@@ -506,7 +506,7 @@ export default function AdminDashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.45 }}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div>
@@ -563,7 +563,7 @@ export default function AdminDashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.45 }}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div>
@@ -619,7 +619,7 @@ export default function AdminDashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.45 }}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div>
@@ -662,7 +662,7 @@ export default function AdminDashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.45 }}
-        className={`mt-8 rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
+        className={`mt-8 rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200 bg-white shadow-md shadow-slate-200/40"}`}
       >
         <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
           <div className="flex items-center gap-3">

@@ -91,7 +91,7 @@ export default function RepositorySemanticSearchPage() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`flex flex-wrap gap-2 overflow-hidden rounded-xl border p-2 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}
+            className={`flex flex-wrap gap-2 overflow-hidden rounded-xl border p-2 ${isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-white"}`}
           >
             {TABS.map((tab) => {
               const count = getTabCount(tab.key);
@@ -144,7 +144,7 @@ export default function RepositorySemanticSearchPage() {
                 {data.functions.length > 0 && <FunctionSearch results={data.functions} />}
                 {data.classes.length > 0 && <ClassSearch results={data.classes} />}
                 {data.totalResults === 0 && (
-                  <div className={`rounded-xl border p-8 text-center ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+                  <div className={`rounded-xl border p-8 text-center ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                     <Search size={48} className={`mx-auto mb-4 ${isDark ? "text-slate-600" : "text-slate-300"}`} />
                     <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                       No results found for "{query}". Try different keywords or adjust filters.
@@ -164,7 +164,7 @@ export default function RepositorySemanticSearchPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`rounded-xl border p-12 text-center ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}
+            className={`rounded-xl border p-12 text-center ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
           >
             <Search size={64} className={`mx-auto mb-4 ${isDark ? "text-slate-700" : "text-slate-200"}`} />
             <h3 className={`mb-2 text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>

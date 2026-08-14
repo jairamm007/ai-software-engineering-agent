@@ -2,7 +2,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
+import ScrollProgress from "@/components/motion/ScrollProgress";
+import BackToTop from "@/components/motion/BackToTop";
 import {
   ChevronDown,
   HelpCircle,
@@ -15,6 +16,7 @@ import {
   GitBranch,
   Globe,
   Clock,
+  Search,
 } from "lucide-react";
 
 const faqCategories = [
@@ -124,19 +126,25 @@ export default function FAQPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [openIndex, setOpenIndex] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const query = search.trim().toLowerCase();
+  const filteredCategories = faqCategories
+    .map((cat) => ({
+      ...cat,
+      questions: cat.questions.filter(
+        (item) => item.q.toLowerCase().includes(query) || item.a.toLowerCase().includes(query)
+      ),
+    }))
+    .filter((cat) => cat.questions.length > 0);
 
   const toggle = (key: string) => {
     setOpenIndex((prev) => (prev === key ? null : key));
   };
 
   return (
-    <main className={`min-h-screen font-[Inter] transition-colors duration-300 ${isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900"}`}>
-      <PlexusTerrainBackground />
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-violet-600/5 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-fuchsia-600/3 rounded-full blur-[130px]" />
-      </div>
-
+<main className={`min-h-screen font-[Inter] transition-colors duration-300 ${isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900"}`}>
+      <ScrollProgress className="bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500" />
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 md:py-20">
         <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }} className="mb-10">
           <Link to="/" className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}>
@@ -156,13 +164,31 @@ export default function FAQPage() {
           </h1>
           <p className={`mx-auto mt-5 max-w-xl text-lg font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             Everything you need to know about Repo Verify. Can't find what you're looking for?{" "}
-            <Link to="/dashboard" className="text-violet-400 hover:text-violet-300 transition-colors font-medium">Contact us</Link>
+            <Link to="/support" className="text-violet-400 hover:text-violet-300 transition-colors font-medium">Contact us</Link>
           </p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="mb-14 grid grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }} className="mx-auto mb-10 max-w-xl">
+          <div className={`relative flex items-center rounded-2xl border px-4 py-3 transition-colors ${isDark ? "border-white/10 bg-white/[0.04] focus-within:border-violet-500/40" : "border-slate-200/70 bg-white/60 backdrop-blur-xl focus-within:border-violet-300"}`}>
+            <Search size={18} className={isDark ? "shrink-0 text-slate-500" : "shrink-0 text-slate-400"} />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search questions…"
+              className={`ml-3 w-full bg-transparent text-sm outline-none ${isDark ? "text-white placeholder:text-slate-600" : "text-slate-900 placeholder:text-slate-400"}`}
+            />
+            {search && (
+              <button type="button" onClick={() => setSearch("")} className={`ml-2 shrink-0 text-xs font-medium ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+                Clear
+              </button>
+            )}
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="mb-14 grid grid-cols-3 gap-3 sm:gap-4">
           {[{ icon: MessageCircle, label: "Questions Answered", value: "10K+" }, { icon: Clock, label: "Avg Response Time", value: "< 24h" }, { icon: Globe, label: "Help Articles", value: "200+" }].map((stat, i) => (
-            <motion.div key={stat.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }} className={`rounded-xl border p-4 text-center ${isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
+            <motion.div key={stat.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }} className={`rounded-xl border p-4 text-center ${isDark ? "border-white/[0.08] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
               <stat.icon size={18} className={`mx-auto mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`} />
               <div className="font-[Outfit] text-lg font-bold">{stat.value}</div>
               <div className={`text-xs font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>{stat.label}</div>
@@ -171,7 +197,7 @@ export default function FAQPage() {
         </motion.div>
 
         <div className="space-y-12">
-          {faqCategories.map((category, catIndex) => {
+          {filteredCategories.map((category, catIndex) => {
             const CatIcon = category.icon;
             return (
               <motion.div key={category.title} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + catIndex * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
@@ -180,6 +206,9 @@ export default function FAQPage() {
                     <CatIcon size={18} className={category.color} />
                   </div>
                   <h2 className={`font-[Outfit] text-xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>{category.title}</h2>
+                  <span className={`ml-auto rounded-full border px-2.5 py-0.5 text-xs font-medium ${isDark ? "border-white/10 text-slate-500" : "border-slate-200 text-slate-400"}`}>
+                    {category.questions.length}
+                  </span>
                 </div>
                 <div className="space-y-3">
                   {category.questions.map((item, qIndex) => {
@@ -187,7 +216,7 @@ export default function FAQPage() {
                     const isOpen = openIndex === key;
                     return (
                       <motion.div key={key} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + catIndex * 0.1 + qIndex * 0.05 }}>
-                        <button type="button" onClick={() => toggle(key)} className={`w-full text-left rounded-2xl border p-5 sm:p-6 transition-all duration-300 ${isOpen ? isDark ? "border-violet-500/20 bg-violet-500/5 shadow-lg shadow-violet-500/5" : "border-violet-200 bg-violet-50 shadow-md" : isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl hover:border-white/10 hover:bg-white/[0.04]" : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-slate-300 hover:shadow-md"}`}>
+                        <button type="button" onClick={() => toggle(key)} className={`w-full text-left rounded-2xl border p-5 sm:p-6 transition-all duration-300 ${isOpen ? isDark ? "border-violet-500/20 bg-violet-500/5 shadow-lg shadow-violet-500/5" : "border-violet-200 bg-violet-50 shadow-md" : isDark ? "border-white/[0.08] bg-[var(--card-bg)] hover:border-white/10 hover:bg-white/[0.04]" : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-slate-300 hover:shadow-md"}`}>
                           <div className="flex items-start justify-between gap-4">
                             <h3 className={`font-[Outfit] text-base font-semibold sm:text-lg ${isDark ? "text-white" : "text-slate-900"}`}>{item.q}</h3>
                             <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3, ease: "easeInOut" }} className="mt-1 shrink-0">
@@ -211,14 +240,25 @@ export default function FAQPage() {
           })}
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.6 }} className={`mt-16 rounded-2xl border p-8 text-center ${isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
+        {filteredCategories.length === 0 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-dashed p-10 text-center">
+            <HelpCircle size={22} className={`mx-auto mb-2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+            <p className={`text-sm font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              No results found for "{search}". Try a different search term.
+            </p>
+          </motion.div>
+        )}
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.6 }} className={`mt-16 rounded-2xl border p-8 text-center ${isDark ? "border-white/[0.08] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
           <h3 className="font-[Outfit] text-xl font-bold mb-2">Still have questions?</h3>
           <p className={`text-sm font-[Inter] mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Our team is here to help you get the most out of Repo Verify.</p>
-          <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-xl hover:shadow-violet-500/40 hover:scale-[1.03]">
+          <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-xl hover:shadow-violet-500/40 hover:scale-[1.03]">
             Get Started Free
           </Link>
         </motion.div>
       </div>
+
+      <BackToTop />
     </main>
   );
 }

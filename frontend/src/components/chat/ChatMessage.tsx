@@ -17,7 +17,7 @@ export default function ChatMessage({ role, message }: Props) {
           role === "user"
             ? "bg-blue-600 text-white"
             : isDark
-              ? "border border-white/10 bg-white/5 text-slate-200"
+              ? "border border-white/10 bg-[var(--bg-secondary)] text-slate-200"
               : "border border-slate-200 bg-white text-slate-800"
         }`}
       >

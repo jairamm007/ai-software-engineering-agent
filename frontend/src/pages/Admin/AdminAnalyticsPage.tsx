@@ -196,7 +196,7 @@ export default function AdminAnalyticsPage() {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white shadow-sm"}`}
+      className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white shadow-sm"}`}
     >
       <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
         <div className="flex items-center gap-2.5">
@@ -264,7 +264,7 @@ export default function AdminAnalyticsPage() {
             key={stat.label}
             variants={item}
             className={`relative overflow-hidden rounded-2xl border p-5 ${
-              isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white shadow-sm"
+              isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white shadow-sm"
             }`}
           >
             <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${stat.gradient}`} />
@@ -308,7 +308,7 @@ export default function AdminAnalyticsPage() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`lg:col-span-2 rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white shadow-sm"}`}
+          className={`lg:col-span-2 rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white shadow-sm"}`}
         >
           <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div className="flex items-center gap-2.5">

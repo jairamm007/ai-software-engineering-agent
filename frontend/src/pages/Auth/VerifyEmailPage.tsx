@@ -68,7 +68,7 @@ export default function VerifyEmailPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={`w-full max-w-md space-y-6 rounded-2xl border p-8 text-center shadow-sm ${
-          isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
+          isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
         }`}
       >
         <div className="mx-auto mb-4">

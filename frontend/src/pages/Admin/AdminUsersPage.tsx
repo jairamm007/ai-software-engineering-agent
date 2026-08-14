@@ -221,7 +221,7 @@ export default function AdminUsersPage() {
               onChange={(e) => setSearch(e.target.value)}
               className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-[13px] outline-none transition-all ${
                 isDark
-                  ? "border-white/[0.06] bg-[#111118] text-white placeholder:text-slate-600 focus:border-rose-500/50"
+                  ? "border-white/[0.06] bg-[var(--card-bg)] text-white placeholder:text-slate-600 focus:border-rose-500/50"
                   : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-rose-500/50"
               }`}
             />
@@ -239,7 +239,7 @@ export default function AdminUsersPage() {
                   roleFilter === role
                     ? "bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-500/20"
                     : isDark
-                      ? "border border-white/[0.06] bg-[#111118] text-slate-400 hover:bg-white/[0.04]"
+                      ? "border border-white/[0.06] bg-[var(--card-bg)] text-slate-400 hover:bg-white/[0.04]"
                       : "border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
                 }`}
               >
@@ -259,7 +259,7 @@ export default function AdminUsersPage() {
                   statusFilter === status
                     ? "bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-500/20"
                     : isDark
-                      ? "border border-white/[0.06] bg-[#111118] text-slate-400 hover:bg-white/[0.04]"
+                      ? "border border-white/[0.06] bg-[var(--card-bg)] text-slate-400 hover:bg-white/[0.04]"
                       : "border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
                 }`}
               >
@@ -273,7 +273,7 @@ export default function AdminUsersPage() {
       <motion.div
         variants={fadeUp}
         className={`overflow-hidden rounded-2xl border shadow-sm ${
-          isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+          isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
         }`}
       >
         <div className="overflow-x-auto">
@@ -561,7 +561,7 @@ export default function AdminUsersPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className={`w-full max-w-lg rounded-2xl border p-6 shadow-2xl ${
-                isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className="mb-5 flex items-center justify-between">
@@ -638,7 +638,7 @@ export default function AdminUsersPage() {
                         key={s.label}
                         className={`rounded-xl border p-3.5 ${
                           isDark
-                            ? "border-white/[0.04] bg-white/[0.02]"
+                            ? "border-white/[0.04] bg-[var(--bg-secondary)]"
                             : "border-slate-100 bg-slate-50"
                         }`}
                       >
@@ -652,7 +652,7 @@ export default function AdminUsersPage() {
                   <div
                     className={`rounded-xl border p-3.5 text-xs ${
                       isDark
-                        ? "border-white/[0.04] bg-white/[0.02] text-slate-500"
+                        ? "border-white/[0.04] bg-[var(--bg-secondary)] text-slate-500"
                         : "border-slate-100 bg-slate-50 text-slate-400"
                     }`}
                   >
@@ -681,7 +681,7 @@ export default function AdminUsersPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl ${
-                isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className="mb-5 flex items-center justify-between">
@@ -774,7 +774,7 @@ export default function AdminUsersPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className={`w-full max-w-sm rounded-2xl border p-6 shadow-2xl ${
-                isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10">

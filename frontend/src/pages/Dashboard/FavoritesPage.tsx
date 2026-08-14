@@ -93,7 +93,7 @@ export default function FavoritesPage() {
             transition={{ delay: 0.1 }}
             className={`flex flex-col items-center justify-center rounded-2xl border py-20 ${
               isDark
-                ? "border-white/[0.06] bg-white/[0.01]"
+                ? "border-white/[0.06] bg-[var(--card-bg)]"
                 : "border-slate-200 bg-slate-50"
             }`}
           >
@@ -128,7 +128,7 @@ export default function FavoritesPage() {
                   whileHover={{ y: -3 }}
                   className={`group relative rounded-2xl border p-5 transition-shadow ${
                     isDark
-                      ? "border-white/[0.06] bg-white/[0.02] hover:shadow-lg hover:shadow-amber-500/5"
+                      ? "border-white/[0.06] bg-[var(--card-bg)] hover:shadow-lg hover:shadow-amber-500/5"
                       : "border-slate-200 bg-white hover:shadow-lg hover:shadow-slate-200/50"
                   }`}
                 >

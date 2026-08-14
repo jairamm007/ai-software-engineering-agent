@@ -305,7 +305,7 @@ export default function GitHubIntegrationPage() {
         </div>
 
         {/* Tabs */}
-        <div className={`flex flex-wrap gap-1 overflow-hidden rounded-xl border p-1 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+        <div className={`flex flex-wrap gap-1 overflow-hidden rounded-xl border p-1 ${isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-slate-50"}`}>
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -440,7 +440,7 @@ export default function GitHubIntegrationPage() {
 
           {activeTab !== "repos" && activeTab !== "webhooks" && activeTab !== "ai-pr" && activeTab !== "protection" && !selectedRepo && (
             <motion.div key="no-repo" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-              <div className={`rounded-xl border p-12 text-center ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"}`}>
+              <div className={`rounded-xl border p-12 text-center ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 <FolderGit2 size={48} className={`mx-auto mb-4 ${isDark ? "text-slate-700" : "text-slate-200"}`} />
                 <h3 className={`mb-2 text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
                   Select a repository first

@@ -113,7 +113,7 @@ export default function RepositoryOverviewPage() {
               key={stat.label}
               variants={item}
               className={`relative overflow-hidden rounded-2xl border p-5 shadow-sm ${
-                isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
+                isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${stat.color}`} />
@@ -140,7 +140,7 @@ export default function RepositoryOverviewPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className={`rounded-2xl border shadow-sm ${
-              isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+              isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
             }`}
           >
             <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>

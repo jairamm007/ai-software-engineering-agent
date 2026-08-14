@@ -138,7 +138,7 @@ export default function AdminRepositoriesPage() {
               key={s.label}
               variants={fadeUp}
               className={`relative overflow-hidden rounded-2xl border p-5 transition-all hover:scale-[1.02] ${
-                isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div
@@ -163,7 +163,7 @@ export default function AdminRepositoriesPage() {
       {repoStats && repoStats.filesByExtension.length > 0 && (
         <motion.div
           variants={fadeUp}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
         >
           <div
             className={`flex items-center gap-2 border-b px-5 py-3.5 ${
@@ -237,7 +237,7 @@ export default function AdminRepositoriesPage() {
               onChange={(e) => setSearch(e.target.value)}
               className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-[13px] outline-none transition-all ${
                 isDark
-                  ? "border-white/[0.06] bg-[#111118] text-white placeholder:text-slate-600 focus:border-rose-500/50"
+                  ? "border-white/[0.06] bg-[var(--card-bg)] text-white placeholder:text-slate-600 focus:border-rose-500/50"
                   : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-rose-500/50"
               }`}
             />
@@ -248,7 +248,7 @@ export default function AdminRepositoriesPage() {
       <motion.div
         variants={fadeUp}
         className={`overflow-hidden rounded-2xl border shadow-sm ${
-          isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+          isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
         }`}
       >
         <div className="overflow-x-auto">
@@ -430,7 +430,7 @@ export default function AdminRepositoriesPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className={`w-full max-w-sm rounded-2xl border p-6 shadow-2xl ${
-                isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10">

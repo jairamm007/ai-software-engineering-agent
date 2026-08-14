@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Loader2,
   CheckCircle,
   XCircle,
   Clock,
@@ -20,6 +19,7 @@ import {
   listGitHubDeployments,
 } from "@/services/github-integration";
 import type { GitHubWorkflowRunDetail } from "@/types/github-integration";
+import { SparkleLoader } from "@/components/common/SparkleLoader";
 
 interface GitHubCICDTabProps {
   integrationId: string;
@@ -66,7 +66,7 @@ export default function GitHubCICDTab({ integrationId, owner, repo, timeAgo, aut
   const runs = runsData?.runs ?? [];
 
   const statusIcon = (status: string | null, conclusion: string | null) => {
-    if (status === "in_progress" || status === "queued") return <Loader2 size={14} className="animate-spin text-blue-400" />;
+    if (status === "in_progress" || status === "queued") return <SparkleLoader size={14} />;
     if (conclusion === "success") return <CheckCircle size={14} className="text-emerald-400" />;
     if (conclusion === "failure" || conclusion === "timed_out") return <XCircle size={14} className="text-red-400" />;
     if (conclusion === "cancelled") return <AlertCircle size={14} className="text-slate-500" />;
@@ -123,7 +123,7 @@ export default function GitHubCICDTab({ integrationId, owner, repo, timeAgo, aut
                       }`}
                     >
                       {f === "all" && <Filter size={12} />}
-                      {f === "in_progress" && <Loader2 size={12} />}
+                      {f === "in_progress" && <SparkleLoader size={12} />}
                       {f === "completed" && <CheckCircle size={12} />}
                       {f === "failure" && <XCircle size={12} />}
                       {f.charAt(0).toUpperCase() + f.slice(1).replace("_", " ")}

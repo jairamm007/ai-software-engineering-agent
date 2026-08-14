@@ -17,13 +17,13 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
+import OrbitingRingsBackground from "@/components/landing/OrbitingRingsBackground";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const features = [
-  { icon: Bot, text: "AI-powered code analysis" },
-  { icon: Zap, text: "Smart repository indexing" },
-  { icon: Shield, text: "Security vulnerability detection" },
+  { icon: Bot, text: "AI-powered code analysis", hex: "139,92,246", featured: true },
+  { icon: Zap, text: "Smart repository indexing", hex: "245,166,35" },
+  { icon: Shield, text: "Security vulnerability detection", hex: "16,185,129" },
 ];
 
 export default function LoginPage() {
@@ -44,14 +44,6 @@ export default function LoginPage() {
   const [resendSent, setResendSent] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [hoveredOauth, setHoveredOauth] = useState<"google" | "github" | null>(null);
-  const [particles] = useState(() =>
-    Array.from({ length: 12 }, () => ({
-      left: 10 + Math.random() * 80,
-      top: 10 + Math.random() * 80,
-      duration: 3 + Math.random() * 4,
-      delay: Math.random() * 3,
-    }))
-  );
 
   // Mouse-driven card spotlight + tilt
   const cardRef = useRef<HTMLDivElement>(null);
@@ -141,7 +133,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className={`relative flex min-h-screen overflow-hidden transition-colors duration-300 ${
+      className={`relative flex min-h-screen overflow-x-hidden transition-colors duration-300 ${
         isDark
           ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
@@ -175,12 +167,6 @@ export default function LoginPage() {
           0%, 100% { opacity: 0.4; }
           50% { opacity: 0.8; }
         }
-        @keyframes particle-float {
-          0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-          25% { transform: translateY(-20px) translateX(10px); opacity: 0.6; }
-          50% { transform: translateY(-10px) translateX(-5px); opacity: 0.4; }
-          75% { transform: translateY(-30px) translateX(15px); opacity: 0.5; }
-        }
         @keyframes border-spin {
           0% { background-position: 0% 50%; }
           100% { background-position: 200% 50%; }
@@ -197,14 +183,19 @@ export default function LoginPage() {
         }
       `}      </style>
 
-      <PlexusTerrainBackground />
-
       {/* Left Panel */}
-      <div
-        className={`relative hidden w-1/2 items-center justify-center overflow-hidden lg:flex ${
-          isDark ? "bg-slate-900/50" : "bg-slate-100/80"
-        }`}
-      >
+      <div className="relative hidden w-1/2 items-center justify-center overflow-hidden lg:flex">
+        {/* Unified purple gradient panel (dot-free) */}
+        <div
+          className={`absolute inset-0 ${
+            isDark
+              ? "bg-gradient-to-br from-slate-950 via-violet-950/40 to-slate-950"
+              : "bg-gradient-to-br from-violet-100 via-purple-50 to-slate-100"
+          }`}
+        />
+        {/* Subtle vignette for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(20,10,60,0.16)_100%)]" />
+
         {/* Gradient orbs */}
         <div className="absolute inset-0 overflow-hidden">
           <div
@@ -237,7 +228,7 @@ export default function LoginPage() {
           >
             <div className="relative inline-flex items-center justify-center">
               <div className="absolute inset-0 rounded-2xl accent-gradient blur-xl opacity-50 animate-[pulse-glow_3s_ease-in-out_infinite]" />
-              <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl shadow-2xl accent-shadow-lg">
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl shadow-2xl accent-shadow-lg" style={{ animation: "blink1 1.4s ease-in-out infinite" }}>
                 <Logo size="lg" />
               </div>
             </div>
@@ -264,7 +255,7 @@ export default function LoginPage() {
           </motion.p>
 
           {/* Features */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {features.map((feat, i) => (
               <motion.div
                 key={feat.text}
@@ -272,20 +263,41 @@ export default function LoginPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 + i * 0.15 }}
                 whileHover={{ x: 4, scale: 1.02 }}
-                className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left backdrop-blur-sm transition-colors ${
-                  isDark
-                    ? "border-white/5 bg-white/5"
-                    : "border-slate-200/60 bg-white/60 shadow-sm"
-                }`}
+                className="relative flex items-center gap-4 overflow-hidden rounded-xl border px-5 py-4 text-left transition-colors"
+                style={{
+                  backgroundColor: isDark ? "#12131f" : "#ffffff",
+                  borderColor: feat.featured
+                    ? `rgba(${feat.hex},0.6)`
+                    : isDark
+                      ? "rgba(255,255,255,0.08)"
+                      : "#e4e2f0",
+                  boxShadow: feat.featured
+                    ? isDark
+                      ? `0 0 0 1px rgba(${feat.hex},0.25), 0 0 22px rgba(${feat.hex},0.18)`
+                      : `0 0 0 1px rgba(${feat.hex},0.15), 0 4px 20px rgba(20,20,40,0.06)`
+                    : isDark
+                      ? "0 4px 14px rgba(0,0,0,0.25)"
+                      : "0 4px 20px rgba(20,20,40,0.06)",
+                }}
               >
+                {feat.featured && (
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-[2px]"
+                    style={{ background: `linear-gradient(90deg, transparent, rgba(${feat.hex},0.9), transparent)` }}
+                  />
+                )}
                 <motion.div
                   whileHover={{ rotate: [0, -10, 10, 0] }}
                   transition={{ duration: 0.5 }}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg accent-bg-light"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+                  style={{
+                    backgroundColor: `rgba(${feat.hex},0.14)`,
+                    color: `rgba(${feat.hex},1)`,
+                  }}
                 >
-                  <feat.icon size={18} className="accent-text-base" />
+                  <feat.icon size={18} />
                 </motion.div>
-                <span className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                <span className={`text-sm font-medium hover-accent ${isDark ? "text-[#f2f1f8]" : "text-[#14141f]"}`}>
                   {feat.text}
                 </span>
                 <div className="ml-auto">
@@ -325,9 +337,7 @@ export default function LoginPage() {
           >
             <Link
               to="/"
-              className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"
-              }`}
+              className="inline-flex items-center gap-1.5 text-sm font-medium hover-text"
             >
               <ArrowLeft size={14} /> Back to Home
             </Link>
@@ -336,27 +346,15 @@ export default function LoginPage() {
       </div>
 
       {/* Right Panel */}
-      <div className="relative flex w-full items-center justify-center px-6 py-10 lg:w-1/2">
-        {/* Particles behind card */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {particles.map((p, i) => (
-            <div
-              key={i}
-              className="absolute h-1 w-1 rounded-full accent-bg-light"
-              style={{
-                left: `${p.left}%`,
-                top: `${p.top}%`,
-                animation: `particle-float ${p.duration}s ease-in-out infinite`,
-                animationDelay: `${p.delay}s`,
-              }}
-            />
-          ))}
-        </div>
+      <div className="relative flex w-full items-center justify-center px-6 py-6 lg:py-8 lg:w-1/2">
+        {/* Orbiting rings ambient detail */}
+        <OrbitingRingsBackground />
 
-        {/* Animated gradient border frame */}
-        <div className="gradient-border absolute top-1/2 left-1/2 z-0 h-[calc(100%-40px)] w-[min(100%-24px,460px)] -translate-x-1/2 -translate-y-1/2 rounded-[26px] p-px opacity-20 blur-[2px]" />
+        {/* Animated gradient border frame — hugs the card */}
+        <div className="relative">
+          <div className="gradient-border absolute -inset-[3px] z-0 rounded-3xl p-px opacity-15 blur-[3px]" />
 
-        <motion.div
+          <motion.div
           ref={cardRef}
           initial={{ opacity: 0, y: 40, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -368,10 +366,10 @@ export default function LoginPage() {
             rotateY,
             transformStyle: "preserve-3d",
           }}
-          className={`relative z-10 w-full max-w-md overflow-hidden rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl ${
+          className={`relative z-10 mx-auto w-full max-w-lg overflow-hidden rounded-3xl border p-6 ${
             isDark
-              ? "border-white/10 bg-white/[0.07] shadow-black/20"
-              : "border-slate-200/50 bg-white/70 shadow-slate-200/50"
+              ? "border-white/10 bg-[var(--card-bg)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]"
+              : "border-slate-200/50 bg-white shadow-[0_30px_80px_-20px_rgba(90,60,180,0.3)]"
           }`}
         >
           {/* Cursor spotlight */}
@@ -389,11 +387,7 @@ export default function LoginPage() {
 
           <Link
             to="/"
-            className={`absolute top-4 left-4 inline-flex items-center gap-1.5 text-xs font-medium transition-colors ${
-              isDark
-                ? "text-slate-500 hover:text-white"
-                : "text-slate-400 hover:text-slate-900"
-            }`}
+            className="absolute top-4 left-4 inline-flex items-center gap-1.5 text-xs font-medium hover-text"
           >
             <ArrowLeft size={14} /> Home
           </Link>
@@ -402,15 +396,15 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="relative"
+            className="relative mt-5"
           >
-            <motion.div
-              animate={{ rotate: [0, 8, -8, 0] }}
-              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-              className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300"
+            <div
+              className={`mb-1 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium ${
+                isDark ? "text-violet-300" : "text-violet-700"
+              }`}
             >
               <Sparkles size={12} /> AI Workspace
-            </motion.div>
+            </div>
             <h2
               className={`text-2xl font-bold ${
                 isDark ? "text-white" : "text-slate-900"
@@ -562,7 +556,7 @@ export default function LoginPage() {
               <div className={`w-full border-t ${isDark ? "border-white/10" : "border-slate-200"}`} />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className={`px-2 ${isDark ? "bg-white/[0.07] text-slate-500" : "bg-white/70 text-slate-400"}`}>
+              <span className={`px-2 ${isDark ? "bg-[var(--card-bg)] text-slate-500" : "bg-white text-slate-400"}`}>
                 or continue with email
               </span>
             </div>
@@ -571,7 +565,7 @@ export default function LoginPage() {
           {/* Form */}
           <form
             onSubmit={(e) => void handleSubmit(e)}
-            className="relative mt-4 space-y-4"
+            className="relative mt-4 space-y-3"
           >
             {/* Email */}
             <motion.div
@@ -580,7 +574,7 @@ export default function LoginPage() {
               transition={{ delay: 0.45, duration: 0.4 }}
             >
               <label className={`mb-1.5 block text-xs font-medium transition-colors ${
-                focusedField === "email" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+                focusedField === "email" ? "text-[#a855f7]" : isDark ? "text-slate-400" : "text-slate-500"
               }`}>
                 Email address
               </label>
@@ -588,7 +582,7 @@ export default function LoginPage() {
                 <Mail
                   size={16}
                   className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                    focusedField === "email" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
+                    focusedField === "email" ? "text-[#a855f7]" : isDark ? "text-slate-500" : "text-slate-400"
                   }`}
                 />
                 <input
@@ -598,9 +592,9 @@ export default function LoginPage() {
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
                   placeholder="you@example.com"
-                  className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-all duration-300 ${
+                  className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-300 ${
                     focusedField === "email"
-                      ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                      ? "border-[#a855f7] shadow-[0_0_0_1px_#a855f7,0_0_18px_rgba(168,85,247,0.35)]"
                       : isDark
                         ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
                         : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
@@ -626,7 +620,7 @@ export default function LoginPage() {
               transition={{ delay: 0.55, duration: 0.4 }}
             >
               <label className={`mb-1.5 block text-xs font-medium transition-colors ${
-                focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+                focusedField === "password" ? "text-[#a855f7]" : isDark ? "text-slate-400" : "text-slate-500"
               }`}>
                 Password
               </label>
@@ -634,7 +628,7 @@ export default function LoginPage() {
                 <Lock
                   size={16}
                   className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                    focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
+                    focusedField === "password" ? "text-[#a855f7]" : isDark ? "text-slate-500" : "text-slate-400"
                   }`}
                 />
                 <input
@@ -644,9 +638,9 @@ export default function LoginPage() {
                   onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
                   placeholder="Enter your password"
-                  className={`w-full rounded-xl border py-3 pl-10 pr-11 text-sm outline-none transition-all duration-300 ${
+                  className={`w-full rounded-xl border py-2.5 pl-10 pr-11 text-sm outline-none transition-all duration-300 ${
                     focusedField === "password"
-                      ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                      ? "border-[#a855f7] shadow-[0_0_0_1px_#a855f7,0_0_18px_rgba(168,85,247,0.35)]"
                       : isDark
                         ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
                         : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
@@ -702,7 +696,7 @@ export default function LoginPage() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className={`shimmer-btn group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100`}
+                className={`shimmer-btn group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl accent-gradient px-4 py-2.5 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100`}
               >
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 {loading ? (
@@ -735,6 +729,7 @@ export default function LoginPage() {
             </Link>
           </motion.p>
         </motion.div>
+        </div>
       </div>
     </div>
   );

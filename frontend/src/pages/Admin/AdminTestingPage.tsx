@@ -80,7 +80,7 @@ export default function AdminTestingPage() {
 
       <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         {[{ label: "Total Reports", value: pagination.total, gradient: "from-cyan-500 to-blue-500" }, { label: "Total Tests", value: totalTests, gradient: "from-emerald-500 to-teal-500" }, { label: "Pass Rate", value: totalTests ? `${((totalPassed / totalTests) * 100).toFixed(0)}%` : "N/A", gradient: "from-violet-500 to-purple-500" }, { label: "Avg Coverage", value: avgCoverage === "N/A" ? avgCoverage : `${avgCoverage}%`, gradient: "from-amber-500 to-orange-500" }].map((s) => (
-          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${s.gradient}`} />
             <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{s.label}</p>
             <p className="mt-1 text-2xl font-bold">{s.value}</p>
@@ -88,7 +88,7 @@ export default function AdminTestingPage() {
         ))}
       </motion.div>
 
-      <motion.div variants={fadeUp} className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+      <motion.div variants={fadeUp} className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
         {loading ? (
           <div className="p-6 space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className={`h-16 animate-pulse rounded-xl ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />)}</div>
         ) : reports.length === 0 ? (
@@ -133,7 +133,7 @@ export default function AdminTestingPage() {
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className={`rounded-2xl border p-6 shadow-2xl ${isDark ? "border-white/10 bg-[#111118]" : "border-slate-200 bg-white"}`}>
+          <div className={`rounded-2xl border p-6 shadow-2xl ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <h3 className="text-lg font-bold">Delete Test Report?</h3>
             <p className={`mt-2 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>This action cannot be undone.</p>
             <div className="mt-5 flex justify-end gap-3">

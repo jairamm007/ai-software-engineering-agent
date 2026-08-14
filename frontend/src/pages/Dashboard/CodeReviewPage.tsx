@@ -132,7 +132,7 @@ export default function CodeReviewPage() {
         {/* Stat Cards */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="grid gap-4 overflow-hidden sm:grid-cols-2 lg:grid-cols-4">
           {statCards.map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.06 }} className={`rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+            <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.06 }} className={`rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
               <div className="flex items-center justify-between mb-3">
                 <p className={`text-xs font-medium font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>{s.label}</p>
                 <s.icon size={16} className={s.colorClass ?? `text-${s.color}-500`} />
@@ -147,7 +147,7 @@ export default function CodeReviewPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"}`}
+          className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
             <h2 className={`text-lg font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>
@@ -175,7 +175,7 @@ export default function CodeReviewPage() {
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {repos.map((repo) => (
-                  <button key={repo.id} type="button" onClick={() => handleRepoSelect(repo.id)} className={`group flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${selectedRepoId === repo.id ? isDark ? "border-[var(--accent)]/30 accent-bg-light shadow-sm ring-1 ring-[var(--accent)]/20" : "border-[var(--accent)]/20 accent-bg-light shadow-sm ring-1 ring-[var(--accent)]/20" : isDark ? "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
+                  <button key={repo.id} type="button" onClick={() => handleRepoSelect(repo.id)} className={`group flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${selectedRepoId === repo.id ? isDark ? "border-[var(--accent)]/30 accent-bg-light shadow-sm ring-1 ring-[var(--accent)]/20" : "border-[var(--accent)]/20 accent-bg-light shadow-sm ring-1 ring-[var(--accent)]/20" : isDark ? "border-white/10 bg-[var(--card-bg)] hover:border-white/20 hover:bg-white/[0.04]" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
                     <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${selectedRepoId === repo.id ? "accent-bg-light" : isDark ? "bg-white/5" : "bg-slate-100"}`}>
                       <FileCode2 size={16} className={selectedRepoId === repo.id ? "accent-text-base" : isDark ? "text-slate-400" : "text-slate-500"} />
                     </div>
@@ -196,7 +196,7 @@ export default function CodeReviewPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"}`}
+            className={`rounded-2xl border shadow-sm ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
           >
             <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
               <h2 className={`text-lg font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>
@@ -308,7 +308,7 @@ export default function CodeReviewPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+          className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
         >
           <div className={`border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <h2 className={`font-[Outfit] text-sm font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Review History</h2>

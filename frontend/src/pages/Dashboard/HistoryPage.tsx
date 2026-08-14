@@ -193,7 +193,7 @@ export default function HistoryPage() {
                 {group.label}
               </h2>
               <div className={`rounded-2xl border overflow-hidden ${
-                isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}>
                 {group.items.map((item, i) => {
                   const cfg = TYPE_CONFIG[item.type];

@@ -72,7 +72,7 @@ export default function AdminActivityLogsPage() {
 
       <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[{ label: "Total Logs", value: pagination.total, gradient: "from-cyan-500 to-blue-500" }, { label: "Today", value: todayLogs, gradient: "from-emerald-500 to-teal-500" }, { label: "Unique Actions", value: new Set(logs.map((l) => l.action)).size, gradient: "from-amber-500 to-orange-500" }].map((s) => (
-          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${s.gradient}`} />
             <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{s.label}</p>
             <p className="mt-1 text-2xl font-bold">{s.value}</p>
@@ -81,13 +81,13 @@ export default function AdminActivityLogsPage() {
       </motion.div>
 
       <motion.div variants={fadeUp}>
-        <div className={`flex items-center gap-2 rounded-xl border p-2 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+        <div className={`flex items-center gap-2 rounded-xl border p-2 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           <Search size={14} className={`ml-2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
           <input value={actionFilter} onChange={(e) => { setActionFilter(e.target.value); setPage(1); }} placeholder="Filter by action type..." className={`flex-1 bg-transparent text-sm outline-none ${isDark ? "text-white placeholder:text-slate-600" : "text-slate-900 placeholder:text-slate-400"}`} />
         </div>
       </motion.div>
 
-      <motion.div variants={fadeUp} className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+      <motion.div variants={fadeUp} className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
         {loading ? (
           <div className="p-6 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className={`h-14 animate-pulse rounded-xl ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />)}</div>
         ) : logs.length === 0 ? (

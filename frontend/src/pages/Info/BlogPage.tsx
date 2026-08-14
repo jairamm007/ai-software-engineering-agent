@@ -2,8 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
-import GradientOrbs from "@/components/motion/GradientOrbs";
 import Reveal from "@/components/motion/Reveal";
 import SpotlightCard from "@/components/motion/SpotlightCard";
 import PageHero from "@/components/motion/PageHero";
@@ -12,7 +10,7 @@ import BackToTop from "@/components/motion/BackToTop";
 import CTACard from "@/components/motion/CTACard";
 import Magnetic from "@/components/motion/Magnetic";
 import { glassCard } from "@/components/motion/styles";
-import { Rss, Calendar, Tag, Clock, ArrowRight, Newspaper, Link2 } from "lucide-react";
+import { Rss, Calendar, Tag, Clock, Newspaper, Link2, Search, Sparkles } from "lucide-react";
 
 const posts = [
   {
@@ -76,8 +74,17 @@ export default function BlogPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [activeTag, setActiveTag] = useState("All");
+  const [search, setSearch] = useState("");
 
-  const filtered = activeTag === "All" ? posts : posts.filter((p) => p.tag === activeTag);
+  const query = search.trim().toLowerCase();
+  const filtered = (activeTag === "All" ? posts : posts.filter((p) => p.tag === activeTag)).filter(
+    (p) =>
+      p.title.toLowerCase().includes(query) ||
+      p.excerpt.toLowerCase().includes(query) ||
+      p.content.toLowerCase().includes(query)
+  );
+
+  const tagCount = (tag: string) => (tag === "All" ? posts.length : posts.filter((p) => p.tag === tag).length);
 
   return (
     <motion.main
@@ -86,8 +93,6 @@ export default function BlogPage() {
       transition={{ duration: 0.4 }}
       className={cn("min-h-screen font-[Inter] transition-colors duration-300", isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900")}
     >
-      <PlexusTerrainBackground />
-      <GradientOrbs className="[&>*]:opacity-90" />
       <ScrollProgress className="bg-gradient-to-r from-fuchsia-500 via-violet-500 to-pink-500" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 md:py-20">
@@ -101,6 +106,24 @@ export default function BlogPage() {
           gradientClass="from-fuchsia-400 via-violet-400 to-pink-400"
           glowClass="rgba(217, 70, 239, 0.12)"
         />
+
+        <Reveal className="mx-auto mb-6 max-w-md">
+          <div className={`relative flex items-center rounded-2xl border px-4 py-2.5 transition-colors ${isDark ? "border-white/10 bg-white/[0.04] focus-within:border-fuchsia-500/40" : "border-slate-200/70 bg-white/60 backdrop-blur-xl focus-within:border-fuchsia-300"}`}>
+            <Search size={16} className={isDark ? "shrink-0 text-slate-500" : "shrink-0 text-slate-400"} />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search posts…"
+              className={`ml-3 w-full bg-transparent text-sm outline-none ${isDark ? "text-white placeholder:text-slate-600" : "text-slate-900 placeholder:text-slate-400"}`}
+            />
+            {search && (
+              <button type="button" onClick={() => setSearch("")} className={`ml-2 shrink-0 text-xs font-medium ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+                Clear
+              </button>
+            )}
+          </div>
+        </Reveal>
 
         <Reveal className="mb-10 flex flex-wrap items-center justify-center gap-2.5">
           {tagFilters.map((tag) => (
@@ -124,13 +147,16 @@ export default function BlogPage() {
               )}
             >
               {tag}
+              <span className={cn("ml-1.5 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold", activeTag === tag ? (isDark ? "border-violet-400/30 text-violet-200" : "border-violet-300 text-violet-700") : (isDark ? "border-white/10 text-slate-500" : "border-slate-200 text-slate-400"))}>
+                {tagCount(tag)}
+              </span>
             </motion.button>
           ))}
         </Reveal>
 
         <motion.div layout className="space-y-8">
           <AnimatePresence mode="popLayout">
-            {filtered.map((post) => (
+            {filtered.map((post, i) => (
               <motion.article
                 key={post.title}
                 layout
@@ -159,6 +185,16 @@ export default function BlogPage() {
                     >
                       <Tag size={10} /> {post.tag}
                     </motion.span>
+                    {i === 0 && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.7 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 14 }}
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-0.5 text-xs font-semibold text-amber-500"
+                      >
+                        <Sparkles size={10} /> Latest
+                      </motion.span>
+                    )}
                     <span className={cn("flex items-center gap-1 text-xs", isDark ? "text-slate-500" : "text-slate-400")}>
                       <Calendar size={11} /> {post.date}
                     </span>
@@ -187,14 +223,6 @@ export default function BlogPage() {
                   >
                     {post.content}
                   </div>
-
-                  <motion.div
-                    whileHover={{ x: 6 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className="mt-5 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-fuchsia-500 transition-colors hover:text-fuchsia-400"
-                  >
-                    Read full post <ArrowRight size={14} />
-                  </motion.div>
                 </SpotlightCard>
               </motion.article>
             ))}
@@ -211,7 +239,7 @@ export default function BlogPage() {
             <Magnetic>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
                 <a
-                  href="https://github.com/anomalyco/opencode"
+                  href="https://github.com/jairamm007/ai-software-engineering-agent"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-600 to-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/25 transition-shadow hover:shadow-xl hover:shadow-fuchsia-500/40"

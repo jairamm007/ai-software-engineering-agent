@@ -171,7 +171,7 @@ export default function AdminSupportPage() {
             variants={fadeUp}
             className={`group relative overflow-hidden rounded-2xl border p-5 transition-all duration-200 ${
               isDark
-                ? "border-white/[0.06] bg-[#111118] hover:border-white/[0.1] hover:bg-[#13131b]"
+                ? "border-white/[0.06] bg-[var(--card-bg)] hover:border-white/[0.1] hover:bg-[#13131b]"
                 : "border-slate-200 bg-white shadow-sm hover:shadow-md"
             }`}
           >
@@ -204,7 +204,7 @@ export default function AdminSupportPage() {
                 statusFilter === status
                   ? "bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-500/20"
                   : isDark
-                    ? "border border-white/[0.06] bg-[#111118] text-slate-400 hover:bg-white/[0.04]"
+                    ? "border border-white/[0.06] bg-[var(--card-bg)] text-slate-400 hover:bg-white/[0.04]"
                     : "border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
               }`}
             >
@@ -217,7 +217,7 @@ export default function AdminSupportPage() {
       <motion.div
         variants={fadeUp}
         className={`overflow-hidden rounded-2xl border shadow-sm ${
-          isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+          isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
         }`}
       >
         <div className="divide-y">
@@ -290,7 +290,7 @@ export default function AdminSupportPage() {
                           </p>
 
                           {msg.reply && (
-                            <div className={`mt-4 rounded-xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-slate-50"}`}>
+                            <div className={`mt-4 rounded-xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--bg-secondary)]" : "border-slate-200 bg-slate-50"}`}>
                               <p className={`text-xs font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                                 Your Reply ({new Date(msg.repliedAt!).toLocaleDateString()})
                               </p>
@@ -427,7 +427,7 @@ export default function AdminSupportPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className={`w-full max-w-sm rounded-2xl border p-6 shadow-2xl ${
-                isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10">

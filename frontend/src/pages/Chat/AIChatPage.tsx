@@ -367,7 +367,7 @@ export default function AIChatPage() {
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
               className={`flex shrink-0 flex-col border-r overflow-hidden ${
-                isDark ? "border-white/[0.06] bg-[#0B0614]" : "border-slate-200 bg-white"
+                isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className={`flex items-center justify-between border-b px-4 py-3 ${
@@ -506,7 +506,7 @@ export default function AIChatPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     className={`absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border shadow-xl ${
-                      isDark ? "border-white/10 bg-[#110C1D]" : "border-slate-200 bg-white"
+                        isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-white"
                     }`}
                   >
                     <div className="max-h-64 overflow-y-auto p-1.5">
@@ -610,7 +610,7 @@ export default function AIChatPage() {
                             onClick={() => send(q)}
                             className={`rounded-xl border px-4 py-3 text-left text-sm font-[Inter] transition-all hover:scale-[1.01] ${
                               isDark
-                                ? "border-white/10 bg-white/5 text-slate-300 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
+                                ? "border-white/10 bg-[var(--card-bg)] text-slate-300 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
                                 : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)]"
                             }`}
                           >
@@ -659,7 +659,7 @@ export default function AIChatPage() {
                       <Bot size={16} />
                     </div>
                     <div className={`rounded-2xl border px-5 py-4 ${
-                      isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-slate-50"
                     }`}>
                       {thinkingStage ? (
                         <div className="flex items-center gap-2">
@@ -690,7 +690,7 @@ export default function AIChatPage() {
           {/* Input area */}
           <div className={`border-t px-4 py-3 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
             <div className={`mx-auto max-w-3xl rounded-2xl border p-2 ${
-              isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
+              isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-white shadow-sm"
             }`}>
               <form onSubmit={handleSubmit} className="flex items-end gap-2">
                 <textarea
@@ -807,7 +807,7 @@ function MessageBubble({
           <div className={`w-full rounded-2xl px-5 py-3 ${
             isUser
               ? "bg-blue-600 text-white"
-              : isDark ? "border border-white/10 bg-white/5" : "border border-slate-200 bg-slate-50"
+              : isDark ? "border border-white/10 bg-[var(--card-bg)]" : "border border-slate-200 bg-slate-50"
           }`}>
             {isUser ? (
               <p className="whitespace-pre-wrap text-sm leading-relaxed font-[Inter]">{message.content}</p>
@@ -862,7 +862,7 @@ function MessageBubble({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       className={`absolute left-0 top-full z-50 mt-1 w-36 overflow-hidden rounded-xl border shadow-xl ${
-                        isDark ? "border-white/10 bg-[#110C1D]" : "border-slate-200 bg-white"
+                      isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-white"
                       }`}
                     >
                       {([

@@ -56,8 +56,8 @@ export default function CustomSelect({ value, onChange, options, placeholder = "
         aria-label={ariaLabel}
         className={`w-full rounded-xl border px-4 py-3 text-sm text-left outline-none transition-all duration-200 font-[Inter] flex items-center justify-between gap-2 cursor-pointer ${
           isDark
-            ? "border-white/10 bg-white/[0.04] text-white placeholder:text-slate-600 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
-            : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+            ? "border-white/10 bg-[#151515] text-white placeholder:text-slate-600 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+            : "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
         } ${className}`}
       >
         <span className={`truncate ${!selectedOption ? (isDark ? "text-slate-600" : "text-slate-400") : ""}`}>
@@ -75,7 +75,7 @@ export default function CustomSelect({ value, onChange, options, placeholder = "
         <div
           className={`absolute left-0 right-0 z-50 mt-1.5 rounded-xl border py-1 shadow-xl animate-fadeIn ${
             isDark
-              ? "border-white/[0.12] bg-[#1a1a2e] shadow-black/40"
+              ? "border-white/[0.12] bg-[var(--bg-secondary)] shadow-black/40"
               : "border-slate-200 bg-white shadow-slate-200/60"
           }`}
           style={{ maxHeight: "240px", overflowY: "auto" }}

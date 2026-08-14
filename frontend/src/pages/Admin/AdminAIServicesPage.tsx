@@ -112,7 +112,7 @@ export default function AdminAIServicesPage() {
             variants={item}
             className={`group relative overflow-hidden rounded-2xl border p-5 transition-all duration-200 ${
               isDark
-                ? "border-white/[0.06] bg-[#111118] hover:border-white/[0.1] hover:bg-[#13131b]"
+                ? "border-white/[0.06] bg-[var(--card-bg)] hover:border-white/[0.1] hover:bg-[#13131b]"
                 : "border-slate-200 bg-white shadow-sm hover:shadow-md"
             }`}
           >
@@ -139,7 +139,7 @@ export default function AdminAIServicesPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.4 }}
-        className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white shadow-sm"}`}
+        className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white shadow-sm"}`}
       >
         <div className={`flex items-center justify-between border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
           <div className="flex items-center gap-2.5">
@@ -230,7 +230,7 @@ export default function AdminAIServicesPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.4 }}
-        className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white shadow-sm"}`}
+        className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white shadow-sm"}`}
       >
         <div className={`flex items-center gap-2.5 border-b px-6 py-4 ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500">

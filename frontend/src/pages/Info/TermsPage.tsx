@@ -1,15 +1,14 @@
 import { motion } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
-import GradientOrbs from "@/components/motion/GradientOrbs";
 import Reveal from "@/components/motion/Reveal";
 import SpotlightCard from "@/components/motion/SpotlightCard";
 import PageHero from "@/components/motion/PageHero";
 import ScrollProgress from "@/components/motion/ScrollProgress";
 import BackToTop from "@/components/motion/BackToTop";
 import { glassCard } from "@/components/motion/styles";
-import { FileText, CheckCircle, AlertTriangle, Ban, Scale, Mail } from "lucide-react";
+import { FileText, CheckCircle, AlertTriangle, Ban, Scale } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const sections = [
   {
@@ -78,8 +77,6 @@ export default function TermsPage() {
       transition={{ duration: 0.4 }}
       className={cn("min-h-screen font-[Inter] transition-colors duration-300", isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900")}
     >
-      <PlexusTerrainBackground />
-      <GradientOrbs />
       <ScrollProgress className="bg-gradient-to-r from-slate-400 via-violet-500 to-fuchsia-500" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 md:py-20">
@@ -123,7 +120,7 @@ export default function TermsPage() {
                     <h2 className="font-[Outfit] text-xl font-bold">{section.title}</h2>
                   </div>
 
-                  <div className={cn("whitespace-pre-line rounded-xl border p-5 text-sm leading-relaxed", isDark ? "border-white/[0.06] bg-white/[0.02] text-slate-400" : "border-slate-200/70 bg-white/50 text-slate-500")}>
+                  <div className={cn("whitespace-pre-line rounded-xl border p-5 text-sm leading-relaxed", isDark ? "border-white/[0.06] bg-[var(--card-bg)] text-slate-400" : "border-slate-200/70 bg-white/50 text-slate-500")}>
                     {section.content}
                   </div>
                 </SpotlightCard>
@@ -132,27 +129,17 @@ export default function TermsPage() {
           })}
         </div>
 
-        <Reveal delay={0.1} className="mt-12">
-          <motion.div
-            whileHover={{ y: -3 }}
-            transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className={cn("flex flex-col items-center justify-center gap-3 rounded-2xl border p-8 text-center sm:flex-row sm:gap-4", glassCard(isDark))}
-          >
-            <motion.span
-              animate={{ y: [0, -5, 0] }}
-              transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut" }}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-lg shadow-violet-500/20"
-            >
-              <Mail size={20} />
-            </motion.span>
-            <p className={cn("text-sm", isDark ? "text-slate-400" : "text-slate-500")}>
-              Questions about these terms? Contact us at{" "}
-              <a href="mailto:legal@repo-verify.dev" className="font-medium text-violet-500 transition-colors hover:text-violet-400">
-                legal@repo-verify.dev
-              </a>
-            </p>
-          </motion.div>
-        </Reveal>
+        <div className="mt-12 flex flex-col items-center justify-center gap-1.5 text-center">
+          <p className={cn("text-sm", isDark ? "text-slate-400" : "text-slate-500")}>
+            Questions about these terms?{" "}
+            <Link to="/support" className="font-medium text-violet-500 transition-colors hover:text-violet-400">
+              Visit our Support page
+            </Link>
+          </p>
+          <p className={cn("text-xs", isDark ? "text-slate-600" : "text-slate-400")}>
+            Last updated: June 2026
+          </p>
+        </div>
       </div>
 
       <BackToTop />

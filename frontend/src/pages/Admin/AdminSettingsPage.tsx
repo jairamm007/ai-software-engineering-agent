@@ -114,7 +114,7 @@ export default function AdminSettingsPage() {
     setSettings((prev) => ({ ...prev, [key]: String(value) }));
   };
 
-  const cardClass = isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white";
+  const cardClass = isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white";
   const textPrimary = isDark ? "text-white" : "text-slate-900";
   const textSecondary = isDark ? "text-slate-400" : "text-slate-500";
   const textMuted = isDark ? "text-slate-500" : "text-slate-400";

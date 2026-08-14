@@ -85,7 +85,7 @@ export default function SearchPage() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
-          <div className={`relative rounded-2xl border transition-shadow ${isDark ? "border-white/[0.06] bg-white/[0.02] focus-within:border-[var(--accent)]/30 focus-within:shadow-[0_0_30px_-10px] focus-within:accent-shadow" : "border-slate-200 bg-white focus-within:border-[var(--accent)] focus-within:shadow-lg"}`}>
+          <div className={`relative rounded-2xl border transition-shadow ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] focus-within:border-[var(--accent)]/30 focus-within:shadow-[0_0_30px_-10px] focus-within:accent-shadow" : "border-slate-200 bg-white focus-within:border-[var(--accent)] focus-within:shadow-lg"}`}>
             <Search size={20} className={`absolute left-5 top-1/2 -translate-y-1/2 ${isDark ? "text-slate-600" : "text-slate-400"}`} />
             <input
               type="text"
@@ -120,7 +120,7 @@ export default function SearchPage() {
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-              <div className={`flex items-center gap-3 p-4 rounded-2xl border ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+              <div className={`flex items-center gap-3 p-4 rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 <div className="flex gap-1">
                   {[0, 1, 2].map((i) => (
                     <motion.div key={i} className={`w-2 h-2 rounded-full accent-text-base`} animate={{ y: [0, -8, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }} />
@@ -129,7 +129,7 @@ export default function SearchPage() {
                 <span className={`text-sm font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>Searching codebase with AI...</span>
               </div>
               {[1, 2, 3].map((i) => (
-                <div key={i} className={`rounded-xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                <div key={i} className={`rounded-xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                   <div className="flex items-center gap-3">
                     <div className={`h-10 w-10 rounded-xl animate-pulse ${isDark ? "bg-white/[0.05]" : "bg-slate-200"}`} />
                     <div className="flex-1 space-y-2">
@@ -141,7 +141,7 @@ export default function SearchPage() {
               ))}
             </motion.div>
           ) : !results ? (
-            <motion.div key="empty" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={`flex flex-col items-center justify-center rounded-2xl border py-20 ${isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"}`}>
+            <motion.div key="empty" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={`flex flex-col items-center justify-center rounded-2xl border py-20 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-slate-50"}`}>
               <div className={`flex h-16 w-16 items-center justify-center rounded-2xl mb-4 accent-bg-light`}>
                 <Bot size={28} className="accent-text-base" />
               </div>
@@ -163,7 +163,7 @@ export default function SearchPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.04 }}
-                        className={`flex items-center gap-4 rounded-xl border p-4 transition-all cursor-pointer group ${isDark ? "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-[var(--accent)]/20" : "border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--accent)]/30"}`}
+                        className={`flex items-center gap-4 rounded-xl border p-4 transition-all cursor-pointer group ${isDark ? "border-white/[0.06] bg-[var(--card-bg)] hover:bg-white/[0.04] hover:border-[var(--accent)]/20" : "border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--accent)]/30"}`}
                       >
                         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl accent-bg-light`}>
                           <Icon size={18} className="accent-text-base" />
@@ -178,7 +178,7 @@ export default function SearchPage() {
                 </div>
               )}
 
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg accent-gradient">
                     <Bot size={14} className="text-white" />

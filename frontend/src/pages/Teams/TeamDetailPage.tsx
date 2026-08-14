@@ -278,7 +278,7 @@ export default function TeamDetailPage() {
         </motion.div>
 
         {/* Tabs */}
-        <div className={`flex flex-wrap gap-1 overflow-hidden rounded-xl border p-1 ${isDark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+        <div className={`flex flex-wrap gap-1 overflow-hidden rounded-xl border p-1 ${isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-slate-50"}`}>
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -314,7 +314,7 @@ export default function TeamDetailPage() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 + i * 0.03 }}
-                    className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}
+                    className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${stat.color}`}>
@@ -332,7 +332,7 @@ export default function TeamDetailPage() {
               </div>
 
               {/* Quick Actions */}
-              <div className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+              <div className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 <h3 className={`text-sm font-semibold font-[Inter] mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>
                   Quick Actions
                 </h3>
@@ -402,7 +402,7 @@ export default function TeamDetailPage() {
 
               {/* Recent Activity */}
               {analytics?.recentActivities && analytics.recentActivities.length > 0 && (
-                <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                   <div className={`px-6 py-4 border-b ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
                     <h3 className={`text-sm font-semibold font-[Inter] ${isDark ? "text-white" : "text-slate-900"}`}>
                       Recent Activity
@@ -439,7 +439,7 @@ export default function TeamDetailPage() {
             <motion.div key="members" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4">
               {/* Invite */}
               {isAdmin && (
-                <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                   <div className="flex items-center gap-2">
                     <input
                       type="email"
@@ -480,7 +480,7 @@ export default function TeamDetailPage() {
               )}
 
               {/* Member list */}
-              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 {team.members?.map((member: TeamMember, idx: number) => (
                   <div
                     key={member.id}
@@ -551,7 +551,7 @@ export default function TeamDetailPage() {
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
-                    className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-200 bg-white"}`}
+                    className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-[var(--bg-secondary)]" : "border-slate-200 bg-white"}`}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <h3 className={`text-sm font-semibold font-[Inter] ${isDark ? "text-white" : "text-slate-900"}`}>Share a Repository</h3>
@@ -584,7 +584,7 @@ export default function TeamDetailPage() {
               </AnimatePresence>
 
               {/* Shared repos list */}
-              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 {sharedRepos.length === 0 ? (
                   <div className="py-12 text-center">
                     <FolderGit2 size={32} className={`mx-auto mb-3 ${isDark ? "text-slate-700" : "text-slate-300"}`} />
@@ -627,7 +627,7 @@ export default function TeamDetailPage() {
           {/* ── Activity Tab ── */}
           {activeTab === "activity" && (
             <motion.div key="activity" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 {activitiesLoading ? (
                   <div className="py-12 flex justify-center">
                     <LoadingIndicator size="md" />
@@ -667,7 +667,7 @@ export default function TeamDetailPage() {
             <motion.div key="comments" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4">
               {/* Post comment */}
               {isMember && (
-                <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                <div className={`rounded-2xl border p-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                   <textarea
                     placeholder="Write a comment... Use @username to mention"
                     value={commentText}
@@ -693,7 +693,7 @@ export default function TeamDetailPage() {
               )}
 
               {/* Comment list */}
-              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+              <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                 {commentsLoading ? (
                   <div className="py-12 flex justify-center">
                     <LoadingIndicator size="md" />
@@ -764,7 +764,7 @@ export default function TeamDetailPage() {
             <motion.div key="settings" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4">
               {/* Edit Team */}
               {isAdmin && (
-                <div className={`rounded-2xl border p-6 space-y-4 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                <div className={`rounded-2xl border p-6 space-y-4 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                   <h3 className={`text-sm font-semibold font-[Inter] ${isDark ? "text-white" : "text-slate-900"}`}>Team Details</h3>
                   <input
                     type="text"
@@ -799,7 +799,7 @@ export default function TeamDetailPage() {
 
               {/* Pending Invitations */}
               {isAdmin && (
-                <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+                <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
                   <div className={`px-4 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
                     <h3 className={`text-sm font-semibold font-[Inter] ${isDark ? "text-white" : "text-slate-900"}`}>Pending Invitations</h3>
                   </div>

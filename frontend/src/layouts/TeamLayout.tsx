@@ -6,6 +6,8 @@ import { getTeam } from "@/services/team";
 import { useAuth } from "@/context/AuthContext";
 import type { TeamMember, TeamRole } from "@/types/team";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import AuroraBackground from "@/components/motion/AuroraBackground";
+import PageTransition from "@/components/motion/PageTransition";
 
 interface NavItem {
   icon: typeof LayoutDashboard;
@@ -65,11 +67,12 @@ export default function TeamLayout() {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="app-bg relative flex h-screen overflow-hidden">
+      <AuroraBackground />
       {/* Team Sidebar */}
       <aside
-        className={`w-60 shrink-0 border-r flex flex-col ${
-          isDark ? "border-white/[0.06] bg-[#0B0614]" : "border-slate-200/80 bg-white"
+        className={`relative z-10 w-60 shrink-0 border-r flex flex-col ${
+          isDark ? "border-white/[0.06] surface-elevated" : "border-slate-200/80 bg-white"
         }`}
       >
         {/* Team Header */}
@@ -145,10 +148,12 @@ export default function TeamLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-4 sm:p-6 md:p-8">
-          <Outlet context={{ team, myRole, myMember }} />
-        </div>
+      <main className="relative z-10 flex-1 overflow-y-auto">
+        <PageTransition locationKey={location.pathname} variant="slide-up">
+          <div className="p-4 sm:p-6 md:p-8">
+            <Outlet context={{ team, myRole, myMember }} />
+          </div>
+        </PageTransition>
       </main>
     </div>
   );

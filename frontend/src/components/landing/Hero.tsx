@@ -130,7 +130,7 @@ export default function Hero() {
                 variants={wordVariants}
                 initial="hidden"
                 animate="visible"
-                className={`block ${isDark ? "text-white" : "text-slate-900"}`}
+                className={`block hover-accent ${isDark ? "text-white" : "text-slate-900"}`}
               >
                 Analyze
               </motion.span>
@@ -152,7 +152,7 @@ export default function Hero() {
                 variants={wordVariants}
                 initial="hidden"
                 animate="visible"
-                className={`block ${isDark ? "text-white" : "text-slate-900"}`}
+                className={`block hover-accent ${isDark ? "text-white" : "text-slate-900"}`}
               >
                 With AI
               </motion.span>

@@ -214,7 +214,7 @@ export default function AdminLoginPage() {
                 transition={{ duration: 0.5, delay: 0.4 + i * 0.15 }}
                 className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left backdrop-blur-sm ${
                   isDark
-                    ? "border-white/5 bg-white/5"
+                    ? "border-white/10 bg-[var(--card-bg)]"
                     : "border-slate-200/60 bg-white/60 shadow-sm"
                 }`}
               >
@@ -288,7 +288,7 @@ export default function AdminLoginPage() {
           }}
           className={`relative z-10 w-full max-w-md space-y-6 rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl ${
             isDark
-              ? "border-white/10 bg-white/[0.07] shadow-black/20"
+              ? "border-white/10 bg-[var(--card-bg)] shadow-black/20"
               : "border-slate-200/50 bg-white/60 shadow-slate-200/50"
           }`}
         >
@@ -388,7 +388,7 @@ export default function AdminLoginPage() {
               <div className={`w-full border-t ${isDark ? "border-white/10" : "border-slate-200"}`} />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className={`px-2 ${isDark ? "bg-white/[0.07] text-slate-500" : "bg-white/60 text-slate-400"}`}>
+              <span className={`px-2 ${isDark ? "bg-[var(--card-bg)] text-slate-500" : "bg-white text-slate-400"}`}>
                 or continue with email
               </span>
             </div>

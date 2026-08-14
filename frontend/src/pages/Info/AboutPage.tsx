@@ -1,8 +1,6 @@
 import { motion } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
-import GradientOrbs from "@/components/motion/GradientOrbs";
 import Reveal from "@/components/motion/Reveal";
 import TiltCard from "@/components/motion/TiltCard";
 import SpotlightCard from "@/components/motion/SpotlightCard";
@@ -54,8 +52,6 @@ export default function AboutPage() {
       transition={{ duration: 0.4 }}
       className={cn("min-h-screen font-[Inter] transition-colors duration-300", isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900")}
     >
-      <PlexusTerrainBackground />
-      <GradientOrbs />
       <ScrollProgress />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 md:py-20">
@@ -82,6 +78,42 @@ export default function AboutPage() {
               </p>
             </div>
           </TiltCard>
+        </Reveal>
+
+        <Reveal delay={0.1} className="mt-12">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              { icon: Cpu, value: "50K+", label: "Files indexed" },
+              { icon: Code2, value: "50+", label: "Languages supported" },
+              { icon: Zap, value: "< 3 min", label: "Avg. analysis time" },
+              { icon: Rocket, value: "100%", label: "Open source" },
+            ].map((stat, i) => {
+              const StatIcon = stat.icon;
+              return (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.05 + i * 0.08, duration: 0.5 }}
+                  whileHover={{ y: -4 }}
+                  className={cn("rounded-2xl border p-5 text-center", glassCard(isDark))}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.15, rotate: 6 }}
+                    transition={{ type: "spring", stiffness: 350, damping: 14 }}
+                    className={cn("mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl", isDark ? "bg-violet-500/10 text-violet-400" : "bg-violet-100 text-violet-600")}
+                  >
+                    <StatIcon size={18} />
+                  </motion.div>
+                  <div className="bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text font-[Outfit] text-2xl font-extrabold text-transparent">
+                    {stat.value}
+                  </div>
+                  <div className={cn("mt-1 text-xs", isDark ? "text-slate-500" : "text-slate-400")}>{stat.label}</div>
+                </motion.div>
+              );
+            })}
+          </div>
         </Reveal>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-3">
@@ -138,7 +170,7 @@ export default function AboutPage() {
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ delay: 0.05 + i * 0.04, duration: 0.45 }}
                     whileHover={{ x: 5, scale: 1.015 }}
-                    className={cn("flex items-center gap-3 rounded-xl border p-3.5", isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-100 bg-slate-50")}
+                    className={cn("flex items-center gap-3 rounded-xl border p-3.5", isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-100 bg-slate-50")}
                   >
                     <motion.span
                       whileHover={{ rotate: 180 }}
@@ -167,7 +199,7 @@ export default function AboutPage() {
           action={
             <Magnetic>
               <motion.a
-                href="https://github.com/anomalyco/opencode"
+                href="https://github.com/jairamm007/ai-software-engineering-agent"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}

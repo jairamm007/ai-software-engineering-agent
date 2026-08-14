@@ -78,7 +78,7 @@ export default function TeamChatPage() {
     <div className="flex h-[calc(100vh-10rem)] gap-4">
       {/* Chat List Sidebar */}
       <div className={`w-64 shrink-0 rounded-2xl border overflow-hidden flex flex-col ${
-        isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"
+        isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
       }`}>
         <div className={`p-4 border-b ${isDark ? "border-white/[0.06]" : "border-slate-100"}`}>
           <div className="flex items-center justify-between mb-3">
@@ -147,7 +147,7 @@ export default function TeamChatPage() {
 
       {/* Chat Area */}
       <div className={`flex-1 rounded-2xl border overflow-hidden flex flex-col ${
-        isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"
+        isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
       }`}>
         {!selectedChat ? (
           <div className="flex-1 flex flex-col items-center justify-center">

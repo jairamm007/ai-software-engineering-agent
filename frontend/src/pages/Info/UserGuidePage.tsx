@@ -3,9 +3,9 @@ import { motion, AnimatePresence, useScroll, useSpring, useTransform, type Varia
 import { Link } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
 import { useTheme } from "@/context/ThemeContext";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
 import {
   ArrowLeft,
+  ArrowRight,
   ArrowUp,
   BookOpen,
   ChevronDown,
@@ -571,23 +571,24 @@ const cardVariants: Variants = {
 };
 
 const floatingIcons = [
-  { icon: Sparkles, x: "4%", y: "22%", delay: 0, color: "text-violet-400" },
-  { icon: Command, x: "90%", y: "30%", delay: 1.2, color: "text-fuchsia-400" },
-  { icon: BookOpen, x: "10%", y: "68%", delay: 2, color: "text-cyan-400" },
-  { icon: Users, x: "88%", y: "66%", delay: 0.6, color: "text-emerald-400" },
-  { icon: Wand2, x: "50%", y: "78%", delay: 1.6, color: "text-amber-400" },
+  { icon: Sparkles, x: "4%", y: "14%", delay: 0, color: "text-violet-400" },
+  { icon: Command, x: "93%", y: "18%", delay: 1.2, color: "text-fuchsia-400" },
+  { icon: BookOpen, x: "5%", y: "52%", delay: 2, color: "text-cyan-400" },
+  { icon: Users, x: "93%", y: "48%", delay: 0.6, color: "text-emerald-400" },
+  { icon: Wand2, x: "6%", y: "80%", delay: 1.6, color: "text-amber-400" },
 ];
 
-function AnimatedCounter({ end, suffix, label, gradient, isDark, index }: {
+function AnimatedCounter({ end, suffix, label, gradient, isDark, index, href }: {
   end: number;
   suffix: string;
   label: string;
   gradient: string;
   isDark: boolean;
   index: number;
+  href: string;
 }) {
   const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLAnchorElement>(null);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
@@ -614,23 +615,33 @@ function AnimatedCounter({ end, suffix, label, gradient, isDark, index }: {
   }, [end]);
 
   return (
-    <motion.div
+    <motion.a
       ref={ref}
+      href={href}
       initial={{ opacity: 0, y: 30, scale: 0.9 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4, scale: 1.06 }}
-      className="relative cursor-default text-center"
+      className="group relative cursor-pointer text-center"
     >
-      <div className={`absolute -inset-3 bg-gradient-to-b ${gradient} opacity-0 hover:opacity-10 rounded-2xl blur-xl transition-opacity duration-500`} />
+      <div className={`absolute -inset-3 bg-gradient-to-b ${gradient} opacity-0 group-hover:opacity-10 rounded-2xl blur-xl transition-opacity duration-500`} />
       <div className="relative">
         <div className={`bg-gradient-to-b ${gradient} bg-clip-text font-[Outfit] text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl text-transparent`}>
           {count}{suffix}
         </div>
-        <div className={`mt-2 text-xs sm:text-sm font-[Inter] ${isDark ? "text-slate-400" : "text-slate-500"}`}>{label}</div>
+        <div className={`mt-2 inline-flex items-center gap-1 text-xs sm:text-sm font-[Inter] transition-colors ${isDark ? "text-slate-400 group-hover:text-white" : "text-slate-500 group-hover:text-slate-900"}`}>
+          {label}
+          <motion.span
+            animate={{ x: [0, 3, 0] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+            className="opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          >
+            <ArrowRight size={12} />
+          </motion.span>
+        </div>
       </div>
-    </motion.div>
+    </motion.a>
   );
 }
 
@@ -662,7 +673,7 @@ function SectionCard({ section, index }: { section: GuideSection; index: number 
       {/* Hover glow wash */}
       <div className={`absolute inset-0 bg-gradient-to-br ${section.glow} opacity-0 transition-opacity duration-500 group-hover:opacity-[0.04]`} />
 
-      <div className={`relative p-6 sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
+      <div className={`relative p-6 sm:p-8 ${isDark ? "border-white/[0.08] bg-[var(--card-bg)]" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <motion.div
@@ -802,6 +813,8 @@ export default function UserGuidePage() {
   const isDark = theme === "dark";
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showTop, setShowTop] = useState(false);
+  const [faqSearch, setFaqSearch] = useState("");
+  const [activeId, setActiveId] = useState<string | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll();
@@ -821,17 +834,36 @@ export default function UserGuidePage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const guideStats = [
-    { end: sections.length, suffix: "", label: "Sections", gradient: "from-violet-500 to-purple-600" },
-    { end: shortcuts.length, suffix: "", label: "Shortcuts", gradient: "from-fuchsia-500 to-pink-600" },
-    { end: paletteCommands.length, suffix: "", label: "Commands", gradient: "from-cyan-500 to-blue-600" },
-    { end: faqItems.length, suffix: "", label: "FAQ Items", gradient: "from-emerald-500 to-teal-600" },
-  ];
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        }
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
+    sections.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const faqQuery = faqSearch.trim().toLowerCase();
+  const filteredFaq = faqItems.filter(
+    (item) => item.q.toLowerCase().includes(faqQuery) || item.a.toLowerCase().includes(faqQuery)
+  );
+
+const guideStats = [
+  { end: sections.length, suffix: "", label: "Sections", gradient: "from-violet-500 to-purple-600", href: "#table-of-contents" },
+  { end: shortcuts.length, suffix: "", label: "Shortcuts", gradient: "from-fuchsia-500 to-pink-600", href: "#shortcuts" },
+  { end: paletteCommands.length, suffix: "", label: "Commands", gradient: "from-cyan-500 to-blue-600", href: "#command-palette" },
+  { end: faqItems.length, suffix: "", label: "FAQ Items", gradient: "from-emerald-500 to-teal-600", href: "#faq" },
+];
 
   return (
     <main className={`min-h-screen font-[Inter] transition-colors duration-300 ${isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900"}`}>
-      <PlexusTerrainBackground />
-
       {/* Scroll progress bar */}
       <motion.div
         style={{ scaleX: progress }}
@@ -1043,9 +1075,13 @@ export default function UserGuidePage() {
                   whileHover={{ y: -5, scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   className={`group relative overflow-hidden rounded-xl border px-4 py-3 transition-colors duration-300 ${
-                    isDark
-                      ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl hover:border-violet-500/40 hover:bg-violet-500/5"
-                      : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-violet-300 hover:bg-violet-50"
+                    activeId === s.id
+                      ? isDark
+                        ? "border-violet-500/40 bg-violet-500/10 text-violet-200 shadow-lg shadow-violet-500/10"
+                        : "border-violet-300 bg-violet-100 text-violet-800 shadow-md"
+                      : isDark
+                        ? "border-white/[0.08] bg-[var(--card-bg)] hover:border-violet-500/40 hover:bg-violet-500/5"
+                        : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-violet-300 hover:bg-violet-50"
                   }`}
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${s.glow} opacity-0 transition-opacity duration-500 group-hover:opacity-[0.06]`} />
@@ -1087,7 +1123,7 @@ export default function UserGuidePage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="absolute inset-x-0 top-0 h-[3px] origin-left bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500"
           />
-          <div className={`relative p-6 sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
+          <div className={`relative p-6 sm:p-8 ${isDark ? "border-white/[0.08] bg-[var(--card-bg)]" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
             <div className="mb-6 flex items-center gap-3">
               <motion.div
                 whileHover={{ rotate: 8, scale: 1.1 }}
@@ -1099,7 +1135,7 @@ export default function UserGuidePage() {
               <h2 className={`font-[Outfit] text-lg font-bold sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>Key Commands</h2>
             </div>
 
-            <h3 className={`mb-3 mt-6 text-sm font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>Keyboard Shortcuts</h3>
+            <h3 id="shortcuts" className={`mb-3 mt-6 scroll-mt-28 text-sm font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>Keyboard Shortcuts</h3>
             <div className="overflow-hidden rounded-xl border">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[420px] text-left text-sm">
@@ -1145,7 +1181,7 @@ export default function UserGuidePage() {
               </div>
             </div>
 
-            <h3 className={`mb-3 mt-8 text-sm font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>Command Palette (Ctrl + K)</h3>
+            <h3 id="command-palette" className={`mb-3 mt-8 scroll-mt-28 text-sm font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>Command Palette (Ctrl + K)</h3>
             <p className={`mb-4 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               Inside a repository workspace, select a file and press{" "}
               <motion.span
@@ -1166,7 +1202,7 @@ export default function UserGuidePage() {
                   transition={{ delay: 0.05 + i * 0.05 }}
                   whileHover={{ y: -3, scale: 1.02 }}
                   className={`group flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors duration-300 ${
-                    isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl hover:border-violet-500/30 hover:bg-violet-500/5" : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-violet-300 hover:bg-violet-50"
+                    isDark ? "border-white/[0.08] bg-[var(--card-bg)] hover:border-violet-500/30 hover:bg-violet-500/5" : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-violet-300 hover:bg-violet-50"
                   }`}
                 >
                   <motion.span
@@ -1187,11 +1223,12 @@ export default function UserGuidePage() {
 
         {/* FAQ */}
         <motion.section
+          id="faq"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
-          className="group relative mt-10 overflow-hidden rounded-2xl border"
+          className="group relative mt-10 scroll-mt-24 overflow-hidden rounded-2xl border"
         >
           <motion.div
             initial={{ scaleX: 0 }}
@@ -1200,7 +1237,7 @@ export default function UserGuidePage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="absolute inset-x-0 top-0 h-[3px] origin-left bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500"
           />
-          <div className={`relative p-6 sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
+          <div className={`relative p-6 sm:p-8 ${isDark ? "border-white/[0.08] bg-[var(--card-bg)]" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}>
             <div className="mb-6 flex items-center gap-3">
               <motion.div
                 whileHover={{ rotate: 8, scale: 1.1 }}
@@ -1212,8 +1249,24 @@ export default function UserGuidePage() {
               <h2 className={`font-[Outfit] text-lg font-bold sm:text-xl ${isDark ? "text-white" : "text-slate-900"}`}>Troubleshooting & FAQ</h2>
             </div>
 
+            <div className={`mb-5 flex items-center rounded-xl border px-4 py-2.5 transition-colors ${isDark ? "border-white/10 bg-white/[0.03] focus-within:border-emerald-500/40" : "border-slate-200/70 bg-white/60 backdrop-blur-xl focus-within:border-emerald-300"}`}>
+              <Search size={16} className={isDark ? "shrink-0 text-slate-500" : "shrink-0 text-slate-400"} />
+              <input
+                type="text"
+                value={faqSearch}
+                onChange={(e) => { setFaqSearch(e.target.value); setOpenFaq(null); }}
+                placeholder="Search the FAQ…"
+                className={`ml-3 w-full bg-transparent text-sm outline-none ${isDark ? "text-white placeholder:text-slate-600" : "text-slate-900 placeholder:text-slate-400"}`}
+              />
+              {faqSearch && (
+                <button type="button" onClick={() => setFaqSearch("")} className={`ml-2 shrink-0 text-xs font-medium ${isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"}`}>
+                  Clear
+                </button>
+              )}
+            </div>
+
             <div className="space-y-3">
-              {faqItems.map((item, i) => {
+              {filteredFaq.map((item, i) => {
                 const isOpen = openFaq === i;
                 return (
                   <motion.div
@@ -1229,7 +1282,7 @@ export default function UserGuidePage() {
                       className={`w-full rounded-xl border px-5 py-4 text-left transition-all duration-300 ${
                         isOpen
                           ? isDark ? "border-emerald-500/20 bg-emerald-500/5 shadow-lg shadow-emerald-500/5" : "border-emerald-300 bg-emerald-50 shadow-md"
-                          : isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl hover:border-white/10 hover:bg-white/[0.04]" : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-slate-300 hover:shadow-md"
+                          : isDark ? "border-white/[0.08] bg-[var(--card-bg)] hover:border-white/10 hover:bg-white/[0.04]" : "border-slate-200/70 bg-white/60 backdrop-blur-xl hover:border-slate-300 hover:shadow-md"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4">
@@ -1261,6 +1314,14 @@ export default function UserGuidePage() {
                   </motion.div>
                 );
               })}
+              {filteredFaq.length === 0 && (
+                <div className="rounded-xl border border-dashed p-8 text-center">
+                  <HelpCircle size={20} className={`mx-auto mb-2 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    No results found for "{faqSearch}". Try a different search term.
+                  </p>
+                </div>
+              )}
             </div>
 
             <motion.div
@@ -1269,7 +1330,7 @@ export default function UserGuidePage() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
               whileHover={{ scale: 1.01 }}
-              className={`mt-8 overflow-hidden rounded-xl border p-6 text-center sm:p-8 ${isDark ? "border-white/[0.08] bg-white/[0.04] backdrop-blur-xl shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}
+              className={`mt-8 overflow-hidden rounded-xl border p-6 text-center sm:p-8 ${isDark ? "border-white/[0.08] bg-[var(--card-bg)] shadow-lg shadow-black/20" : "border-slate-200/70 bg-white/60 backdrop-blur-xl"}`}
             >
               <div className={`absolute inset-0 bg-gradient-to-br from-violet-600/5 via-transparent to-fuchsia-600/5`} />
               <div className="relative">
@@ -1299,6 +1360,24 @@ export default function UserGuidePage() {
             </motion.div>
           </div>
         </motion.section>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-14 flex flex-col items-center justify-center gap-2 text-center"
+        >
+          <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+            Still stuck?{" "}
+            <Link to="/support" className="font-medium text-violet-500 transition-colors hover:text-violet-400">Visit Support</Link>
+            {" · "}
+            <Link to="/faq" className="font-medium text-violet-500 transition-colors hover:text-violet-400">FAQ</Link>
+            {" · "}
+            <Link to="/changelog" className="font-medium text-violet-500 transition-colors hover:text-violet-400">Changelog</Link>
+          </p>
+          <p className={`text-xs ${isDark ? "text-slate-600" : "text-slate-400"}`}>Last updated: June 2026</p>
+        </motion.div>
       </div>
     </main>
   );

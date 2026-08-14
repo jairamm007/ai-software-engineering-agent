@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
 import { Eye, EyeOff, Lock, ArrowLeft, ArrowRight, Check, Shield, RefreshCw, Clock } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import Logo from "@/components/common/Logo";
+import OrbitingRingsBackground from "@/components/landing/OrbitingRingsBackground";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 const features = [
@@ -29,14 +30,26 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const [particles] = useState(() =>
-    Array.from({ length: 12 }, () => ({
-      left: 10 + Math.random() * 80,
-      top: 10 + Math.random() * 80,
-      duration: 3 + Math.random() * 4,
-      delay: Math.random() * 3,
-    }))
-  );
+
+  // Mouse-driven card spotlight + tilt
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(50);
+  const my = useMotionValue(50);
+  const springMx = useSpring(mx, { stiffness: 120, damping: 18 });
+  const springMy = useSpring(my, { stiffness: 120, damping: 18 });
+  const spotlight = useMotionTemplate`radial-gradient(480px circle at ${springMx}% ${springMy}%, ${isDark ? "rgba(139,92,246,0.14)" : "rgba(139,92,246,0.12)"}, transparent 65%)`;
+  const rotateX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18 });
+  const rotateY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = ((e.clientX - rect.left) / rect.width) * 100;
+    const py = ((e.clientY - rect.top) / rect.height) * 100;
+    mx.set(px);
+    my.set(py);
+    rotateX.set((py - 50) / 40);
+    rotateY.set((50 - px) / 40);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,11 +81,18 @@ export default function ResetPasswordPage() {
   };
 
   const renderLeftPanel = ({ heading, subheading }: { heading: string; subheading: string }) => (
-    <div
-      className={`relative hidden w-1/2 items-center justify-center overflow-hidden lg:flex ${
-        isDark ? "bg-slate-900/50" : "bg-slate-100/80"
-      }`}
-    >
+    <div className="relative hidden w-1/2 items-center justify-center overflow-hidden lg:flex">
+      {/* Unified purple gradient panel (dot-free) */}
+      <div
+        className={`absolute inset-0 ${
+          isDark
+            ? "bg-gradient-to-br from-slate-950 via-violet-950/40 to-slate-950"
+            : "bg-gradient-to-br from-violet-100 via-purple-50 to-slate-100"
+        }`}
+      />
+      {/* Subtle vignette for depth */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(20,10,60,0.16)_100%)]" />
+
       <style>{`
         @keyframes float1 {
           0%, 100% { transform: translate(0, 0) scale(1); }
@@ -88,6 +108,12 @@ export default function ResetPasswordPage() {
           0%, 100% { transform: translate(0, 0) scale(1); }
           50% { transform: translate(20px, 40px) scale(1.15); }
         }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .shake-animation { animation: shake 0.5s ease-in-out; }
       `}</style>
 
       <div className="absolute inset-0 overflow-hidden">
@@ -114,7 +140,7 @@ export default function ResetPasswordPage() {
         >
           <div className="relative inline-flex items-center justify-center">
             <div className="absolute inset-0 rounded-2xl accent-gradient blur-xl opacity-50 animate-[pulse-glow_3s_ease-in-out_infinite]" />
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl shadow-2xl accent-shadow-lg">
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl shadow-2xl accent-shadow-lg" style={{ animation: "blink1 1.4s ease-in-out infinite" }}>
               <Logo size="lg" />
             </div>
           </div>
@@ -138,23 +164,23 @@ export default function ResetPasswordPage() {
           {subheading}
         </motion.p>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {features.map((feat, i) => (
             <motion.div
               key={feat.text}
               initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.4 + i * 0.15 }}
-              className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left backdrop-blur-sm ${
+              className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left ${
                 isDark
-                  ? "border-white/5 bg-white/5"
-                  : "border-slate-200/60 bg-white/60 shadow-sm"
+                  ? "border-white/10 bg-[var(--card-bg)]"
+                  : "border-slate-200/60 bg-white shadow-sm"
               }`}
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg accent-bg-light">
                 <feat.icon size={18} className="accent-text-base" />
               </div>
-              <span className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+              <span className={`text-sm font-medium hover-accent ${isDark ? "text-slate-300" : "text-slate-600"}`}>
                 {feat.text}
               </span>
               <div className="ml-auto">
@@ -181,9 +207,7 @@ export default function ResetPasswordPage() {
         >
           <Link
             to="/"
-            className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${
-              isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"
-            }`}
+            className="inline-flex items-center gap-1.5 text-sm font-medium hover-text"
           >
             <ArrowLeft size={14} /> Back to Home
           </Link>
@@ -194,25 +218,60 @@ export default function ResetPasswordPage() {
 
   if (expired && !success) {
     return (
-      <div className={`flex min-h-screen overflow-hidden transition-colors duration-300 ${
+<div className={`flex min-h-screen overflow-x-hidden transition-colors duration-300 ${
         isDark
           ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           : "bg-gradient-to-br from-slate-50 via-white to-slate-100"
       }`}>
         {renderLeftPanel({ heading: "Link expired", subheading: "Don't worry, we can fix this" })}
 
-        <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
-          <motion.div
+        <div className="relative flex w-full items-center justify-center px-6 py-6 lg:py-8 lg:w-1/2">
+          {/* Orbiting rings ambient detail */}
+          <OrbitingRingsBackground />
+
+          {/* Animated gradient border frame — hugs the card */}
+          <div className="relative">
+            <div className="gradient-border absolute -inset-[3px] z-0 rounded-3xl p-px opacity-15 blur-[3px]" />
+
+            <motion.div
+            ref={cardRef}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className={`relative z-10 w-full max-w-md space-y-6 rounded-3xl border p-8 text-center shadow-2xl backdrop-blur-xl ${
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => { mx.set(50); my.set(50); rotateX.set(0); rotateY.set(0); }}
+            style={{
+              rotateX,
+              rotateY,
+              transformStyle: "preserve-3d",
+            }}
+            className={`relative z-10 mx-auto w-full max-w-lg space-y-5 overflow-hidden rounded-3xl border p-6 text-center backdrop-blur-xl ${
               isDark
-                ? "border-white/10 bg-white/[0.07] shadow-black/20"
-                : "border-slate-200/50 bg-white/60 shadow-slate-200/50"
+                ? "border-white/10 bg-[var(--card-bg)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]"
+                : "border-slate-200/50 bg-white/60 shadow-[0_30px_80px_-20px_rgba(90,60,180,0.3)]"
             }`}
           >
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/15">
+            {/* Cursor spotlight */}
+            <motion.div
+              style={{ background: spotlight }}
+              className="pointer-events-none absolute inset-0"
+            />
+
+            {/* Mobile logo */}
+            <div className="text-center lg:hidden">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl shadow-lg accent-shadow">
+                <Logo size="md" />
+              </div>
+            </div>
+
+            <Link
+              to="/login"
+              className="absolute top-4 left-4 inline-flex items-center gap-1.5 text-xs font-medium hover-text"
+            >
+              <ArrowLeft size={14} /> Sign In
+            </Link>
+
+            <div className="relative mt-6 mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/15">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="12" y1="8" x2="12" y2="12"/>
@@ -232,14 +291,14 @@ export default function ResetPasswordPage() {
             <div className="space-y-3">
               <Link
                 to="/forgot-password"
-                className="flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg"
+                className="flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg"
               >
                 Request new link
                 <ArrowRight size={16} />
               </Link>
               <Link
                 to="/login"
-                className={`flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
+                className={`flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
                   isDark
                     ? "border-white/10 text-slate-300 hover:bg-white/5"
                     : "border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -250,6 +309,7 @@ export default function ResetPasswordPage() {
               </Link>
             </div>
           </motion.div>
+          </div>
         </div>
       </div>
     );
@@ -263,41 +323,38 @@ export default function ResetPasswordPage() {
     }`}>
       {renderLeftPanel({ heading: "Set new password", subheading: "Choose a strong password for your account" })}
 
-      <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
-        <style>{`
-          @keyframes particle-float {
-            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-            25% { transform: translateY(-20px) translateX(10px); opacity: 0.6; }
-            50% { transform: translateY(-10px) translateX(-5px); opacity: 0.4; }
-            75% { transform: translateY(-30px) translateX(15px); opacity: 0.5; }
-          }
-        `}</style>
+      <div className="relative flex w-full items-center justify-center px-6 py-6 lg:py-8 lg:w-1/2">
+        {/* Orbiting rings ambient detail */}
+        <OrbitingRingsBackground />
 
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {particles.map((p, i) => (
-            <div
-              key={i}
-              className={`absolute h-1 w-1 rounded-full ${isDark ? "accent-bg-light" : "accent-bg-light"}`}
-              style={{
-                left: `${p.left}%`,
-                top: `${p.top}%`,
-                animation: `particle-float ${p.duration}s ease-in-out infinite`,
-                animationDelay: `${p.delay}s`,
-              }}
-            />
-          ))}
-        </div>
+        {/* Animated gradient border frame — hugs the card */}
+        <div className="relative">
+          <div className="gradient-border absolute -inset-[3px] z-0 rounded-3xl p-px opacity-15 blur-[3px]" />
 
-        <motion.div
+          <motion.div
+          ref={cardRef}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className={`relative z-10 w-full max-w-md space-y-6 rounded-3xl border p-6 sm:p-8 shadow-2xl backdrop-blur-xl ${
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => { mx.set(50); my.set(50); rotateX.set(0); rotateY.set(0); }}
+          style={{
+            rotateX,
+            rotateY,
+            transformStyle: "preserve-3d",
+          }}
+          className={`relative z-10 mx-auto w-full max-w-lg space-y-5 overflow-hidden rounded-3xl border p-6 backdrop-blur-xl ${
             isDark
-              ? "border-white/10 bg-white/[0.07] shadow-black/20"
-              : "border-slate-200/50 bg-white/60 shadow-slate-200/50"
+              ? "border-white/10 bg-[var(--card-bg)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]"
+              : "border-slate-200/50 bg-white/60 shadow-[0_30px_80px_-20px_rgba(90,60,180,0.3)]"
           }`}
         >
+          {/* Cursor spotlight */}
+          <motion.div
+            style={{ background: spotlight }}
+            className="pointer-events-none absolute inset-0"
+          />
+
           {/* Mobile logo */}
           <div className="text-center lg:hidden">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl shadow-lg accent-shadow">
@@ -307,11 +364,7 @@ export default function ResetPasswordPage() {
 
           <Link
             to="/login"
-            className={`absolute top-4 left-4 inline-flex items-center gap-1.5 text-xs font-medium transition-colors ${
-              isDark
-                ? "text-slate-500 hover:text-white"
-                : "text-slate-400 hover:text-slate-900"
-            }`}
+            className="absolute top-4 left-4 inline-flex items-center gap-1.5 text-xs font-medium hover-text"
           >
             <ArrowLeft size={14} /> Sign In
           </Link>
@@ -320,7 +373,15 @@ export default function ResetPasswordPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
+            className="relative mt-5"
           >
+            <div
+              className={`mb-1 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium ${
+                isDark ? "text-violet-300" : "text-violet-700"
+              }`}
+            >
+              <Shield size={12} /> New Password
+            </div>
             <h2 className={`text-2xl font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
               {success ? "Password updated!" : "Set new password"}
             </h2>
@@ -339,7 +400,7 @@ export default function ResetPasswordPage() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+                className="shake-animation rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
               >
                 {error}
               </motion.div>
@@ -358,14 +419,14 @@ export default function ResetPasswordPage() {
               </div>
             </motion.div>
           ) : (
-            <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+            <form onSubmit={(e) => void handleSubmit(e)} className="space-y-3">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
               >
                 <label className={`mb-1.5 block text-xs font-medium transition-colors ${
-                  focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+                  focusedField === "password" ? "text-[#a855f7]" : isDark ? "text-slate-400" : "text-slate-500"
                 }`}>
                   New password
                 </label>
@@ -373,7 +434,7 @@ export default function ResetPasswordPage() {
                   <Lock
                     size={16}
                     className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                      focusedField === "password" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
+                      focusedField === "password" ? "text-[#a855f7]" : isDark ? "text-slate-500" : "text-slate-400"
                     }`}
                   />
                   <input
@@ -383,9 +444,9 @@ export default function ResetPasswordPage() {
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
                     placeholder="At least 6 characters"
-                    className={`w-full rounded-xl border py-3 pl-10 pr-11 text-sm outline-none transition-all duration-300 ${
+                    className={`w-full rounded-xl border py-2.5 pl-10 pr-11 text-sm outline-none transition-all duration-300 ${
                       focusedField === "password"
-                        ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                        ? "border-[#a855f7] shadow-[0_0_0_1px_#a855f7,0_0_18px_rgba(168,85,247,0.35)]"
                         : isDark
                           ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
                           : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
@@ -409,7 +470,7 @@ export default function ResetPasswordPage() {
                 transition={{ delay: 0.4, duration: 0.4 }}
               >
                 <label className={`mb-1.5 block text-xs font-medium transition-colors ${
-                  focusedField === "confirm" ? "text-[var(--accent)]" : isDark ? "text-slate-400" : "text-slate-500"
+                  focusedField === "confirm" ? "text-[#a855f7]" : isDark ? "text-slate-400" : "text-slate-500"
                 }`}>
                   Confirm password
                 </label>
@@ -417,7 +478,7 @@ export default function ResetPasswordPage() {
                   <Lock
                     size={16}
                     className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
-                      focusedField === "confirm" ? "text-[var(--accent)]" : isDark ? "text-slate-500" : "text-slate-400"
+                      focusedField === "confirm" ? "text-[#a855f7]" : isDark ? "text-slate-500" : "text-slate-400"
                     }`}
                   />
                   <input
@@ -427,9 +488,9 @@ export default function ResetPasswordPage() {
                     onFocus={() => setFocusedField("confirm")}
                     onBlur={() => setFocusedField(null)}
                     placeholder="Repeat your password"
-                    className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-all duration-300 ${
+                    className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-300 ${
                       focusedField === "confirm"
-                        ? "border-[var(--accent)] shadow-[0_0_15px_var(--accent-light)]"
+                        ? "border-[#a855f7] shadow-[0_0_0_1px_#a855f7,0_0_18px_rgba(168,85,247,0.35)]"
                         : isDark
                           ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600"
                           : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400"
@@ -448,7 +509,7 @@ export default function ResetPasswordPage() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="shimmer-btn flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-3 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100"
+                  className="shimmer-btn flex w-full items-center justify-center gap-2 rounded-xl accent-gradient px-4 py-2.5 text-sm font-semibold text-white accent-shadow transition-all hover:accent-shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:scale-100"
                 >
                   {loading ? (
                     <LoadingIndicator size="sm" />
@@ -474,6 +535,7 @@ export default function ResetPasswordPage() {
             </Link>
           </motion.p>
         </motion.div>
+        </div>
       </div>
     </div>
   );

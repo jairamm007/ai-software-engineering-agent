@@ -72,12 +72,12 @@ export default function TeamActivityPage() {
           <LoadingIndicator size="md" />
         </div>
       ) : activities.length === 0 ? (
-        <div className={`rounded-2xl border py-16 text-center ${isDark ? "border-white/[0.06] bg-white/[0.01]" : "border-slate-200 bg-slate-50"}`}>
+        <div className={`rounded-2xl border py-16 text-center ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-slate-50"}`}>
           <Activity size={40} className={`mx-auto mb-4 ${isDark ? "text-slate-700" : "text-slate-300"}`} />
           <p className={`text-sm font-medium font-[Inter] ${isDark ? "text-slate-500" : "text-slate-400"}`}>No activity yet</p>
         </div>
       ) : (
-        <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+        <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           {activities.map((activity: TeamActivity, idx: number) => (
             <div
               key={activity.id}

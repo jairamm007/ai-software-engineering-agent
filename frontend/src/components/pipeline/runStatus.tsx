@@ -1,11 +1,11 @@
 import {
   CheckCircle2,
   Clock,
-  LoaderCircle,
   RotateCcw,
   ShieldX,
   XCircle,
 } from "lucide-react";
+import { SparkleLoader } from "@/components/common/SparkleLoader";
 import type { PipelineRun, RunStageKey, RunStageStatus, StageStatus } from "@/types/pipeline";
 
 export const STAGE_ORDER: RunStageKey[] = ["debugging", "codegen", "security", "performance"];
@@ -28,7 +28,7 @@ export const RUN_STATUS_STYLES: Record<PipelineRun["status"], string> = {
 
 export const RUN_STATUS_ICONS: Record<PipelineRun["status"], React.ReactNode> = {
   queued: <Clock size={12} />,
-  running: <LoaderCircle size={12} className="animate-spin" />,
+  running: <SparkleLoader size={12} />,
   done: <CheckCircle2 size={12} />,
   failed: <XCircle size={12} />,
   rejected: <RotateCcw size={12} />,

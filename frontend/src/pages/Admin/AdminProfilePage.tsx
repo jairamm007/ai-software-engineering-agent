@@ -137,7 +137,7 @@ export default function AdminProfilePage() {
       <motion.div
         variants={fadeUp}
         className={`overflow-hidden rounded-2xl border shadow-sm ${
-          isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+          isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
         }`}
       >
         {profile && (
@@ -186,7 +186,7 @@ export default function AdminProfilePage() {
       <motion.div
         variants={fadeUp}
         className={`rounded-2xl border p-6 shadow-sm ${
-          isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+          isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"
         }`}
       >
         <h2 className={`mb-5 text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>Edit Profile</h2>

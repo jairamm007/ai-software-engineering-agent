@@ -110,7 +110,7 @@ export default function RunDetailPage() {
         </div>
 
         {run?.summary && (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600 dark:border-white/10 dark:bg-[var(--card-bg)] dark:text-slate-300">
             {run.summary}
           </div>
         )}

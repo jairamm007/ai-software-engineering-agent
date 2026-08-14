@@ -60,7 +60,7 @@ export default function AdminSearchPage() {
 
       <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[{ label: "Indexed Files", value: stats?.totalFiles ?? 0, icon: FileCode2, gradient: "from-cyan-500 to-blue-500" }, { label: "Code Chunks", value: stats?.totalChunks ?? 0, icon: Database, gradient: "from-emerald-500 to-teal-500" }, { label: "Storage Used", value: stats?.totalStorageMB ?? "0", icon: Zap, gradient: "from-amber-500 to-orange-500", suffix: " MB" }].map((s) => (
-          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${s.gradient}`} />
             <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${s.gradient} text-white shadow-lg`}><s.icon size={18} /></div>
             <p className={`mt-3 text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{s.label}</p>
@@ -69,7 +69,7 @@ export default function AdminSearchPage() {
         ))}
       </motion.div>
 
-      <motion.div variants={fadeUp} className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+      <motion.div variants={fadeUp} className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
         <h3 className="text-sm font-semibold mb-4">Index Actions</h3>
         <div className="flex flex-wrap gap-3">
           <button onClick={() => void handleRebuild()} disabled={rebuilding} className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-rose-500/25 disabled:opacity-50">
@@ -83,7 +83,7 @@ export default function AdminSearchPage() {
       </motion.div>
 
       {stats && stats.filesByExtension.length > 0 && (
-        <motion.div variants={fadeUp} className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+        <motion.div variants={fadeUp} className={`rounded-2xl border p-6 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           <h3 className="text-sm font-semibold mb-4">Indexed File Types</h3>
           <div className="flex flex-wrap gap-2">
             {stats.filesByExtension.map((ext) => (

@@ -83,7 +83,7 @@ export default function TeamMembersPage() {
 
       {/* Invite */}
       {isAdmin && (
-        <div className={`rounded-2xl border p-4 space-y-3 ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+        <div className={`rounded-2xl border p-4 space-y-3 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           <div className="flex items-center gap-2">
             <input
               type="email"
@@ -156,7 +156,7 @@ export default function TeamMembersPage() {
       )}
 
       {/* Member List */}
-      <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
+      <div className={`rounded-2xl border overflow-hidden ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
         {team.members?.map((member: TeamMember, idx: number) => (
           <div
             key={member.id}

@@ -147,7 +147,7 @@ export default function RepositoryReviewPage() {
                     ? "border-[var(--accent)]/50 bg-[var(--accent)]/10 shadow-lg shadow-[var(--accent)]/10"
                     : "border-[var(--accent)]/50 bg-[var(--accent)]/5 shadow-lg shadow-[var(--accent)]/10"
                   : isDark
-                    ? "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]"
+                    ? "border-white/10 bg-[var(--card-bg)] hover:border-white/20 hover:bg-white/[0.07]"
                     : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
@@ -166,7 +166,7 @@ export default function RepositoryReviewPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={`rounded-2xl border shadow-sm ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>

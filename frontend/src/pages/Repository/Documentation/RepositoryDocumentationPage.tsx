@@ -205,7 +205,7 @@ export default function RepositoryDocumentationPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={`rounded-2xl border shadow-sm ${
-            isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+            isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
           }`}
         >
           <div className={`border-b px-5 py-4 ${isDark ? "border-white/10" : "border-slate-100"}`}>
@@ -239,7 +239,7 @@ export default function RepositoryDocumentationPage() {
                           ? "border-emerald-500/30 bg-emerald-500/10 ring-1 ring-emerald-500/20"
                           : "border-emerald-200 bg-emerald-50 ring-1 ring-emerald-200"
                         : isDark
-                          ? "border-white/10 bg-white/[0.02] hover:border-white/20"
+                          ? "border-white/10 bg-[var(--card-bg)] hover:border-white/20"
                           : "border-slate-200 bg-white hover:border-slate-300"
                     }`}
                   >
@@ -405,7 +405,7 @@ export default function RepositoryDocumentationPage() {
         {(result || loading) && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
             <div className={`rounded-2xl border shadow-sm ${
-              isDark ? "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02]" : "border-slate-200 bg-white"
+              isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"
             }`}>
               <div className={`flex items-center justify-between border-b px-5 py-3 ${isDark ? "border-white/10" : "border-slate-100"}`}>
                 <h3 className={`text-sm font-bold font-[Outfit] ${isDark ? "text-white" : "text-slate-900"}`}>

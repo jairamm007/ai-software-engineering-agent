@@ -32,6 +32,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import AuroraBackground from "@/components/motion/AuroraBackground";
+import PageTransition from "@/components/motion/PageTransition";
 
 const sidebarSections = [
   {
@@ -106,7 +108,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const sidebarWidth = collapsed ? "w-[68px]" : "w-64";
 
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-300 ${isDark ? "bg-[#0a0a0f]" : "bg-[#f8fafc]"}`}>
+    <div className="app-bg relative flex h-screen overflow-hidden transition-colors duration-300">
+      <AuroraBackground />
       {/* Mobile overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -125,7 +128,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r transition-all duration-300 ease-in-out lg:relative ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         } ${sidebarWidth} ${
-          isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"
+          isDark ? "border-white/[0.06] surface-elevated" : "border-slate-200 bg-white"
         }`}
       >
         {/* Sidebar header */}
@@ -244,9 +247,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className={`flex h-16 shrink-0 items-center justify-between border-b px-4 sm:px-6 ${isDark ? "border-white/[0.06] bg-[#111118]/80" : "border-slate-200 bg-white/80"} backdrop-blur-xl`}>
+        <header className={`flex h-16 shrink-0 items-center justify-between border-b px-4 sm:px-6 ${isDark ? "border-white/[0.06] bg-[var(--bg-secondary)]/90" : "border-slate-200 bg-white/80"} backdrop-blur-xl`}>
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -301,9 +304,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-            {children}
-          </div>
+          <PageTransition locationKey={location.pathname} variant="blur">
+            <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+              {children}
+            </div>
+          </PageTransition>
         </main>
       </div>
     </div>

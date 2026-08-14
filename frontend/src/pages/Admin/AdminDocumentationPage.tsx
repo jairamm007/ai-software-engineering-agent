@@ -89,7 +89,7 @@ export default function AdminDocumentationPage() {
 
       <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[{ label: "Total Docs", value: pagination.total, gradient: "from-cyan-500 to-blue-500" }, { label: "Completed", value: completed, gradient: "from-emerald-500 to-teal-500" }, { label: "Generating", value: generating, gradient: "from-amber-500 to-orange-500" }].map((s) => (
-          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+          <div key={s.label} className={`relative overflow-hidden rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${s.gradient}`} />
             <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{s.label}</p>
             <p className="mt-1 text-2xl font-bold">{s.value}</p>
@@ -98,7 +98,7 @@ export default function AdminDocumentationPage() {
       </motion.div>
 
       {showCreate && (
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className={`rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className={`rounded-2xl border p-5 ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Generate New Documentation</h3>
             <button onClick={() => setShowCreate(false)}><X size={16} /></button>
@@ -116,7 +116,7 @@ export default function AdminDocumentationPage() {
         </motion.div>
       )}
 
-      <motion.div variants={fadeUp} className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white"}`}>
+      <motion.div variants={fadeUp} className={`rounded-2xl border ${isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
         {loading ? (
           <div className="p-6 space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className={`h-14 animate-pulse rounded-xl ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />)}</div>
         ) : docs.length === 0 ? (
@@ -151,7 +151,7 @@ export default function AdminDocumentationPage() {
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className={`rounded-2xl border p-6 shadow-2xl ${isDark ? "border-white/10 bg-[#111118]" : "border-slate-200 bg-white"}`}>
+          <div className={`rounded-2xl border p-6 shadow-2xl ${isDark ? "border-white/10 bg-[var(--card-bg)]" : "border-slate-200 bg-white"}`}>
             <h3 className="text-lg font-bold">Delete Documentation?</h3>
             <p className={`mt-2 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>This action cannot be undone.</p>
             <div className="mt-5 flex justify-end gap-3">

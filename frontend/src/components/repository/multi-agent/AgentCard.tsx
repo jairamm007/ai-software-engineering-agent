@@ -1,8 +1,9 @@
 import { useTheme } from "@/context/ThemeContext";
+import { SparkleLoader } from "@/components/common/SparkleLoader";
 import {
   Brain, Search, Lightbulb, MessageSquare, Code, Wrench,
   GitCommit, LayoutGrid, FileText, GitPullRequest, FlaskConical,
-  Shield, CheckCircle, XCircle, Clock, Loader2, SkipForward,
+  Shield, CheckCircle, XCircle, Clock, SkipForward,
 } from "lucide-react";
 import type { AgentExecutionStep, AgentName } from "@/services/multiAgent";
 
@@ -48,7 +49,7 @@ function StatusIcon({ status }: { status: AgentExecutionStep["status"] }) {
     case "error":
       return <XCircle size={14} className="text-red-400" />;
     case "running":
-      return <Loader2 size={14} className="animate-spin text-[var(--accent)]" />;
+      return <SparkleLoader size={14} />;
     case "skipped":
       return <SkipForward size={14} className="text-slate-500" />;
     default:

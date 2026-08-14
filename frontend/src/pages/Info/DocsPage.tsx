@@ -1,8 +1,7 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
-import PlexusTerrainBackground from "@/components/landing/PlexusTerrainBackground";
-import GradientOrbs from "@/components/motion/GradientOrbs";
 import Reveal from "@/components/motion/Reveal";
 import SpotlightCard from "@/components/motion/SpotlightCard";
 import Magnetic from "@/components/motion/Magnetic";
@@ -12,7 +11,7 @@ import BackToTop from "@/components/motion/BackToTop";
 import CTACard from "@/components/motion/CTACard";
 import { glassCard } from "@/components/motion/styles";
 import { Link } from "react-router-dom";
-import { BookOpen, Terminal, Code2, Settings, Zap, ExternalLink, CornerDownRight } from "lucide-react";
+import { BookOpen, Terminal, Code2, Settings, Zap, ExternalLink, CornerDownRight, Copy, Check } from "lucide-react";
 
 const sections = [
   {
@@ -93,6 +92,7 @@ GET /api/repository/:id/review`,
 export default function DocsPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
   return (
     <motion.main
@@ -101,8 +101,6 @@ export default function DocsPage() {
       transition={{ duration: 0.4 }}
       className={cn("min-h-screen font-[Inter] transition-colors duration-300", isDark ? "bg-[#07030F] text-white" : "bg-white text-slate-900")}
     >
-      <PlexusTerrainBackground />
-      <GradientOrbs />
       <ScrollProgress />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 md:py-20">
@@ -113,18 +111,38 @@ export default function DocsPage() {
           titleBefore={["Build", "with"]}
           gradientWord="Repo"
           gradientWords={["Repo", "Verify"]}
-          titleAfter={["Verify"]}
           subtitle="Everything you need to analyze, review, and document your codebase with AI."
           gradientClass="from-violet-400 via-fuchsia-400 to-pink-400"
           glowClass="rgba(139, 92, 246, 0.14)"
         />
+
+        <Reveal className="mb-10 flex flex-wrap items-center justify-center gap-2.5">
+          {sections.map((s) => {
+            const TocIcon = s.icon;
+            return (
+              <a
+                key={s.title}
+                href={`#section-${s.title}`}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors",
+                  isDark
+                    ? "border-white/[0.08] bg-white/[0.04] text-slate-400 hover:border-violet-500/40 hover:text-white"
+                    : "border-slate-200/70 bg-white/60 text-slate-500 hover:border-violet-300 hover:text-slate-900"
+                )}
+              >
+                <TocIcon size={12} className={s.accent} /> {s.title}
+              </a>
+            );
+          })}
+        </Reveal>
 
         <div className="space-y-10">
           {sections.map((section, si) => {
             const Icon = section.icon;
             return (
               <Reveal key={section.title} delay={si * 0.05} y={34}>
-                <SpotlightCard
+                <div id={`section-${section.title}`} className="scroll-mt-24">
+                  <SpotlightCard
                   spotlightColor={isDark ? "rgba(139, 92, 246, 0.11)" : "rgba(139, 92, 246, 0.08)"}
                   className={cn("rounded-2xl border transition-shadow duration-300", glassCard(isDark), isDark ? "hover:shadow-xl hover:shadow-violet-500/10" : "hover:shadow-xl hover:shadow-slate-200/60")}
                   innerClassName="p-6 sm:p-8"
@@ -193,6 +211,17 @@ export default function DocsPage() {
                         <span className="ml-3 flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
                           <Terminal size={11} /> repo-verify
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(section.code);
+                            setCopiedIdx(si);
+                            setTimeout(() => setCopiedIdx(null), 1500);
+                          }}
+                          className="ml-auto flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-medium text-slate-400 transition-colors hover:bg-white/[0.08] hover:text-white"
+                        >
+                          {copiedIdx === si ? <><Check size={11} /> Copied</> : <><Copy size={11} /> Copy</>}
+                        </button>
                       </div>
                       <pre className="overflow-x-auto p-5 text-[13px] leading-6 text-slate-300">
                         <code>{section.code}</code>
@@ -231,6 +260,7 @@ export default function DocsPage() {
                     </ul>
                   )}
                 </SpotlightCard>
+                </div>
               </Reveal>
             );
           })}

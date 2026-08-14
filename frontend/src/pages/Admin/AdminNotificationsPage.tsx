@@ -78,7 +78,7 @@ export default function AdminNotificationsPage() {
     }
   };
 
-  const cardClass = isDark ? "border-white/[0.06] bg-[#111118]" : "border-slate-200 bg-white";
+  const cardClass = isDark ? "border-white/[0.06] bg-[var(--card-bg)]" : "border-slate-200 bg-white";
   const textPrimary = isDark ? "text-white" : "text-slate-900";
   const textSecondary = isDark ? "text-slate-400" : "text-slate-500";
   const textMuted = isDark ? "text-slate-500" : "text-slate-400";
@@ -152,7 +152,7 @@ export default function AdminNotificationsPage() {
                           type === t
                             ? `border-transparent bg-gradient-to-r ${colors.bg} ${colors.text} ring-1 ring-inset ring-current/20`
                             : isDark
-                              ? "border-white/[0.06] bg-[#111118] text-slate-400 hover:bg-white/[0.04]"
+                              ? "border-white/[0.06] bg-[var(--card-bg)] text-slate-400 hover:bg-white/[0.04]"
                               : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
                         }`}
                       >
