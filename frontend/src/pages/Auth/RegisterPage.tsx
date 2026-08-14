@@ -351,7 +351,7 @@ export default function RegisterPage() {
               rotateY,
               transformStyle: "preserve-3d",
             }}
-            className={`relative z-10 mx-auto w-full max-w-lg overflow-hidden rounded-3xl border p-6 ${
+            className={`relative z-10 mx-auto w-full max-w-2xl overflow-hidden rounded-3xl border p-6 sm:p-8 ${
               isDark
                 ? "border-white/10 bg-[var(--card-bg)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]"
                 : "border-slate-200/50 bg-white shadow-[0_30px_80px_-20px_rgba(90,60,180,0.3)]"

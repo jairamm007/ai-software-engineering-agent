@@ -225,7 +225,7 @@ export default function ForgotPasswordPage() {
             rotateY,
             transformStyle: "preserve-3d",
           }}
-          className={`relative z-10 mx-auto w-full max-w-lg space-y-5 overflow-hidden rounded-3xl border p-6 backdrop-blur-xl ${
+          className={`relative z-10 mx-auto w-full max-w-2xl space-y-5 overflow-hidden rounded-3xl border p-6 sm:p-8 backdrop-blur-xl ${
             isDark
               ? "border-white/10 bg-[var(--card-bg)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]"
               : "border-slate-200/50 bg-white/60 shadow-[0_30px_80px_-20px_rgba(90,60,180,0.3)]"
