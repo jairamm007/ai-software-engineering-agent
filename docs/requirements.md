@@ -121,7 +121,7 @@
 - **Scalability**: Modular backend (controllers/routes/services/repositories), provider failover, lazy-loaded frontend routes
 - **Maintainability**: Shared types, strict TypeScript, ESLint clean, documented codebase
 - **Usability**: Responsive UI, dark/light themes, accent colors, landing page with FAQ/docs
-- **Testability**: Vitest unit/integration suites (304 tests)
+- **Testability**: Vitest unit/integration suites (321 tests)
 
 ---
 

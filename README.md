@@ -2,7 +2,7 @@
 
 > 💡 An AI-powered, multi-agent platform that understands complete GitHub repositories, reviews code, detects bugs, finds security vulnerabilities, generates documentation and tests, maps architecture, and helps developers ship faster — like an intelligent teammate.
 
-**🧰 Stack:** React 19 · TypeScript · Vite 8 · Tailwind CSS 4 · Express 5 · PostgreSQL · Prisma 7 · Better Auth · Gemini · OpenAI · Groq · 304 tests passing
+**🧰 Stack:** React 19 · TypeScript · Vite 8 · Tailwind CSS 4 · Express 5 · PostgreSQL · Prisma 7 · Better Auth · Gemini · OpenAI · Groq · 321 tests passing
 
 ---
 
@@ -65,7 +65,7 @@ Most AI coding assistants only autocomplete code. **Repo Verify** operates at th
 | 🧵 LangGraph / LangChain | Agent orchestration |
 | 🐙 Octokit + simple-git | GitHub API & cloning |
 | ✉️ Resend | Transactional email |
-| ✅ Vitest | Testing (304 tests) |
+| ✅ Vitest | Testing (321 tests) |
 
 ### AI / LLM
 Multi-provider router with automatic failover:
@@ -228,7 +228,7 @@ Full details: `docs/system-design.md` and `docs/architecture.md`.
 ## 🧪 Testing
 
 ```bash
-# Backend (304 Vitest tests)
+# Backend (321 Vitest tests)
 cd backend && npm test
 
 # Frontend

@@ -224,7 +224,7 @@ export async function apiClearCache(): Promise<void> {
   }
 }
 
-export async function apiUpdateProfile(updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "bannerUrl" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>): Promise<User> {
+export async function apiUpdateProfile(updates: Partial<Pick<User, "name" | "email" | "bio" | "image" | "bannerUrl" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>): Promise<User> {
   const res = await fetch(`${BACKEND_URL}/api/user/profile`, {
     method: "PUT",
     credentials: "include",

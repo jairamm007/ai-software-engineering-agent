@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(result.token);
   }, []);
 
-  const updateProfile = useCallback(async (updates: Partial<Pick<User, "name" | "email" | "bio" | "role" | "image" | "bannerUrl" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>) => {
+  const updateProfile = useCallback(async (updates: Partial<Pick<User, "name" | "email" | "bio" | "image" | "bannerUrl" | "linkedinUrl" | "githubUrl" | "portfolioUrl">>) => {
     // Optimistic update
     setUser((prev) => (prev ? { ...prev, ...updates } : null));
 

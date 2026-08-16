@@ -54,7 +54,6 @@ export default function ProfilePage() {
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [bio, setBio] = useState(user?.bio ?? "");
-  const [role, setRole] = useState(user?.role ?? "");
   const [linkedinUrl, setLinkedinUrl] = useState(user?.linkedinUrl ?? "");
   const [githubUrl, setGithubUrl] = useState(user?.githubUrl ?? "");
   const [portfolioUrl, setPortfolioUrl] = useState(user?.portfolioUrl ?? "");
@@ -181,7 +180,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
-      await updateProfile({ name, email, bio, role, linkedinUrl, githubUrl, portfolioUrl });
+      await updateProfile({ name, email, bio, linkedinUrl, githubUrl, portfolioUrl });
       setSaved(true);
       setEditing(false);
       setTimeout(() => setSaved(false), 2000);
@@ -344,7 +343,7 @@ export default function ProfilePage() {
               </div>
               <div className="pb-1 min-w-0">
                 <h2 className={`text-xl font-bold truncate ${isDark ? "text-white" : "text-slate-900"}`}>{user?.name ?? name}</h2>
-                <p className={`text-sm truncate ${isDark ? "text-slate-400" : "text-slate-500"}`}>{role || "No role set"}</p>
+                <p className={`text-sm truncate ${isDark ? "text-slate-400" : "text-slate-500"}`}>{email || user?.email}</p>
               </div>
             </div>
 
@@ -529,21 +528,6 @@ export default function ProfilePage() {
                   }`}
                 />
               </div>
-            </div>
-            <div>
-              <label className={`mb-1.5 block text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Role</label>
-              <input
-                type="text"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                disabled={!editing}
-                placeholder="e.g. Software Engineer"
-                className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
-                  isDark
-                    ? "border-white/10 bg-white/5 text-white placeholder:text-slate-600 focus:border-violet-500 disabled:opacity-60"
-                    : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 disabled:opacity-60"
-                }`}
-              />
             </div>
             <div>
               <label className={`mb-1.5 block text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Bio</label>

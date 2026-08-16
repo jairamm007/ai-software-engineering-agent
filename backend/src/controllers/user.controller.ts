@@ -13,13 +13,12 @@ export async function updateProfileController(req: AuthRequest, res: Response) {
       return;
     }
 
-    const { name, email, bio, role, image, bannerUrl, linkedinUrl, githubUrl, portfolioUrl } = req.body;
+    const { name, email, bio, image, bannerUrl, linkedinUrl, githubUrl, portfolioUrl } = req.body;
 
     const data: Record<string, string | null> = {};
     if (name !== undefined) data.name = name;
     if (email !== undefined) data.email = email;
     if (bio !== undefined) data.bio = bio || null;
-    if (role !== undefined) data.role = role || null;
     if (image !== undefined) data.image = image || null;
     if (bannerUrl !== undefined) data.bannerUrl = bannerUrl || null;
     if (linkedinUrl !== undefined) data.linkedinUrl = linkedinUrl || null;

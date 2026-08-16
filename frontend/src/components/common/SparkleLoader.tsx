@@ -5,7 +5,7 @@ interface SparkleLoaderProps {
   className?: string;
 }
 
-export function SparkleLoader({ size = 32, className }: SparkleLoaderProps) {
+export function SparkleLoader({ size = 33, className }: SparkleLoaderProps) {
   return (
     <svg
       width={size}
