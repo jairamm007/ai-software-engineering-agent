@@ -91,7 +91,7 @@ AI + Multi-Agent Orchestration + Full Stack Web App + RAG + Repo Intelligence + 
 - **simple-git** (repo cloning)
 
 ### AI / LLM
-Multi-provider router with automatic failover (`LLM_PROVIDER_ORDER`):
+Multi-provider router with automatic failover (`LLM_PROVIDER_ORDER`), 7 providers:
 - Google **Gemini**
 - **Groq**
 - **OpenRouter**
@@ -99,14 +99,13 @@ Multi-provider router with automatic failover (`LLM_PROVIDER_ORDER`):
 - **Cerebras**
 - **Together AI**
 - **Mistral**
-- **Cohere**
 
 ### RAG / Vectors
 - Repository indexer → parser (AST-based) → chunker → **embeddings** (Gemini/OpenAI) → **pgvector** similarity search
 - Semantic search with multi-query expansion and reranking
 
 ### Testing
-- **Vitest** — 304 unit/integration tests across agents, services, repositories, middleware, RAG, and insights
+- **Vitest** — 321 unit/integration tests across agents, services, repositories, middleware, RAG, and insights
 
 ### Deployment
 - Frontend: static build (`vite build`) — Vercel-ready (`vercel.json`)
@@ -125,24 +124,24 @@ Multi-provider router with automatic failover (`LLM_PROVIDER_ORDER`):
 | **Repository Intelligence** | File tree, AST symbols, language stats, complexity, import/call graphs, architecture diagram |
 | **RAG / Semantic Search** | Chunked embeddings, similarity + natural-language search |
 | **AI Chat** | Conversational agent with repository context and multi-turn memory |
-| **Multi-Agent** | 13+ specialized agents orchestrated via LangGraph |
+| **Multi-Agent** | 12 agents (planner, retriever, reasoner + 9 specialized) orchestrated via LangGraph |
 | **Pipeline (Debug/Codegen/Security/Perf)** | End-to-end automated runs with sandboxed test execution |
 | **Insights** | Auto-generated architecture/module/dependency/tech-stack reports with health scores + PDF/Markdown export |
 | **Code Review** | PR/commit review with issue counts and suggestions |
 | **Documentation** | README/API/architecture doc generation |
 | **GitHub Integration** | OAuth connect, repo/branch/commit/PR/issue management, CI/CD, branch protection, webhooks, AI PR assistant |
 | **Teams** | Team workspace: members, roles, shared repos, chat, discussions, docs, reviews, testing, analytics, notifications |
-| **Admin Panel** | 20+ pages: users, repositories, AI services, analytics, security, reports, backup, support, activity logs, settings |
+| **Admin Panel** | 20 pages: users, repositories, AI services, analytics, security, reports, backup, support, activity logs, settings |
 | **Landing / Public** | Marketing pages, FAQ, docs, blog, about, support, privacy, terms |
 
 ---
 
 ## Current Status
 
-- All core modules implemented and passing: frontend/backend typechecks, production builds, ESLint (0 errors), and 304 backend tests.
+- All core modules implemented and passing: frontend/backend typechecks, production builds, ESLint (0 errors), and 320 backend tests.
 - Authentication includes mandatory email verification and password reset (Resend) — working in development with the test sender.
 - Repository cloning workspaces are stored in `backend/temp/` (git-ignored) and cleaned from the repo.
-- Deployment pending: Resend domain verification + hosting (see `5-roadmap.md`).
+- Deployment pending: Resend domain verification + hosting (see the roadmap in the root `README.md`).
 
 ---
 

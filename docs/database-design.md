@@ -2,7 +2,7 @@
 
 # Database: PostgreSQL + Prisma 7
 
-Single PostgreSQL database. All user data is scoped by `userId`, team data by `teamId`. Cascade deletes remove children. Source of truth: `backend/prisma/schema.prisma`.
+Single PostgreSQL database with 41 Prisma models. All user data is scoped by `userId`, team data by `teamId`. Cascade deletes remove children. Source of truth: `backend/prisma/schema.prisma`.
 
 ---
 

@@ -12,7 +12,7 @@ The Repo Verify Backend is a RESTful API built to power the Repo Verify platform
 - 📧 Email Verification & Password Reset
 - 📂 GitHub Repository Import, Cloning & Indexing
 - 🧠 RAG-Powered Code Understanding & Semantic Search
-- 🤖 Multi-Agent AI System (LangGraph, 13+ agents)
+- 🤖 Multi-Agent AI System (LangGraph, 12 agents)
 - 🔍 AI Code Review & Bug Detection
 - 🛠️ Automated Debug → Codegen → Security → Performance Pipeline
 - 🛡️ Security Scanning (secrets, vulnerabilities, advisories)
@@ -28,20 +28,20 @@ The Repo Verify Backend is a RESTful API built to power the Repo Verify platform
 | Technology | Purpose |
 |---|---|
 | 🟢 Node.js | Runtime Environment |
-| ⚡ Express.js | Backend Framework |
+| ⚡ Express.js 5 | Backend Framework |
 | 📘 TypeScript | Programming Language |
 | 🐘 PostgreSQL | Database |
-| 🔷 Prisma ORM | Database ORM |
+| 🔷 Prisma 7 ORM | Database ORM (41 models) |
 | 🔑 Better Auth | Authentication (email/password, OAuth, email verification) |
 | 🤖 Google Gemini | AI Services (embeddings + LLM) |
 | 🧠 OpenAI | AI Processing (embeddings + LLM) |
 | 🚀 Groq | AI Inference (LLM) |
-| 🌐 OpenRouter / Cerebras / Together / Mistral / Cohere | Additional LLM providers with automatic failover |
+| 🌐 OpenRouter / Cerebras / Together / Mistral | Additional LLM providers with automatic failover |
 | 🧵 LangGraph / LangChain | Agent Orchestration |
-| 🐙 Octokit | GitHub API Integration |
+| 🐙 Octokit + simple-git | GitHub API & repository cloning |
 | 🐳 Docker | Containerization (pipeline sandbox) |
 | ✉️ Resend | Transactional Email |
-| ✅ Vitest | Testing (304 tests) |
+| ✅ Vitest | Testing (321 tests) |
 
 ## 📂 Project Structure
 
@@ -50,7 +50,7 @@ backend/
 │
 ├── 📁 prisma/                 # Prisma schema & migrations
 ├── 📁 src/
-│   ├── 📁 agents/             # LangGraph agents (planner, retriever, reasoner, ...)
+│   ├── 📁 agents/             # LangGraph agents (planner, retriever, reasoner, answer, ...)
 │   ├── 📁 ai/providers/       # LLM provider router (Gemini, Groq, OpenAI, ...)
 │   ├── 📁 auth/               # Better Auth config, middleware, routes
 │   ├── 📁 controllers/        # HTTP controllers
@@ -62,10 +62,14 @@ backend/
 │   ├── 📁 modules/insights/   # Insights generators & PDF/Markdown export
 │   ├── 📁 parser/             # AST-based repository parsing
 │   ├── 📁 pipeline/           # Debug/Codegen/Security/Performance pipeline + sandbox
+│   ├── 📁 prompts/            # Agent prompt templates
 │   ├── 📁 rag/                # Chunking & context building
 │   ├── 📁 repository/         # Data access repositories
 │   ├── 📁 routes/             # Express route definitions
 │   ├── 📁 services/           # Business logic services
+│   ├── 📁 tools/              # Agent tool definitions
+│   ├── 📁 types/              # Shared TypeScript types
+│   ├── 📁 utils/              # Encryption, API responses, helpers
 │   ├── 📁 validators/         # Zod request validation
 │   ├── 📁 vector/             # pgvector repository
 │   ├── 📁 __tests__/          # Vitest test suites
@@ -73,6 +77,9 @@ backend/
 │   └── index.ts               # Server entry point
 ├── 📦 package.json
 ├── ⚙️ tsconfig.json
+├── ⚙️ prisma.config.ts
+├── ⚙️ vitest.config.ts
+├── 🐳 Dockerfile
 └── 📘 README.md
 ```
 
@@ -140,16 +147,16 @@ The API runs at `http://localhost:3000` (health check: `GET /api/health`).
 
 - 🔐 **Authentication** — `/api/auth` (register, login, logout, verify-email, send-verification-email, request-password-reset, reset-password, session)
 - ❤️ **Health** — `/api/health` (database + memory checks)
-- 🐙 **GitHub** — `/api/github`, `/api/github-integration`, `/api/webhooks`, `/api/ai-pr-assistant`
-- 📂 **Repository Management** — `/api/repository` (import, files, dependency graph, intelligence, documentation generator, semantic search)
-- 💬 **AI Chat** — `/api/chat`, `/api/conversations`
-- 🤖 **Agents** — `/api/agent`, `/api` (multi-agent orchestration)
-- 👤 **User Management** — `/api/user`, `/api/user/preferences`
+- 🐙 **GitHub** — `/api/github` (parse, clone), `/api/github-integrations` (connect, repos, branches, commits, PRs, issues, CI/CD, branch protection), `/api/webhooks`, `/api/github/ai-pr`
+- 📂 **Repository Management** — `/api/repository` (CRUD, analytics, favorite, reindex, analyze) + dependency graph + intelligence + documentation generator + semantic search
+- 💬 **AI Chat** — `/api/chat` (single + stream), `/api/conversations`
+- 🤖 **Agents** — `/api/agent`, `/api/multi-agent` (orchestration, metadata, tools, memory)
+- 👤 **User Management** — `/api/user` (profile, account, password, export, cache, banner), `/api/user/preferences`
 - 🧠 **AI Providers** — `/api/ai-providers`
-- 🛠️ **Pipeline** — `/api` (debug / codegen / security / performance runs)
-- 📊 **Insights** — `/api` (repository insights & health reports)
-- 👥 **Teams** — `/api` (teams, members, comments, activity, team-chat, team-notification, team-analytics)
-- 🛡️ **Admin** — `/api` (users, repositories, AI services, analytics, security, reports, backup, support, settings)
+- 🛠️ **Pipeline** — `/api/pipeline/runs`, `/api/runs` (debug / codegen / security / performance runs)
+- 📊 **Insights** — `/api/insights` (repository insights, refresh, export, report download)
+- 👥 **Teams** — `/api/teams` (members, invitations, repositories, documents, code reviews, test reports) + comments, activities, team-chat, team-notification, team-analytics
+- 🛡️ **Admin** — `/api/admin` (users, repositories, AI stats, analytics, security, docs, reviews, tests, notifications, support, settings, health, activity logs, backups, reports, profile)
 
 ## 🌍 Environment Variables
 
@@ -158,8 +165,19 @@ Create a `.env` file with the required values:
 ```env
 PORT=3000
 NODE_ENV=development
-DATABASE_URL=
-BETTER_AUTH_SECRET=
+
+# Database
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=ai_software_engineering_agent
+POSTGRES_PORT=5432
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ai_software_engineering_agent?schema=public"
+
+# Redis (optional, for distributed rate limiting)
+REDIS_URL=redis://localhost:6379
+
+# Authentication
+BETTER_AUTH_SECRET=change-me-to-a-secure-random-string
 BETTER_AUTH_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:5173
 
@@ -180,12 +198,24 @@ OPENAI_API_KEY=
 CEREBRAS_API_KEY=
 TOGETHER_API_KEY=
 MISTRAL_API_KEY=
-COHERE_API_KEY=
 LLM_PROVIDER_ORDER=gemini,groq,openrouter,openai,cerebras,together,mistral
 
 # Email (Resend)
 RESEND_API_KEY=
 EMAIL_FROM="AI Software Engineering Agent / Repo Verify <onboarding@resend.dev>"
+
+# Frontend
+VITE_API_URL=http://localhost:3000
+
+# Error Tracking (Sentry, optional)
+SENTRY_DSN=
+
+# Logging (debug | info | warn | error)
+LOG_LEVEL=info
+
+# Rate Limiting (requests per minute)
+RATE_LIMIT_MAX=100
+AUTH_RATE_LIMIT_MAX=10
 ```
 
 ## 🧪 Testing
@@ -194,7 +224,7 @@ EMAIL_FROM="AI Software Engineering Agent / Repo Verify <onboarding@resend.dev>"
 npm test
 ```
 
-Runs the Vitest suite (304 tests) covering agents, services, repositories, middleware, RAG, and insights.
+Runs the Vitest suite (321 tests) covering agents, services, repositories, middleware, RAG, and insights.
 
 ## 🤝 Contributors
 

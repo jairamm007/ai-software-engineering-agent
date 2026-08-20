@@ -28,7 +28,7 @@ Most AI coding assistants only autocomplete code. **Repo Verify** operates at th
 | 🗂️ | **Repository Import** | Clone & index any GitHub repo with per-user isolation (no data collisions) |
 | 🧠 | **RAG Code Understanding** | AST parsing → chunking → embeddings (Gemini/OpenAI) → pgvector semantic search |
 | 💬 | **AI Chat** | Multi-turn, context-aware conversations with repository memory |
-| 🤖 | **Multi-Agent Orchestration** | 13+ specialized agents powered by LangGraph with execution timeline & insights |
+| 🤖 | **Multi-Agent Orchestration** | 12 agents (planner, retriever, reasoner + 9 specialized) powered by LangGraph with execution timeline & insights |
 | 🛠️ | **Debug Pipeline** | Run tests → collect failures → diagnose root cause → generate patches → re-test |
 | 🔒 | **Security Scanning** | Secrets, vulnerabilities, and dependency advisories with findings + blocking |
 | ⚡ | **Performance Benchmarks** | Baseline vs. after-patch comparisons (time, memory, query count) |
@@ -38,7 +38,7 @@ Most AI coding assistants only autocomplete code. **Repo Verify** operates at th
 | 📈 | **Insights & Health** | Auto-generated reports + documentation/security/performance/maintainability scores |
 | 🐙 | **GitHub Integration** | Branches, commits, PRs, issues, CI/CD, branch protection, webhooks, AI PR assistant |
 | 👥 | **Team Workspace** | Members & roles, invitations, shared repos, team chat, docs, reviews, analytics |
-| 🛡️ | **Admin Panel** | 20+ pages: users, repos, AI services, analytics, security, reports, backup, support |
+| 🛡️ | **Admin Panel** | 20 pages: users, repos, AI services, analytics, security, reports, backup, support |
 
 ---
 
@@ -69,7 +69,7 @@ Most AI coding assistants only autocomplete code. **Repo Verify** operates at th
 
 ### AI / LLM
 Multi-provider router with automatic failover:
-**Google Gemini · Groq · OpenRouter · OpenAI · Cerebras · Together AI · Mistral · Cohere**
+**Google Gemini · Groq · OpenRouter · OpenAI · Cerebras · Together AI · Mistral**
 
 ### RAG / Vectors
 **AST Parser → Chunker → Embeddings → pgvector similarity search → Context Builder**
@@ -82,7 +82,7 @@ Multi-provider router with automatic failover:
 ai-software-engineering-agent/
 │
 ├── 📁 frontend/            # React + Vite + Tailwind app
-│   ├── 📁 src/pages/       # 180+ pages (Dashboard, Repository, Teams, Admin, ...)
+│   ├── 📁 src/pages/       # 81 page components (Dashboard, Repository, Teams, Admin, ...)
 │   ├── 📁 src/services/    # Typed API layer
 │   ├── 📁 src/context/     # Auth, App, Sidebar, Theme
 │   ├── 📁 src/components/  # Reusable UI & feature components
@@ -91,7 +91,7 @@ ai-software-engineering-agent/
 │   └── 📖 README.md
 │
 ├── 📁 backend/             # Express + Prisma + PostgreSQL API
-│   ├── 📁 prisma/          # Schema & migrations (40 models)
+│   ├── 📁 prisma/          # Schema & migrations (41 models)
 │   ├── 📁 src/
 │   │   ├── 📁 agents/      # LangGraph agents
 │   │   ├── 📁 ai/providers/# LLM provider router
@@ -104,7 +104,6 @@ ai-software-engineering-agent/
 │   │   └── 📁 __tests__/   # Vitest suites
 │   └── 📖 README.md
 │
-├── 📁 shared/              # Shared resources
 ├── 📁 docs/                # Project documentation
 │   ├── 📖 project-overview.md
 │   ├── 📖 requirements.md
@@ -167,7 +166,14 @@ Open **http://localhost:5173** — the Vite dev server proxies `/api` to the bac
 ```env
 PORT=3000
 NODE_ENV=development
-DATABASE_URL=
+
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ai_software_engineering_agent?schema=public"
+
+# Redis (optional, for distributed rate limiting)
+REDIS_URL=redis://localhost:6379
+
+# Authentication
 BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:5173
@@ -189,12 +195,19 @@ OPENAI_API_KEY=
 CEREBRAS_API_KEY=
 TOGETHER_API_KEY=
 MISTRAL_API_KEY=
-COHERE_API_KEY=
 LLM_PROVIDER_ORDER=gemini,groq,openrouter,openai,cerebras,together,mistral
 
 # Email (Resend)
 RESEND_API_KEY=
 EMAIL_FROM="AI Software Engineering Agent / Repo Verify <onboarding@resend.dev>"
+
+# Error tracking (optional) & logging
+SENTRY_DSN=
+LOG_LEVEL=info
+
+# Rate limiting (requests per minute)
+RATE_LIMIT_MAX=100
+AUTH_RATE_LIMIT_MAX=10
 ```
 
 ### Frontend (`frontend/.env`)
@@ -214,12 +227,15 @@ VITE_API_URL=http://localhost:3000   # leave empty in dev (Vite proxy handles /a
 | `/api/auth` | Register, login, verify email, password reset, OAuth |
 | `/api/health` | Health checks (DB + memory) |
 | `/api/repository` | Repos, files, dependency graph, intelligence, docs, semantic search |
-| `/api/github*` | GitHub proxy, integration, webhooks, AI PR assistant |
 | `/api/chat` · `/api/conversations` | AI chat & history |
-| `/api/agent` | Agent / multi-agent execution |
+| `/api/agent` · `/api/multi-agent` | Agent & multi-agent execution |
 | `/api/user` · `/api/user/preferences` | Profile & preferences |
 | `/api/ai-providers` | LLM providers |
-| `/api` | Pipeline (debug/codegen/security/perf), insights, teams, comments, activity, notifications, admin |
+| `/api/github*` · `/api/webhooks` · `/api/github/ai-pr` | GitHub integration, webhooks, AI PR assistant |
+| `/api/pipeline/runs` · `/api/runs` | Pipeline (debug/codegen/security/perf) |
+| `/api/insights` | Repository insights & health reports |
+| `/api/teams` | Teams, members, chat, discussions, docs, reviews, analytics, notifications |
+| `/api/admin` | Admin panel |
 
 Full details: `docs/system-design.md` and `docs/architecture.md`.
 

@@ -21,7 +21,7 @@ The Repo Verify Frontend is a responsive web application built with modern web t
 - 💼 GitHub Integration (PRs, Issues, CI/CD, Webhooks)
 - 👥 Team Collaboration (members, chat, docs, reviews, analytics)
 - 👤 User Profile Management
-- 🛡️ Admin Panel (20+ pages)
+- 🛡️ Admin Panel (20 pages)
 - 📱 Responsive Design
 - ⚡ Fast & Modern User Experience (lazy-loaded routes)
 
@@ -29,20 +29,23 @@ The Repo Verify Frontend is a responsive web application built with modern web t
 
 | Technology | Purpose |
 |---|---|
-| ⚛️ React | Frontend Library |
+| ⚛️ React 19 | Frontend Library |
 | 📘 TypeScript | Programming Language |
-| ⚡ Vite | Build Tool |
-| 🎨 Tailwind CSS | Styling |
-| 🔄 React Router | Routing (lazy-loaded, protected/guest/admin guards) |
-| 📡 Axios | API Communication |
-| 🔍 TanStack Query | Data Fetching & Caching |
+| ⚡ Vite 8 | Build Tool |
+| 🎨 Tailwind CSS 4 | Styling |
+| 🔄 React Router 7 | Routing (lazy-loaded, protected/guest/admin guards) |
+| 📡 Axios + @tanstack/react-query | API Communication & Data Fetching |
 | 📊 Recharts | Charts & Analytics |
 | 🕸️ ReactFlow + dagre | Graph Visualization |
-| 🎞️ framer-motion | Animations |
-| 📝 react-markdown | Markdown Rendering |
+| 🎞️ framer-motion + lenis | Animations & smooth scroll |
+| 📝 react-markdown + remark-gfm | Markdown Rendering |
 | 🔤 react-syntax-highlighter | Code Syntax Highlighting |
 | 🧾 react-hook-form + zod | Forms & Validation |
 | 🔔 sonner | Notifications & Toasts |
+| 📄 jspdf + docx | PDF / Word export |
+| 🔠 lucide-react + react-icons | Icons |
+| 🌗 next-themes | Theming |
+| 🔧 cmdk | Command palette |
 | 📦 npm | Package Manager |
 
 ## 📂 Project Structure
@@ -50,27 +53,28 @@ The Repo Verify Frontend is a responsive web application built with modern web t
 ```
 frontend/
 │
-├── 📁 public/
+├── 📁 public/               # Static assets, icons, manifest, robots.txt, sitemap.xml
 ├── 📁 src/
-│   ├── 📁 components/        # Reusable UI, auth, chat, github, insights, pipeline components
-│   ├── 📁 constants/         # App constants
-│   ├── 📁 context/           # Auth, App, Sidebar, Theme contexts
-│   ├── 📁 hooks/             # Custom hooks
-│   ├── 📁 layouts/           # Public, Dashboard, Repository, Team, Admin, IDE layouts
-│   ├── 📁 lib/               # Auth client, axios, utilities
-│   ├── 📁 pages/             # Page components (Admin, Auth, Chat, Dashboard, GitHub, Info, Insights, Profile, Repository, Runs, Settings, Teams, ...)
-│   ├── 📁 routes/            # Route table
-│   ├── 📁 services/          # Typed API service layer
-│   ├── 📁 store/             # State store
-│   ├── 📁 types/             # TypeScript types
-│   ├── 📁 utils/             # Helpers, file tree builder, file icons
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── router.tsx            # createBrowserRouter with lazy pages
+│   ├── 📁 components/       # Reusable UI, auth, chat, github, insights, pipeline, landing, motion components
+│   ├── 📁 context/          # Auth, Sidebar, Theme contexts
+│   ├── 📁 hooks/            # Custom hooks (useAccent)
+│   ├── 📁 layouts/          # Public, Dashboard, RepositoryWorkspace, Team, Admin layouts
+│   ├── 📁 lib/              # Auth client, axios, error tracking, utils
+│   ├── 📁 pages/            # 81 page components (Admin, Auth, Chat, Dashboard, GitHub, Info, Insights, Profile, Repository, Runs, Settings, Teams, ...)
+│   ├── 📁 services/         # Typed API service layer (22 modules)
+│   ├── 📁 types/            # TypeScript types
+│   ├── 📁 utils/            # Helpers, file tree builder, file icons
+│   ├── main.tsx             # Entry (QueryClient + Theme/Sidebar/Auth providers + RouterProvider)
+│   └── router.tsx           # createBrowserRouter with lazy pages (the route table)
 ├── 📦 package.json
 ├── ⚙️ vite.config.ts
-├── 🎨 tailwind.config.js (via @tailwindcss/vite)
+├── ⚙️ tailwindcss (via @tailwindcss/vite)
 ├── 📘 tsconfig.json
+├── ⚙️ eslint.config.js
+├── ⚙️ components.json       # shadcn/ui config
+├── 🌐 vercel.json
+├── 🐳 Dockerfile
+├── ⚙️ nginx.conf
 └── 📖 README.md
 ```
 
@@ -132,7 +136,7 @@ http://localhost:5173
 
 ## 🌟 Application Modules
 
-- 🎯 **Landing / Public** — marketing pages, FAQ, docs, blog, changelog, support, about, careers, privacy, terms
+- 🎯 **Landing / Public** — landing, FAQ, user guide, docs, blog, changelog, support, about, careers, privacy, terms
 - 🔐 **Authentication** — login, register, email verification, forgot/reset password
 - 🏠 **Dashboard** — overview, search, code review, runs, architecture, documentation, testing, analytics, favorites, history
 - 📂 **Repositories** — list, details, overview, files, chat, review, architecture, documentation, dependency graph, intelligence, doc generator, semantic search, multi-agent, settings

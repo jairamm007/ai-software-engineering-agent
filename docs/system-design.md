@@ -9,8 +9,8 @@ Repo Verify is a full-stack, multi-agent AI software engineering platform. A Rea
 ### Frontend
 - React 19 + TypeScript + Vite + Tailwind CSS 4
 - React Router 7 with lazy loading, Protected/Guest/Admin route guards
-- Layouts: Public, Dashboard, Repository, Team, Admin, IDE Workspace
-- Contexts: Auth (session, verify, password reset, resend verification), App, Sidebar, Theme
+- Layouts: Public, Dashboard, Repository Workspace, Team, Admin
+- Contexts: Auth (session, verify, password reset, resend verification), Sidebar, Theme
 - Typed service layer (`src/services/`) over Axios; Better Auth client
 
 ### Backend
@@ -45,7 +45,7 @@ Repo Verify is a full-stack, multi-agent AI software engineering platform. A Rea
 - Multi-agent orchestration with shared memory, insights, timing
 
 ### AI Providers
-- Router with failover: Gemini, Groq, OpenRouter, OpenAI, Cerebras, Together, Mistral, Cohere
+- Router with failover (7 providers): Gemini, Groq, OpenRouter, OpenAI, Cerebras, Together, Mistral
 - Configurable order via `LLM_PROVIDER_ORDER`
 
 ### Pipeline
@@ -63,7 +63,7 @@ Repo Verify is a full-stack, multi-agent AI software engineering platform. A Rea
 - Team chat, discussions/comments, docs, code reviews, testing, analytics, activity, notifications
 
 ### Admin Panel
-- 20+ pages: dashboard, users, repositories, AI services, analytics, security, notifications, reports, settings, admins, documentation, code reviews, testing, search, activity logs, backup, support, profile
+- 20 pages: dashboard, users, repositories, AI services, analytics, security, notifications, reports, settings, admins, documentation, code reviews, testing, search, activity logs, backup, support, profile
 
 ### Email (Resend)
 - Verification + password reset emails
@@ -89,7 +89,7 @@ Environment variables required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AU
 
 ## Testing & Quality
 
-- Vitest backend suite: 304 tests (agents, services, repositories, middleware, RAG, insights)
+- Vitest backend suite: 321 tests (agents, services, repositories, middleware, RAG, insights)
 - Frontend: ESLint clean, TypeScript strict, production build passes
 - Health endpoint: DB connectivity + memory usage
 

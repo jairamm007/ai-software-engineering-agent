@@ -166,7 +166,7 @@ The **AI Chat** page is your assistant for anything code-related.
 
 - **Rename** a conversation (click the pencil icon, press **Enter** to save, **Esc** to cancel).
 - **Delete** a conversation.
-- **Export** a conversation as a **PDF** or **Word** document.
+- **Export** a conversation as **plain text, PDF, Markdown, or Word** document.
 - **Generate test files** for code the AI produces, right from the chat.
 
 ---

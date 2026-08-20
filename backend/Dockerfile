@@ -5,9 +5,9 @@ WORKDIR /app
 # Install build tools for native modules
 RUN apk add --no-cache python3 make g++
 
-# Install dependencies
+# Install dependencies (including dev for build; pruned below)
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # Copy source
 COPY prisma ./prisma/

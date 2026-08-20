@@ -62,14 +62,26 @@ Key cross-cutting concerns are applied in `app.ts` middleware:
 |---|---|
 | `/api/auth` | Better Auth (login, register, verify-email, send-verification-email, request-password-reset, reset-password, session) |
 | `/api/health` | Health checks (DB + memory) |
-| `/api/github` | GitHub proxy (repos, branches, commits, PRs, issues) |
-| `/api/repository` | Repositories + dependency graph + intelligence + doc generator + semantic search |
-| `/api/chat` | AI chat |
-| `/api/conversations` | Conversation/message persistence |
+| `/api/github` | GitHub proxy (parse URL, clone repository) |
+| `/api/repository` | Repositories CRUD + analytics + reindex + favorite + dependency graph + intelligence + doc generator + semantic search |
+| `/api/chat` | AI chat (single + streaming) |
+| `/api/conversations` | Conversation/message persistence (list, get, create, rename, delete) |
 | `/api/agent` | Agent execution |
-| `/api/user`, `/api/user/preferences` | User profile and preferences |
+| `/api/user` | Profile, account, change-password, data export, clear cache, banner upload |
+| `/api/user/preferences` | User preferences (default model, temperature, theme, accent) |
 | `/api/ai-providers` | Available LLM providers + settings |
-| `/api` (multi-agent, team, comment, activity, team-chat, team-notification, team-analytics, github-integration, webhook, ai-pr-assistant, admin, pipeline, insights) | Remaining business modules |
+| `/api/multi-agent` | Multi-agent orchestration, agent metadata, tools, memory |
+| `/api/teams` | Teams, members, invitations, repositories, documents, code reviews, test reports |
+| `/api/teams/:teamId/comments`, `/api/teams/:teamId/activities` | Discussions & activity feed |
+| `/api/teams/:teamId/chats` | Team AI chat |
+| `/api/teams/:teamId/notifications`, `/api/notifications` | Team notifications |
+| `/api/teams/:teamId/analytics` | Team analytics |
+| `/api/github-integrations` | GitHub OAuth/PAT connect, repos, branches, commits, PRs, issues, CI/CD, branch protection |
+| `/api/webhooks` | GitHub webhook ingestion + event list |
+| `/api/github/ai-pr` | AI PR assistant (description, review, title) |
+| `/api/admin` | Admin panel (users, repos, AI stats, analytics, security, docs, reviews, tests, notifications, support, settings, health, activity logs, backups, reports, profile) |
+| `/api/pipeline/runs`, `/api/runs` | Debug/Codegen/Security/Performance pipeline |
+| `/api/insights` | Repository insights, refresh, export, report download |
 
 ## AI / Agent Subsystem
 
@@ -82,7 +94,7 @@ Query / Task
                             security, architecture, documentation, commit-message, pull-request)
    -> Agent Executor (memory, insights, tool calling, timing trace)
    -> LLM Provider Router (Gemini / Groq / OpenRouter / OpenAI / Cerebras /
-                           Together / Mistral / Cohere) with failover
+                            Together / Mistral) with failover
 ```
 
 ### Agents (backend `src/agents/`)
@@ -141,13 +153,13 @@ Sandbox utilities: `docker.ts`, `test-runner.ts`, `repo.ts`, `diff.ts`, `stack-d
 ## Frontend Architecture
 
 - `src/router.tsx` — single `createBrowserRouter` with lazy-loaded pages
-  - Public routes (`PublicLayout`): `/`, `/faq`, `/docs`, `/blog`, `/changelog`, `/support`, `/about`, `/careers`, `/privacy`, `/terms`
+  - Public routes (`PublicLayout`): `/`, `/landing`, `/faq`, `/user-guide`, `/docs`, `/blog`, `/changelog`, `/support`, `/about`, `/careers`, `/privacy`, `/terms`
   - Guest routes: `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`
-  - Protected routes (`ProtectedRoute`): dashboard, chat, runs, repositories, teams, insights, profile, settings, etc.
-  - Admin routes (`AdminRoute`): `/admin/*` (20+ pages)
-- Layouts: `PublicLayout`, `AdminLayout`, `TeamLayout`, `RepositoryLayout`, `DashboardLayout`, `IDEWorkspaceLayout`, `MainLayout`
-- State: `AuthContext` (session + callbacks), `AppContext`, `SidebarContext`, `ThemeContext`
-- Data access: typed service modules under `src/services/` + `axios`
+  - Protected routes (`ProtectedRoute`): dashboard, search, chat, code-review, runs, architecture, documentation, testing, analytics, favorites, history, settings, profile, github, teams, repositories, insights, etc.
+  - Admin routes (`AdminRoute`): `/admin/*` (20 pages) with `AdminLayout`
+- Layouts: `PublicLayout`, `AdminLayout`, `TeamLayout`, `DashboardLayout`, `RepositoryWorkspaceLayout`
+- State: `AuthContext` (session + callbacks), `SidebarContext`, `ThemeContext`
+- Data access: typed service modules under `src/services/` + `axios` + `@tanstack/react-query`
 
 ## Authentication Flow
 
