@@ -11,7 +11,8 @@
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:report": "vitest run --outputFile=test-results.json && echo 'Test report generated'"
+    "test:report": "vitest run --outputFile=test-results.json && echo 'Test report generated'",
+    "migrate": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
