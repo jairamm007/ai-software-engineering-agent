@@ -37,6 +37,10 @@ import insightsRoutes from "./modules/insights/insights.routes.js";
 
 const app = express();
 
+if (process.env.TRUST_PROXY === "true") {
+  app.set("trust proxy", 1);
+}
+
 app.use(compression({
   level: 6,
   threshold: 1024,

@@ -114,8 +114,8 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "asea",
     defaultCookieAttributes: {
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production" && process.env.TRUST_PROXY === "true",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
       // In development, frontend (port 5173) and backend (port 3000) are on different ports.
       // Setting domain to "localhost" makes session cookies work across both ports.
