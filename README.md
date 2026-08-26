@@ -2,6 +2,9 @@
 
 > 💡 An AI-powered, multi-agent platform that understands complete GitHub repositories, reviews code, detects bugs, finds security vulnerabilities, generates documentation and tests, maps architecture, and helps developers ship faster — like an intelligent teammate.
 
+**🌐 Frontend:** https://asea-frontend.onrender.com
+**🌐 Backend:** https://asea-backend.onrender.com
+
 **🧰 Stack:** React 19 · TypeScript · Vite 8 · Tailwind CSS 4 · Express 5 · PostgreSQL · Prisma 7 · Better Auth · Gemini · OpenAI · Groq · 321 tests passing
 
 ---
@@ -143,7 +146,7 @@ npm install
 cp .env.example .env     # add your keys (see below)
 npx prisma generate
 npx prisma migrate dev
-npm run dev              # → http://localhost:3000
+npm run dev              # → https://asea-backend.onrender.com
 ```
 
 ### 3️⃣ Frontend
@@ -152,10 +155,10 @@ npm run dev              # → http://localhost:3000
 cd frontend
 npm install
 cp .env.example .env
-npm run dev              # → http://localhost:5173
+npm run dev              # → https://asea-frontend.onrender.com
 ```
 
-Open **http://localhost:5173** — the Vite dev server proxies `/api` to the backend automatically.
+Open **https://asea-frontend.onrender.com** — the Vite dev server proxies `/api` to the backend automatically.
 
 ---
 
@@ -175,8 +178,8 @@ REDIS_URL=redis://localhost:6379
 
 # Authentication
 BETTER_AUTH_SECRET=
-BETTER_AUTH_URL=http://localhost:3000
-FRONTEND_URL=http://localhost:5173
+BETTER_AUTH_URL=https://asea-backend.onrender.com
+FRONTEND_URL=https://asea-frontend.onrender.com
 
 # OAuth (optional)
 GOOGLE_CLIENT_ID=
@@ -213,7 +216,7 @@ AUTH_RATE_LIMIT_MAX=10
 ### Frontend (`frontend/.env`)
 
 ```env
-VITE_API_URL=http://localhost:3000   # leave empty in dev (Vite proxy handles /api)
+VITE_API_URL=https://asea-backend.onrender.com   # leave empty in dev (Vite proxy handles /api)
 ```
 
 > 📌 **Email note:** Resend's test sender (`onboarding@resend.dev`) only delivers to the email that owns the Resend account. For production, verify a domain at resend.com and update `EMAIL_FROM`.

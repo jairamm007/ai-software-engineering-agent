@@ -2,6 +2,8 @@
 
 💡 An AI-powered backend that powers the Repo Verify platform. It provides secure authentication, GitHub repository analysis, RAG-powered code understanding, multi-agent AI orchestration, automated debug/codegen/security/performance pipelines, repository insights, team collaboration, and email notifications.
 
+**🌐 Backend URL:** https://asea-backend.onrender.com
+
 ## 📖 Overview
 
 The Repo Verify Backend is a RESTful API built to power the Repo Verify platform. It securely manages authentication, GitHub repository import & indexing, AI-driven code analysis, multi-agent orchestration, semantic search over codebases, automated pipelines, repository insights, team collaboration, and transactional email.
@@ -141,7 +143,7 @@ npx prisma db push
 npm run dev
 ```
 
-The API runs at `http://localhost:3000` (health check: `GET /api/health`).
+The API runs at `https://asea-backend.onrender.com` (health check: `GET /api/health`).
 
 ## 📡 API Modules
 
@@ -178,8 +180,8 @@ REDIS_URL=redis://localhost:6379
 
 # Authentication
 BETTER_AUTH_SECRET=change-me-to-a-secure-random-string
-BETTER_AUTH_URL=http://localhost:3000
-FRONTEND_URL=http://localhost:5173
+BETTER_AUTH_URL=https://asea-backend.onrender.com
+FRONTEND_URL=https://asea-frontend.onrender.com
 
 # OAuth
 GOOGLE_CLIENT_ID=
@@ -205,7 +207,7 @@ RESEND_API_KEY=
 EMAIL_FROM="AI Software Engineering Agent / Repo Verify <onboarding@resend.dev>"
 
 # Frontend
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=https://asea-backend.onrender.com
 
 # Error Tracking (Sentry, optional)
 SENTRY_DSN=

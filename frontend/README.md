@@ -2,6 +2,8 @@
 
 💡 A modern, AI-powered frontend application that lets developers import GitHub repositories, chat with their codebase, review code, generate documentation, analyze architecture, run automated pipelines, and collaborate with teams through an intuitive user interface.
 
+**🌐 Frontend URL:** https://asea-frontend.onrender.com
+
 ## 📖 Overview
 
 The Repo Verify Frontend is a responsive web application built with modern web technologies. It provides developers with an interactive workspace to import repositories, view AI-powered analysis and recommendations, inspect architecture and dependency graphs, run debug/codegen/security/performance pipelines, explore repository insights, manage teams, and administer the platform.
@@ -86,7 +88,7 @@ Before running the project, install:
 - ✅ Node.js (LTS)
 - ✅ npm
 - ✅ Visual Studio Code (Recommended)
-- ✅ Backend running on `http://localhost:3000`
+- ✅ Backend running on `https://asea-backend.onrender.com`
 
 ## 📥 Installation
 
@@ -115,10 +117,10 @@ Create a `.env` file in the project root and add the required environment variab
 Example:
 
 ```env
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=https://asea-backend.onrender.com
 ```
 
-> In development, you can leave `VITE_API_URL` empty — the Vite dev server proxies `/api` requests to `http://localhost:3000`.
+> In development, you can leave `VITE_API_URL` empty — the Vite dev server proxies `/api` requests to `https://asea-backend.onrender.com`.
 
 ### 5️⃣ Start the Development Server
 
@@ -131,7 +133,7 @@ npm run dev
 Open your browser and visit:
 
 ```
-http://localhost:5173
+https://asea-frontend.onrender.com
 ```
 
 ## 🌟 Application Modules
@@ -153,7 +155,7 @@ http://localhost:5173
 Create a `.env` file with the required values:
 
 ```env
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=https://asea-backend.onrender.com
 ```
 
 ## 🔨 Production Build
