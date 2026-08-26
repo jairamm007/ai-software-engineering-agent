@@ -4,9 +4,13 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 function createAdapter() {
+  const connectionString = process.env.DATABASE_URL!;
+  const needsSSL = connectionString.includes("sslmode=");
+
   return new PrismaPg({
-    connectionString: process.env.DATABASE_URL!,
+    connectionString,
     max: 20,
+    ...(needsSSL ? { ssl: { rejectUnauthorized: false } } : {}),
   });
 }
 
