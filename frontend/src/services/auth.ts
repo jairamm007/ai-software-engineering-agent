@@ -5,6 +5,11 @@ const FRONTEND_URL = window.location.origin;
 const BACKEND_URL = import.meta.env.VITE_API_URL || "";
 
 function mapUser(data: Record<string, unknown>): User {
+  const emailVerifiedRaw = data.emailVerified;
+  const emailVerified = emailVerifiedRaw instanceof Date
+    ? emailVerifiedRaw.getTime() > 0
+    : Boolean(emailVerifiedRaw);
+
   return {
     id: data.id as string,
     name: data.name as string,
@@ -16,7 +21,7 @@ function mapUser(data: Record<string, unknown>): User {
     linkedinUrl: data.linkedinUrl as string | undefined,
     githubUrl: data.githubUrl as string | undefined,
     portfolioUrl: data.portfolioUrl as string | undefined,
-    emailVerified: data.emailVerified as boolean,
+    emailVerified,
     createdAt: (data.createdAt as string) ?? new Date().toISOString(),
   };
 }
@@ -29,16 +34,19 @@ export async function apiLogin(credentials: LoginCredentials): Promise<{ user: U
   });
 
   if (error) {
-    throw new Error(error.message || "Invalid email or password");
+    const message = (error as { message?: string; error?: { message?: string } }).message
+      || (error as { error?: { message?: string } }).error?.message
+      || "Invalid email or password";
+    throw new Error(message);
   }
 
-  if (!data) {
-    throw new Error("Login failed");
+  if (!data?.user) {
+    throw new Error("Login failed — no user data returned");
   }
 
   return {
     user: mapUser(data.user as Record<string, unknown>),
-    token: data.token ?? "",
+    token: (data as { token?: string }).token ?? "",
   };
 }
 
@@ -50,16 +58,19 @@ export async function apiRegister(data: RegisterData): Promise<{ user: User; tok
   });
 
   if (error) {
-    throw new Error(error.message || "Registration failed");
+    const message = (error as { message?: string; error?: { message?: string } }).message
+      || (error as { error?: { message?: string } }).error?.message
+      || "Registration failed";
+    throw new Error(message);
   }
 
-  if (!result) {
-    throw new Error("Registration failed");
+  if (!result?.user) {
+    throw new Error("Registration failed — no user data returned");
   }
 
   return {
     user: mapUser(result.user as Record<string, unknown>),
-    token: result.token ?? "",
+    token: (result as { token?: string }).token ?? "",
   };
 }
 
@@ -70,7 +81,10 @@ export async function apiLoginWithGoogle(callbackURL?: string): Promise<{ user: 
   });
 
   if (error) {
-    throw new Error(error.message || "Google sign-in failed");
+    const message = (error as { message?: string; error?: { message?: string } }).message
+      || (error as { error?: { message?: string } }).error?.message
+      || "Google sign-in failed";
+    throw new Error(message);
   }
 
   if (data?.url) {
@@ -88,7 +102,10 @@ export async function apiLoginWithGithub(callbackURL?: string): Promise<{ user: 
   });
 
   if (error) {
-    throw new Error(error.message || "GitHub sign-in failed");
+    const message = (error as { message?: string; error?: { message?: string } }).message
+      || (error as { error?: { message?: string } }).error?.message
+      || "GitHub sign-in failed";
+    throw new Error(message);
   }
 
   if (data?.url) {
@@ -101,9 +118,9 @@ export async function apiLoginWithGithub(callbackURL?: string): Promise<{ user: 
 
 export async function apiGetSession(): Promise<{ user: User; token: string } | null> {
   try {
-    const { data } = await authClient.getSession();
+    const { data, error } = await authClient.getSession();
 
-    if (!data?.session || !data.user) return null;
+    if (error || !data?.session || !data.user) return null;
 
     return {
       user: mapUser(data.user as Record<string, unknown>),
@@ -119,8 +136,9 @@ export async function apiLogout(): Promise<void> {
 }
 
 export async function apiForgotPassword(email: string): Promise<void> {
-  const res = await fetch(`${BACKEND_URL}/api/auth/request-password-reset`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/forget-password`, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       email,
@@ -130,30 +148,45 @@ export async function apiForgotPassword(email: string): Promise<void> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error((body as { error?: string }).error || "Failed to send reset email");
+    const message = (body as { message?: string; error?: string }).message
+      || (body as { error?: string }).error
+      || "Failed to send reset email";
+    throw new Error(message);
   }
 }
 
 export async function apiResetPassword(token: string, newPassword: string): Promise<void> {
-  const { error } = await authClient.resetPassword({
-    token,
-    newPassword,
+  const res = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, newPassword }),
   });
 
-  if (error) {
-    throw new Error(error.message || "Failed to reset password");
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const message = (body as { message?: string; error?: string }).message
+      || (body as { error?: string }).error
+      || "Failed to reset password";
+    throw new Error(message);
   }
 }
 
 export async function apiVerifyEmail(token: string): Promise<void> {
-  const res = await fetch(`${BACKEND_URL}/api/auth/verify-email?token=${encodeURIComponent(token)}`, {
+  const url = new URL(`${BACKEND_URL}/api/auth/verify-email`);
+  url.searchParams.set("token", token);
+
+  const res = await fetch(url.toString(), {
     method: "GET",
     credentials: "include",
   });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error((body as { error?: string }).error || "Verification failed");
+    const message = (body as { message?: string; error?: string }).message
+      || (body as { error?: string }).error
+      || "Verification failed";
+    throw new Error(message);
   }
 }
 
@@ -162,12 +195,18 @@ export async function apiResendVerificationEmail(email: string): Promise<void> {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({
+      email,
+      callbackURL: `${window.location.origin}/verify-email`,
+    }),
   });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error((body as { error?: string }).error || "Failed to resend verification email");
+    const message = (body as { message?: string; error?: string }).message
+      || (body as { error?: string }).error
+      || "Failed to resend verification email";
+    throw new Error(message);
   }
 }
 

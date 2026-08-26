@@ -26,7 +26,7 @@ export async function requireAdmin(req: AuthRequest, res: Response, next: NextFu
       res.status(401).json({ success: false, error: "Unauthorized" });
       return;
     }
-    if (session.user.role !== "admin") {
+    if ((session.user as Record<string, unknown>).role !== "admin") {
       res.status(403).json({ success: false, error: "Forbidden: Admin access required" });
       return;
     }

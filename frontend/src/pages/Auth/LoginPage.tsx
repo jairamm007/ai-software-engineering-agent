@@ -38,7 +38,19 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    const urlError = params.get("error");
+    if (urlError) {
+      const errorMessages: Record<string, string> = {
+        account_not_linked: "An account with this email already exists. Please sign in with your email and password.",
+        auth_error: "Authentication failed. Please try again.",
+        access_denied: "Access was denied. Please try again.",
+      };
+      return errorMessages[urlError] || `Authentication error: ${urlError}`;
+    }
+    return "";
+  });
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSent, setResendSent] = useState(false);
