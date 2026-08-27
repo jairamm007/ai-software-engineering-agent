@@ -29,7 +29,7 @@ FROM node:22-alpine AS production
 
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init curl
+RUN apk add --no-cache dumb-init curl git ca-certificates
 
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/dist ./dist

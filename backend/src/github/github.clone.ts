@@ -15,7 +15,14 @@ export const cloneRepository = async (
 
   const clonePath = path.resolve(tempDir, uniqueFolder);
 
-  await git.clone(repoUrl, clonePath);
+  try {
+    await git.clone(repoUrl, clonePath);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new Error("Git is unavailable in the backend runtime. Install Git and redeploy the backend.");
+    }
+    throw error;
+  }
 
   return clonePath;
 };
