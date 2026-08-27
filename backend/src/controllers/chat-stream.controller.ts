@@ -96,6 +96,7 @@ export const chatStreamController = async (
       // Send completion event
       res.write(`data: ${JSON.stringify({
         type: "done",
+        conversationId: convId,
         messageType: typeInfo,
         source: sourceInfo,
       })}\n\n`);
@@ -119,6 +120,10 @@ export const chatStreamController = async (
         errorResponse(error instanceof Error ? error.message : "Internal Server Error")
       );
     }
+    res.write(`data: ${JSON.stringify({
+      type: "error",
+      message: error instanceof Error ? error.message : "Internal Server Error",
+    })}\n\n`);
     res.end();
   }
 };

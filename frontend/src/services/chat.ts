@@ -1,4 +1,4 @@
-import api from "@/lib/axios";
+import api, { API_BASE_URL } from "@/lib/axios";
 import type { Conversation, StreamEvent } from "@/types/chat";
 
 interface AskRepositoryInput {
@@ -74,7 +74,7 @@ export const streamChat = async ({
 }: StreamChatInput): Promise<void> => {
   let response: Response;
   try {
-    response = await fetch("/api/chat/stream", {
+    response = await fetch(`${API_BASE_URL}/chat/stream`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -102,10 +102,16 @@ export const streamChat = async ({
 
   const decoder = new TextDecoder();
   let buffer = "";
+  let completed = false;
 
   while (true) {
     const { done, value } = await reader.read();
-    if (done) break;
+    if (done) {
+      if (!completed && !signal?.aborted) {
+        onError("The analysis service ended the response unexpectedly");
+      }
+      break;
+    }
 
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split("\n");
@@ -123,6 +129,7 @@ export const streamChat = async ({
             if (event.token) onToken(event.token);
             break;
           case "done":
+            completed = true;
             onDone({
               conversationId: event.conversationId ?? "",
               messageType: event.messageType ?? "answer",
