@@ -1,8 +1,9 @@
 import type { User, LoginCredentials, RegisterData } from "@/types/auth";
 import { authClient } from "@/lib/auth-client";
+import { API_ORIGIN } from "@/lib/axios";
 
 const FRONTEND_URL = window.location.origin;
-const BACKEND_URL = import.meta.env.VITE_API_URL || "";
+const BACKEND_URL = API_ORIGIN;
 
 function mapUser(data: Record<string, unknown>): User {
   const emailVerifiedRaw = data.emailVerified;
