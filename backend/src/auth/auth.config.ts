@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { bearer } from "better-auth/plugins";
 import { prisma } from "../database/prisma.js";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../services/email/email.service.js";
 
@@ -37,6 +38,10 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
 export const auth = betterAuth({
   baseURL: backendUrl,
   trustedOrigins: [frontendUrl, backendUrl, "http://localhost:80", "http://localhost"],
+  // Keep cookie sessions as the primary transport, while allowing authenticated
+  // API calls from a separately deployed frontend when a browser blocks its
+  // cross-origin cookie.
+  plugins: [bearer()],
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),

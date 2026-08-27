@@ -18,6 +18,7 @@ import {
   apiUploadBanner,
   apiRemoveBanner,
 } from "@/services/auth";
+import { saveSessionToken } from "@/lib/axios";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -33,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!cancelled && session) {
           setUser(session.user);
           setToken(session.token);
+          saveSessionToken(session.token);
         }
       })
       .finally(() => {
@@ -45,12 +47,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await apiLogin(credentials);
     setUser(result.user);
     setToken(result.token);
+    saveSessionToken(result.token);
   }, []);
 
   const register = useCallback(async (data: RegisterData) => {
     const result = await apiRegister(data);
     setUser(result.user);
     setToken(result.token);
+    saveSessionToken(result.token);
     return result.user;
   }, []);
 
@@ -58,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await apiLogout();
     setUser(null);
     setToken(null);
+    saveSessionToken(null);
   }, []);
 
   const forgotPassword = useCallback(async (email: string) => {
@@ -74,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (session) {
       setUser(session.user);
       setToken(session.token);
+      saveSessionToken(session.token);
     }
   }, []);
 
@@ -122,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // User and session are already deleted server-side — just clear local state
     setUser(null);
     setToken(null);
+    saveSessionToken(null);
   }, []);
 
   const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
